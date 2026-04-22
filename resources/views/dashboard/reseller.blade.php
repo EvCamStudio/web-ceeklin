@@ -5,16 +5,6 @@
     <x-slot:topbarTitle>BERANDA</x-slot:topbarTitle>
     <x-slot:menuSlot>@include('dashboard.reseller._menu')</x-slot:menuSlot>
 
-    {{-- Banner Peringatan Order --}}
-    {{-- BACKEND-TODO: Tampilkan hanya jika ada countdown aktif dari CampaignController --}}
-    <div class="w-full bg-secondary border-b-[3px] border-gray-900 px-6 py-2.5 flex items-center justify-between mb-6 -mt-6 -mx-6 sticky top-0 z-10" style="width: calc(100% + 3rem);">
-        <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            <span class="font-headline font-bold text-white text-xs uppercase tracking-tight">⚠ Waktu tersisa: 48 Jam untuk Order Minimal 50pcs!</span>
-        </div>
-        <span class="font-headline font-black text-white text-lg tabular-nums tracking-tighter">47:59:59</span>
-    </div>
-
     {{-- KPI Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-darkest)] p-6">
@@ -39,7 +29,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         {{-- Aksi Cepat --}}
-        <div class="grid grid-cols-3 xl:grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4">
             <a href="/dashboard/reseller/earnings"
                class="bg-white border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex flex-col xl:flex-row items-center gap-3 hover:bg-neutral-light transition-colors group">
                 <div class="w-10 h-10 bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -80,11 +70,11 @@
                 </div>
                 <div>
                     {{-- BACKEND-TODO: Link WA dari distributor->whatsapp_number --}}
-                    <button type="button" aria-label="Hubungi distributor via WhatsApp"
+                    <a href="https://wa.me/628xxxxxxxxxx" target="_blank" aria-label="Hubungi distributor via WhatsApp"
                         class="w-full bg-secondary text-white px-4 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         Hubungi WhatsApp
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

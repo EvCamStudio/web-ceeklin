@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Galeri Hasil - CEEKLIN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-neutral font-body text-gray-900 antialiased min-h-screen flex flex-col overflow-x-hidden">
@@ -17,7 +18,7 @@
             <a href="{{ route('gallery') }}" class="text-[10px] font-bold uppercase tracking-widest text-primary border-b-2 border-primary pb-1 transition-all duration-300 hover:-translate-y-0.5">GALERI</a>
             <a href="{{ route('contact') }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 pb-1">KONTAK</a>
         </x-slot:links>
-        <a href="/login" class="hidden md:inline-flex font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">PORTAL LOGIN</a>
+        <a href="/login" class="w-full md:w-auto font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300 text-center">PORTAL LOGIN</a>
     </x-layouts.navbar>
 
     <main class="flex-grow">

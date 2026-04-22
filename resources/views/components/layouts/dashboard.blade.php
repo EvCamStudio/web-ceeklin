@@ -13,6 +13,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard - CEEKLIN Portal</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* App Shell: kunci viewport agar sidebar selalu diam */
@@ -40,11 +41,11 @@
     </style>
 </head>
 {{-- h-full + overflow-hidden mengunci frame agar tidak ada page scroll --}}
-<body class="bg-neutral antialiased h-full overflow-hidden">
+<body class="bg-neutral antialiased h-full overflow-hidden" x-data="{ sidebarOpen: false }">
 <div class="h-full flex font-body text-gray-900">
 
-    {{-- ===== SIDEBAR (diam, tidak pernah bergerak) ===== --}}
-    <aside class="w-64 flex-shrink-0 flex flex-col h-full {{ $sidebarClasses }}">
+    {{-- ===== SIDEBAR (Desktop: Visible lg+) ===== --}}
+    <aside class="hidden lg:flex w-64 flex-shrink-0 flex-col h-full {{ $sidebarClasses }}">
         {{-- Logo Area --}}
         <div class="h-20 flex-shrink-0 flex items-center px-6 border-b-2 border-neutral-border">
             <div class="flex flex-col">
@@ -55,54 +56,91 @@
             </div>
         </div>
 
-        {{-- Navigation: flex-1 + overflow-y-auto agar menu bisa scroll jika banyak --}}
+        {{-- Navigation --}}
         <nav class="flex-1 overflow-y-auto py-2 flex flex-col" aria-label="Navigasi Dashboard">
             {{ $menuSlot ?? '' }}
         </nav>
     </aside>
 
-    {{-- ===== MAIN CONTENT WRAPPER (topbar diam, hanya <main> yang scroll) ===== --}}
+    {{-- ===== SIDEBAR (Mobile: Drawer) ===== --}}
+    <div x-show="sidebarOpen" 
+         class="fixed inset-0 z-[100] lg:hidden" 
+         style="display: none;"
+         @keydown.escape.window="sidebarOpen = false">
+        {{-- Backdrop --}}
+        <div x-show="sidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm"
+             @click="sidebarOpen = false"></div>
+
+        {{-- Drawer Content --}}
+        <div x-show="sidebarOpen"
+             x-transition:enter="transition ease-in-out duration-300 transform"
+             x-transition:enter-start="-translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in-out duration-300 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="-translate-x-full"
+             class="relative flex w-full max-w-xs flex-1 flex-col h-full {{ $sidebarClasses }} shadow-[10px_0_0_var(--color-primary)]">
+            
+            <div class="h-20 flex-shrink-0 flex items-center justify-between px-6 border-b-2 border-neutral-border">
+                <div class="flex flex-col">
+                    <span class="font-headline font-black text-2xl tracking-tight {{ $isDarkSidebar ? 'text-white' : 'text-primary' }}">
+                        CEEKLIN
+                    </span>
+                </div>
+                <button @click="sidebarOpen = false" class="text-white bg-gray-900 p-1.5 border-2 border-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-4" @click="sidebarOpen = false">
+                {{ $menuSlot ?? '' }}
+            </nav>
+        </div>
+    </div>
+
+    {{-- ===== MAIN CONTENT WRAPPER ===== --}}
     <div class="flex-1 flex flex-col min-w-0 h-full">
 
-        {{-- Alert Banner (Optional) --}}
-        {{ $alertBannerSlot ?? '' }}
+        {{-- Topbar --}}
+        <header class="h-20 flex-shrink-0 flex items-center justify-between px-4 md:px-8 border-b-2 border-neutral-border bg-neutral">
+            <div class="flex items-center gap-4">
+                {{-- Hamburger Button (Mobile) --}}
+                <button @click="sidebarOpen = true" class="lg:hidden bg-primary text-white p-2 border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
 
-        {{-- TOPBAR — diam, flex-shrink-0 agar tidak tertekan --}}
-        <header class="h-20 flex-shrink-0 flex items-center justify-between px-8 border-b-2 border-neutral-border bg-neutral">
-            <h2 class="font-headline text-xl font-black text-primary uppercase tracking-widest">
-                {{ $topbarTitle ?? 'DASHBOARD OVERVIEW' }}
-            </h2>
+                <h2 class="font-headline text-sm md:text-xl font-black text-primary uppercase tracking-widest leading-none">
+                    {{ $topbarTitle ?? 'DASHBOARD' }}
+                </h2>
+            </div>
 
-            <div class="flex items-center gap-6">
-                {{-- Search --}}
-                <div class="relative hidden md:block border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]">
-                    <input type="text" placeholder="Search..." aria-label="Search dashboard"
-                        class="w-56 bg-white border-none px-4 py-2 font-body text-sm font-bold text-primary focus:ring-0 focus:outline-none placeholder:text-primary/40">
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
+            <div class="flex items-center gap-3 md:gap-6">
+                {{-- Search (Hidden on small mobile) --}}
+                <div class="relative hidden sm:block border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]">
+                    <input type="text" placeholder="Search..." class="w-32 md:w-56 bg-white border-none px-4 py-2 font-body text-xs md:text-sm font-bold text-primary focus:ring-0 focus:outline-none">
                 </div>
 
                 {{-- Notif + Avatar --}}
-                <div class="flex items-center gap-5 text-primary">
-                    <button class="hover:text-secondary transition-colors duration-150" aria-label="Notifikasi">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
+                <div class="flex items-center gap-3 md:gap-5 text-primary">
+                    <button class="hover:text-secondary transition-colors" aria-label="Notifikasi">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     </button>
-                    {{-- BACKEND-TODO: Ganti 'A' dengan initial dari Auth::user()->name --}}
-                    <div class="w-10 h-10 bg-primary border-[3px] border-gray-900 text-white flex items-center justify-center font-headline font-black text-base shadow-[4px_4px_0_var(--color-gray-900)] cursor-pointer hover:bg-primary-hover transition-colors duration-150" aria-label="Profil pengguna">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-primary border-[2px] md:border-[3px] border-gray-900 text-white flex items-center justify-center font-headline font-black text-xs md:text-base shadow-[3px_3px_0_var(--color-gray-900)]">
                         A
                     </div>
                 </div>
             </div>
         </header>
 
-        {{-- SCROLLABLE CONTENT AREA — hanya bagian ini yang bergerak --}}
-        <main class="dash-main flex-1 overflow-y-auto p-8">
-            {{-- Wrapper dengan animasi masuk (fade + slide subtle) setiap navigasi --}}
+        {{-- SCROLLABLE CONTENT AREA --}}
+        <main class="dash-main flex-1 overflow-y-auto p-4 md:p-8">
             <div class="dash-content-enter">
                 {{ $slot }}
             </div>

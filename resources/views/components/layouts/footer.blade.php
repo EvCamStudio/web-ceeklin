@@ -20,8 +20,8 @@
         </div>
     </footer>
 @elseif($variant === 'simple')
-    <footer class="w-full bg-gray-900 border-t-2 border-primary py-4 px-8 md:px-12 flex justify-between items-center text-secondary-dark text-[9px] font-bold uppercase tracking-[0.2em] z-40">
+    <footer class="w-full bg-gray-900 border-t-2 border-primary py-6 px-8 md:px-12 flex flex-col md:flex-row justify-between items-center gap-2 text-secondary-dark text-[9px] font-bold uppercase tracking-[0.2em] z-40 text-center md:text-left">
         <div>CEEKLIN INDUSTRIAL</div>
-        <div>&copy; 2024 CEEKLIN</div>
+        <div class="opacity-50">&copy; 2024 CEEKLIN OFFICIAL</div>
     </footer>
 @endif

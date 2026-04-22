@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CEEKLIN - Jagonya Pembasmi Noda & Kerak Super</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -27,7 +28,7 @@
         </x-slot:links>
 
         <a href="/login"
-            class="hidden md:inline-flex font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">PORTAL
+            class="w-full md:w-auto font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300 text-center">PORTAL
             LOGIN</a>
     </x-layouts.navbar>
 
@@ -37,7 +38,7 @@
             class="max-w-[1400px] mx-auto px-8 lg:px-12 py-10 lg:py-14 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 relative">
             <div class="w-full lg:w-[55%] flex flex-col items-start z-10">
                 <h1
-                    class="font-headline font-bold leading-[0.85] text-primary uppercase text-6xl lg:text-[5rem] tracking-tighter">
+                    class="font-headline font-black leading-[0.85] text-primary uppercase text-4xl md:text-6xl lg:text-[5rem] tracking-tighter">
                     KERAK<br>
                     BERAKHIR<br>
                     <span class="text-gray-900">DI SINI.</span>
@@ -411,7 +412,7 @@
     <x-layouts.footer variant="complex" />
 
     {{-- 4. Floating WhatsApp Button --}}
-    <a href="#" class="fixed bottom-8 right-8 z-[100] bg-primary text-white p-4 shadow-[8px_8px_0_var(--color-secondary)] hover:shadow-[2px_2px_0_var(--color-secondary)] hover:translate-x-[6px] hover:translate-y-[6px] transition-all duration-300 border-2 border-gray-900 group overflow-hidden">
+    <a href="https://wa.me/628xxxxxxxxxx" target="_blank" class="fixed bottom-8 right-8 z-[10000] bg-primary text-white p-4 shadow-[8px_8px_0_var(--color-secondary)] hover:shadow-[2px_2px_0_var(--color-secondary)] hover:translate-x-[6px] hover:translate-y-[6px] transition-all duration-300 border-2 border-gray-900 group overflow-hidden flex items-center justify-center">
         <div class="flex items-center gap-0 group-hover:gap-3 transition-all duration-300">
             <span class="text-[10px] font-black uppercase tracking-widest max-w-0 opacity-0 group-hover:max-w-[150px] group-hover:opacity-100 transition-all duration-500 overflow-hidden whitespace-nowrap">
                 Konsultasi Admin
