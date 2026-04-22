@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Distributor | Settings</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#570000", "primary-container": "#800000", "secondary": "#735c00", "surface": "#fef9e9", "surface-container": "#f2eede", "surface-container-low": "#f8f4e4", "surface-container-high": "#ece8d8", "surface-container-highest": "#e6e3d3", "surface-container-lowest": "#ffffff", "surface-variant": "#e6e3d3", "on-surface": "#1d1c12", "on-surface-variant": "#5a413d", "on-primary": "#ffffff", "outline": "#8e706c" }, fontFamily: { "headline": ["Space Grotesk", "sans-serif"], "body": ["Inter", "sans-serif"] } } } }</script>
+    <style>
+        body {
+            background-color: #fef9e9;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")
+        }
+    </style>
+</head>
+
+<body class="font-body text-on-surface antialiased flex h-screen overflow-hidden">
+    <nav class="fixed left-0 top-0 h-full w-60 bg-primary flex flex-col pt-8 z-40">
+        <div class="px-6 pb-6 border-b border-white/10 mb-2">
+            <h2 class="font-headline font-black text-white text-xl tracking-tighter">CEEKLIN</h2>
+            <p class="text-yellow-500 text-[10px] font-bold mt-1 uppercase tracking-widest">Distributor Portal</p>
+        </div>
+        <div class="flex-1 flex flex-col gap-0.5 px-2 text-xs font-headline font-bold uppercase tracking-widest">
+            <a class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="dashboard.html"><span class="material-symbols-outlined text-lg">dashboard</span>Overview</a>
+            <a class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="sales-map.html"><span class="material-symbols-outlined text-lg">map</span>Sales Map</a>
+            <a class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="resellers.html"><span class="material-symbols-outlined text-lg">groups</span>Resellers</a>
+            <a class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="inventory.html"><span class="material-symbols-outlined text-lg">inventory_2</span>Inventory</a>
+            <a class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="order.html"><span class="material-symbols-outlined text-lg">shopping_cart</span>New Order</a>
+        </div>
+        <div class="px-4 pb-6 mt-auto border-t border-white/10 pt-4 space-y-0.5">
+            <a class="bg-white/10 text-yellow-500 flex items-center gap-3 px-4 py-3 border-l-4 border-yellow-500 text-xs font-headline font-bold uppercase tracking-widest"
+                href="settings.html"><span class="material-symbols-outlined text-lg">settings</span>Settings</a>
+            <a href="../login.html"
+                class="text-white/60 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent text-xs font-headline font-bold uppercase tracking-widest hover:text-white transition-colors"><span
+                    class="material-symbols-outlined text-lg">logout</span>Logout</a>
+        </div>
+    </nav>
+    <div class="flex-1 ml-60 flex flex-col h-full">
+        <header
+            class="sticky top-0 z-30 flex justify-between items-center px-8 h-14 bg-surface/90 backdrop-blur border-b border-surface-container-high">
+            <h1 class="font-headline font-black text-primary text-lg uppercase tracking-tight">Settings</h1>
+        </header>
+        <main class="flex-1 overflow-y-auto p-8 space-y-8 max-w-3xl">
+            <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Profil
+                    Distributor</h3>
+                <div class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label
+                                class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Nama
+                                Perusahaan</label>
+                            <input
+                                class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm font-bold"
+                                value="PT. Industrial Mandiri" type="text" />
+                        </div>
+                        <div><label
+                                class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Email</label>
+                            <input
+                                class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                                value="ops@industrialmandiri.co.id" type="email" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label
+                                class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">No.
+                                Telepon</label>
+                            <input
+                                class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                                value="021-55501234" type="tel" />
+                        </div>
+                        <div><label
+                                class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Wilayah
+                                Operasi</label>
+                            <input
+                                class="w-full bg-surface-container-highest border-b-2 border-surface-variant py-2 px-4 text-sm text-on-surface-variant cursor-not-allowed"
+                                value="Jawa Barat" type="text" disabled />
+                        </div>
+                    </div>
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Alamat
+                            Gudang</label>
+                        <textarea
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm resize-none"
+                            rows="3">Jl. Industri No. 45, Cikarang, Bekasi, Jawa Barat 17530</textarea>
+                    </div>
+                    <button
+                        class="bg-primary-container text-on-primary py-3 px-6 font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary transition-colors mt-2">Simpan
+                        Perubahan</button>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Ganti Password
+                </h3>
+                <div class="space-y-5 max-w-md">
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Password
+                            Lama</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                            placeholder="••••••••" type="password" />
+                    </div>
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Password
+                            Baru</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                            placeholder="Minimal 8 karakter" type="password" />
+                    </div>
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Konfirmasi
+                            Password Baru</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                            placeholder="Ketik ulang" type="password" />
+                    </div>
+                    <button
+                        class="bg-primary-container text-on-primary py-3 px-6 font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary transition-colors mt-2">Update
+                        Password</button>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Informasi
+                    Rekening</h3>
+                <div class="space-y-5 max-w-md">
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Nama
+                            Bank</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm font-bold"
+                            value="BCA" type="text" />
+                    </div>
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Nomor
+                            Rekening</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm"
+                            value="1234567890" type="text" />
+                    </div>
+                    <div><label
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">Atas
+                            Nama</label>
+                        <input
+                            class="w-full bg-surface-container border-b-2 border-primary py-2 px-4 focus:outline-none focus:border-secondary text-sm font-bold"
+                            value="PT. INDUSTRIAL MANDIRI" type="text" />
+                    </div>
+                    <button
+                        class="bg-primary-container text-on-primary py-3 px-6 font-headline font-bold text-sm uppercase tracking-widest hover:bg-primary transition-colors mt-2">Update
+                        Rekening</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

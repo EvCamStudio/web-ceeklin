@@ -1,0 +1,101 @@
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    /* --- Colors --- */
+    --color-primary: #800000;
+    --color-primary-hover: #5a0000;
+    --color-primary-darkest: #4a0000;
+
+    --color-secondary: #D4AF37;
+    --color-secondary-dark: #8c7a26;
+
+    --color-tertiary: #0021B9;
+
+    --color-neutral: #F5F1E1;
+    --color-neutral-dark: #EBE7D3;
+    --color-neutral-hover: #EAE4CA;
+    --color-neutral-border: #DCD6BE;
+    --color-neutral-border-light: #E6E1CE;
+    --color-neutral-light: #fdfaf2;
+
+    --color-gray-900: #1a1a1a;
+    --color-gray-darkest: #08151D;
+
+    --color-secondary-hover: #99862A;
+
+    /* --- Typography --- */
+    --font-headline: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Override default Tailwind font-sans */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+
+    /* Default Base Styles */
+    html {
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--font-body);
+        background-color: var(--color-neutral);
+        color: #1a1a1a;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-headline);
+    }
+
+    /* Animasi Transisi Halaman (Fade In Up) */
+    main {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Animasi Marquee untuk Ribbon */
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    .animate-marquee {
+        animation: marquee 20s linear infinite;
+    }
+
+    /* Industrial Grain Texture */
+    .grain-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 9999;
+    }
+}

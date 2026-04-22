@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin | National Sales</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#570000", "primary-container": "#800000", "secondary": "#735c00", "surface": "#fef9e9", "surface-container": "#f2eede", "surface-container-low": "#f8f4e4", "surface-container-high": "#ece8d8", "surface-container-highest": "#e6e3d3", "surface-container-lowest": "#ffffff", "surface-variant": "#e6e3d3", "on-surface": "#1d1c12", "on-surface-variant": "#5a413d", "on-primary": "#ffffff", "outline": "#8e706c" }, fontFamily: { "headline": ["Space Grotesk", "sans-serif"], "body": ["Inter", "sans-serif"] } } } }
+    </script>
+    <style>
+        body {
+            background-color: #fef9e9;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")
+        }
+    </style>
+</head>
+
+<body class="font-body text-on-surface antialiased flex h-screen overflow-hidden">
+    <nav
+        class="fixed left-0 top-0 h-full w-60 bg-surface border-r border-surface-container-high flex flex-col pt-8 z-40">
+        <div class="px-6 pb-6 border-b border-surface-container-high mb-2">
+            <h2 class="font-headline font-black text-primary-container text-xl tracking-tighter">MASTER ADMIN</h2>
+            <p class="text-on-surface-variant text-[10px] font-bold mt-1 uppercase tracking-widest">CV SR Chemical</p>
+        </div>
+        <div class="flex-1 flex flex-col gap-0.5 px-2 text-xs font-headline font-bold uppercase tracking-widest">
+            <a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors"
+                href="dashboard.html"><span class="material-symbols-outlined text-lg">dashboard</span>Overview</a>
+            <a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors"
+                href="pricing.html"><span class="material-symbols-outlined text-lg">payments</span>Pricing Control</a>
+            <a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors"
+                href="bonus.html"><span class="material-symbols-outlined text-lg">military_tech</span>Bonus Tracker</a>
+            <a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors"
+                href="distributors.html"><span
+                    class="material-symbols-outlined text-lg">group_add</span>Distributors</a>
+            <a class="bg-primary-container text-on-primary flex items-center gap-3 px-4 py-3" href="sales.html"><span
+                    class="material-symbols-outlined text-lg">insights</span>National Sales</a>
+        </div>
+        <div class="px-4 pb-6 mt-auto border-t border-surface-container-high pt-4 space-y-0.5">
+            <a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 text-xs font-headline font-bold uppercase tracking-widest hover:bg-surface-container-high transition-colors"
+                href="settings.html"><span class="material-symbols-outlined text-lg">settings</span>Settings</a>
+            <a href="../login.html"
+                class="text-on-surface-variant flex items-center gap-3 px-2 py-2 text-xs font-headline font-bold uppercase tracking-widest hover:text-primary transition-colors"><span
+                    class="material-symbols-outlined text-lg">logout</span>Logout</a>
+        </div>
+    </nav>
+    <div class="flex-1 ml-60 flex flex-col h-full">
+        <header
+            class="sticky top-0 z-30 flex justify-between items-center px-8 h-14 bg-surface/90 backdrop-blur border-b border-surface-container-high">
+            <h1 class="font-headline font-black text-primary text-lg uppercase tracking-tight">National Sales</h1>
+            <select
+                class="bg-surface-container-highest border-b-2 border-primary text-sm py-1.5 px-3 font-headline font-bold focus:outline-none">
+                <option>Q3 2024</option>
+                <option>Q2 2024</option>
+                <option>Q1 2024</option>
+            </select>
+        </header>
+        <main class="flex-1 overflow-y-auto p-8 space-y-8">
+            <!-- Chart -->
+            <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                <h3 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase mb-2">Volume Trend
+                </h3>
+                <p class="text-sm text-on-surface-variant mb-6">Monthly unit sales across all regions</p>
+                <div class="h-[280px] relative border-l-2 border-b-2 border-surface-container-high">
+                    <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                        <path d="M0,80 L17,65 L33,70 L50,30 L67,45 L83,25 L100,10" fill="none" stroke="#800000"
+                            stroke-width="2" vector-effect="non-scaling-stroke" />
+                        <path d="M0,80 L17,65 L33,70 L50,30 L67,45 L83,25 L100,10 L100,100 L0,100 Z" fill="#800000"
+                            opacity="0.05" />
+                    </svg>
+                </div>
+            </div>
+            <!-- Regional Breakdown -->
+            <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Regional
+                    Breakdown</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between"><span class="font-bold text-sm">Jawa Barat</span>
+                        <div class="flex-1 mx-4 bg-surface-container-highest h-3">
+                            <div class="bg-primary-container h-full" style="width:72%"></div>
+                        </div><span class="font-headline font-black text-primary">1,845</span>
+                    </div>
+                    <div class="flex items-center justify-between"><span class="font-bold text-sm">Jawa Timur</span>
+                        <div class="flex-1 mx-4 bg-surface-container-highest h-3">
+                            <div class="bg-secondary h-full" style="width:54%"></div>
+                        </div><span class="font-headline font-black text-primary">1,380</span>
+                    </div>
+                    <div class="flex items-center justify-between"><span class="font-bold text-sm">DKI Jakarta</span>
+                        <div class="flex-1 mx-4 bg-surface-container-highest h-3">
+                            <div class="bg-secondary h-full" style="width:38%"></div>
+                        </div><span class="font-headline font-black text-primary">976</span>
+                    </div>
+                    <div class="flex items-center justify-between"><span class="font-bold text-sm">Jawa Tengah</span>
+                        <div class="flex-1 mx-4 bg-surface-container-highest h-3">
+                            <div class="bg-outline h-full" style="width:24%"></div>
+                        </div><span class="font-headline font-black text-primary">620</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

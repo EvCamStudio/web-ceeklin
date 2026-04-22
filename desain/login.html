@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CEEKLIN | Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#570000",
+                        "primary-container": "#800000",
+                        "secondary": "#735c00",
+                        "surface": "#fef9e9",
+                        "surface-container": "#f2eede",
+                        "surface-container-low": "#f8f4e4",
+                        "surface-container-high": "#ece8d8",
+                        "surface-container-highest": "#e6e3d3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e6e3d3",
+                        "on-surface": "#1d1c12",
+                        "on-surface-variant": "#5a413d",
+                        "on-primary": "#ffffff",
+                        "outline": "#8e706c",
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "jakarta": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f5f1e1;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        .industrial-shadow {
+            box-shadow: 0 20px 40px -10px rgba(115, 92, 0, 0.15)
+        }
+    </style>
+</head>
+
+<body class="font-body text-on-surface min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-surface sticky top-0 z-50 border-b-2 border-surface-container-high">
+        <div class="flex justify-between items-center w-full px-8 py-5 max-w-6xl mx-auto">
+            <a href="index.html"
+                class="text-2xl font-black text-primary-container tracking-tighter font-headline uppercase hover:opacity-80 transition-opacity">CEEKLIN</a>
+            <div class="flex items-center gap-6">
+                <a href="index.html"
+                    class="hidden md:block text-on-surface-variant font-headline font-bold text-sm uppercase tracking-tight hover:text-primary transition-colors">Home</a>
+                <a href="register-1.html"
+                    class="bg-primary-container text-on-primary font-headline font-bold text-sm uppercase tracking-tight px-5 py-2 hover:bg-primary transition-colors">Daftar
+                    Mitra</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div
+            class="w-full max-w-md bg-surface-container-lowest border-t-[8px] border-primary-container industrial-shadow p-10 flex flex-col gap-8">
+
+            <div class="text-center space-y-2">
+                <h1 class="font-headline font-black text-4xl text-primary tracking-tighter uppercase">CEEKLIN</h1>
+                <p class="font-jakarta text-xs tracking-widest text-secondary font-bold uppercase">Industrial Power
+                    Portal</p>
+            </div>
+
+            <!-- Demo: role selector for prototype navigation -->
+            <div class="bg-surface-container-high p-4 text-center">
+                <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-2">Demo: Pilih
+                    Dashboard</p>
+                <div class="flex gap-2 justify-center flex-wrap">
+                    <a href="reseller/dashboard.html"
+                        class="text-[10px] font-bold uppercase tracking-wide text-primary border border-primary px-3 py-1.5 hover:bg-primary hover:text-white transition-colors">Reseller</a>
+                    <a href="distributor/dashboard.html"
+                        class="text-[10px] font-bold uppercase tracking-wide text-primary border border-primary px-3 py-1.5 hover:bg-primary hover:text-white transition-colors">Distributor</a>
+                    <a href="admin/dashboard.html"
+                        class="text-[10px] font-bold uppercase tracking-wide text-primary border border-primary px-3 py-1.5 hover:bg-primary hover:text-white transition-colors">Admin</a>
+                </div>
+            </div>
+
+            <form class="flex flex-col gap-5"
+                onsubmit="event.preventDefault(); window.location.href='reseller/dashboard.html';">
+                <div>
+                    <label
+                        class="block font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-primary mb-1">Email
+                        / Username</label>
+                    <input
+                        class="w-full bg-surface-container-highest border-0 border-b-2 border-primary-container p-3 font-body text-sm focus:outline-none focus:bg-surface-container-high focus:border-secondary transition-colors placeholder:text-outline/40"
+                        placeholder="admin@ceeklin.industrial" type="text" required />
+                </div>
+                <div>
+                    <label
+                        class="block font-headline font-bold text-[10px] uppercase tracking-[0.2em] text-primary mb-1">Password</label>
+                    <input
+                        class="w-full bg-surface-container-highest border-0 border-b-2 border-primary-container p-3 font-body text-sm focus:outline-none focus:bg-surface-container-high focus:border-secondary transition-colors placeholder:text-outline/40"
+                        placeholder="••••••••" type="password" required />
+                    <div class="mt-2 text-right">
+                        <a class="font-headline font-bold text-[11px] uppercase tracking-wider text-primary-container hover:underline underline-offset-4"
+                            href="#">Lupa Password?</a>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-primary-container text-on-primary font-headline font-black py-4 px-6 uppercase tracking-tighter text-lg transition-all hover:bg-primary active:scale-[0.98] flex items-center justify-center gap-2 industrial-shadow mt-2">
+                    Masuk
+                    <span class="material-symbols-outlined text-xl">arrow_forward</span>
+                </button>
+            </form>
+
+            <div class="pt-4 border-t border-surface-variant text-center">
+                <a href="register-1.html"
+                    class="font-jakarta font-bold text-sm text-primary-container hover:text-primary transition-colors inline-flex items-center gap-1">
+                    Belum punya akun? Daftar di sini
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="w-full px-8 py-8 flex justify-between items-center bg-[#1d1c12] border-t-4 border-[#800000] mt-auto">
+        <div class="text-[#735c00] font-headline font-bold text-sm tracking-tighter">CEEKLIN INDUSTRIAL</div>
+        <div class="text-[#735c00] text-[10px] tracking-widest uppercase">© 2024 CEEKLIN</div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Reseller | New Order</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#570000", "primary-container": "#800000", "secondary": "#735c00", "surface": "#fef9e9", "surface-container": "#f2eede", "surface-container-low": "#f8f4e4", "surface-container-high": "#ece8d8", "surface-container-highest": "#e6e3d3", "surface-container-lowest": "#ffffff", "surface-variant": "#e6e3d3", "on-surface": "#1d1c12", "on-surface-variant": "#5a413d", "on-primary": "#ffffff", "outline": "#8e706c" }, fontFamily: { "headline": ["Space Grotesk", "sans-serif"], "body": ["Inter", "sans-serif"] } } } }</script>
+    <style>
+        body {
+            background-color: #fef9e9;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")
+        }
+    </style>
+</head>
+
+<body class="font-body text-on-surface antialiased flex h-screen overflow-hidden">
+    <nav class="fixed left-0 top-0 h-full w-60 bg-[#2a0505] flex flex-col pt-8 z-40">
+        <div class="px-6 pb-6 border-b border-white/10 mb-2">
+            <h2 class="font-headline font-black text-amber-500 text-xl tracking-tighter">CEEKLIN</h2>
+            <p class="text-white/50 text-[10px] font-bold mt-1 uppercase tracking-widest">Authorized Reseller</p>
+        </div>
+        <div class="flex-1 flex flex-col gap-0.5 px-2 text-xs font-headline font-bold uppercase tracking-widest">
+            <a class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="dashboard.html"><span class="material-symbols-outlined text-lg">dashboard</span>Dashboard</a>
+            <a class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="earnings.html"><span class="material-symbols-outlined text-lg">payments</span>Earnings</a>
+            <a class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="referrals.html"><span class="material-symbols-outlined text-lg">share</span>Referrals</a>
+            <a class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent hover:text-white hover:bg-white/5 transition-colors"
+                href="tier.html"><span class="material-symbols-outlined text-lg">military_tech</span>Tier Status</a>
+            <a class="bg-white/10 text-amber-400 flex items-center gap-3 px-4 py-3 border-l-4 border-amber-500"
+                href="order.html"><span class="material-symbols-outlined text-lg">shopping_cart</span>New Order</a>
+        </div>
+        <div class="px-4 pb-6 mt-auto border-t border-white/10 pt-4 space-y-0.5">
+            <a class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent text-xs font-headline font-bold uppercase tracking-widest hover:text-white transition-colors"
+                href="settings.html"><span class="material-symbols-outlined text-lg">settings</span>Settings</a>
+            <a href="../login.html"
+                class="text-white/50 flex items-center gap-3 px-4 py-3 border-l-4 border-transparent text-xs font-headline font-bold uppercase tracking-widest hover:text-white transition-colors"><span
+                    class="material-symbols-outlined text-lg">logout</span>Logout</a>
+        </div>
+    </nav>
+    <div class="flex-1 ml-60 flex flex-col h-full">
+        <!-- Warning Banner -->
+        <div class="bg-secondary text-white px-8 py-3 flex items-center justify-between font-headline text-sm">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">warning</span><span
+                    class="font-bold uppercase tracking-tight">Order Minimal 50pcs — Sisa Waktu: 47:59:59</span></div>
+        </div>
+        <header
+            class="sticky top-0 z-30 flex justify-between items-center px-8 h-14 bg-surface/90 backdrop-blur border-b border-surface-container-high">
+            <h1 class="font-headline font-black text-primary text-lg uppercase tracking-tight">New Order — Order dari
+                Distributor</h1>
+        </header>
+        <main class="flex-1 overflow-y-auto p-8 space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Products -->
+                    <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                        <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Pilih
+                            Produk</h3>
+                        <div
+                            class="border border-surface-variant p-5 flex items-start gap-5 mb-4 hover:border-primary transition-colors">
+                            <div
+                                class="w-20 h-20 bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-on-surface-variant/30">science</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-headline font-bold text-primary uppercase text-sm">Industrial Degreaser
+                                </h4>
+                                <p class="text-xs text-on-surface-variant mt-1">Pembersih industri heavy-duty, format 5L
+                                </p>
+                                <p class="font-headline font-black text-lg text-primary mt-2">Rp 1.450.000 <span
+                                        class="text-xs text-on-surface-variant font-normal">/ unit (Harga
+                                        Reseller)</span></p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button
+                                    class="w-8 h-8 border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">−</button>
+                                <input
+                                    class="w-16 text-center bg-surface-container-highest border-b-2 border-primary py-1 font-headline font-bold text-lg focus:outline-none"
+                                    value="50" type="number" />
+                                <button
+                                    class="w-8 h-8 border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">+</button>
+                            </div>
+                        </div>
+                        <div
+                            class="border border-surface-variant p-5 flex items-start gap-5 hover:border-primary transition-colors">
+                            <div
+                                class="w-20 h-20 bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-on-surface-variant/30">science</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-headline font-bold text-primary uppercase text-sm">Heavy Duty Solvent
+                                </h4>
+                                <p class="text-xs text-on-surface-variant mt-1">Pelarut kuat untuk komponen mesin,
+                                    format 5L</p>
+                                <p class="font-headline font-black text-lg text-primary mt-2">Rp 1.680.000 <span
+                                        class="text-xs text-on-surface-variant font-normal">/ unit (Harga
+                                        Reseller)</span></p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button
+                                    class="w-8 h-8 border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">−</button>
+                                <input
+                                    class="w-16 text-center bg-surface-container-highest border-b-2 border-primary py-1 font-headline font-bold text-lg focus:outline-none"
+                                    value="0" type="number" />
+                                <button
+                                    class="w-8 h-8 border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Distributor Info -->
+                    <div class="bg-surface-container-lowest p-8 border border-surface-container-high">
+                        <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">
+                            Distributor Anda</h3>
+                        <div
+                            class="p-4 bg-surface-container-low border-l-4 border-secondary flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-sm">PT. Industrial Mandiri</p>
+                                <p class="text-xs text-on-surface-variant mt-1">Jawa Barat — Bandung Hub</p>
+                            </div>
+                            <button
+                                class="text-secondary flex items-center gap-1 text-xs font-bold uppercase hover:text-primary transition-colors"><span
+                                    class="material-symbols-outlined text-sm">chat</span>WhatsApp</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-surface-container-lowest p-8 border border-surface-container-high sticky top-20">
+                        <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Ringkasan
+                            Order</h3>
+                        <div class="space-y-3 text-sm border-b border-surface-variant pb-4 mb-4">
+                            <div class="flex justify-between"><span class="text-on-surface-variant">Industrial Degreaser
+                                    × 50</span><span class="font-bold">Rp 72.500.000</span></div>
+                        </div>
+                        <div class="space-y-2 text-sm border-b border-surface-variant pb-4 mb-4">
+                            <div class="flex justify-between"><span class="text-on-surface-variant">Subtotal</span><span
+                                    class="font-bold">Rp 72.500.000</span></div>
+                            <div class="flex justify-between"><span class="text-on-surface-variant">Ongkos
+                                    Kirim</span><span class="text-secondary font-bold">Gratis</span></div>
+                        </div>
+                        <div class="flex justify-between font-headline font-bold text-xl mb-4">
+                            <span class="text-primary uppercase tracking-tight">Total</span>
+                            <span class="text-primary">Rp 72.5M</span>
+                        </div>
+                        <!-- Minimum Order Check -->
+                        <div class="bg-secondary/10 border border-secondary p-3 mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary text-lg"
+                                style="font-variation-settings:'FILL' 1">check_circle</span>
+                            <p class="text-xs text-secondary font-bold">Minimum order 50pcs terpenuhi ✓</p>
+                        </div>
+                        <button
+                            class="w-full bg-primary-container text-on-primary py-4 font-headline font-bold uppercase tracking-widest hover:bg-primary transition-colors shadow-[0_10px_25px_-5px_rgba(87,0,0,0.25)] flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-lg">shopping_cart_checkout</span>Submit Order
+                        </button>
+                        <p class="text-[10px] text-on-surface-variant text-center mt-3">Order dikirim ke distributor
+                            untuk dikonfirmasi</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
