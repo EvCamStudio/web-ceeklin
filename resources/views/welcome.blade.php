@@ -17,14 +17,13 @@
     <x-layouts.navbar>
         <x-slot:links>
             <a href="{{ route('home') }}"
-                class="text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('home') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} pb-1 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">BERANDA</a>
+                class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('home') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} hover:text-primary transition-all duration-300 hover:-translate-y-0.5">BERANDA</a>
             <a href="{{ route('specs') }}"
-                class="text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('specs') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} pb-1 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">SPEK
-                PRODUK</a>
+                class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('specs') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} hover:text-primary transition-all duration-300 hover:-translate-y-0.5">SPEK PRODUK</a>
             <a href="{{ route('gallery') }}"
-                class="text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('gallery') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} pb-1 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">GALERI</a>
+                class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('gallery') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} hover:text-primary transition-all duration-300 hover:-translate-y-0.5">GALERI</a>
             <a href="{{ route('contact') }}"
-                class="text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('contact') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} pb-1 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">KONTAK</a>
+                class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest {{ Request::routeIs('contact') ? 'text-primary border-b-2 border-primary' : 'text-slate-600' }} hover:text-primary transition-all duration-300 hover:-translate-y-0.5">KONTAK</a>
         </x-slot:links>
 
         <a href="/login"
@@ -90,10 +89,18 @@
                         x-data="{ 
                             currentSlide: 0, 
                             totalSlides: 2,
+                            touchStartX: 0,
+                            touchEndX: 0,
                             next() { this.currentSlide = (this.currentSlide + 1) % this.totalSlides },
-                            prev() { this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides }
+                            prev() { this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides },
+                            handleSwipe() {
+                                if (this.touchStartX - this.touchEndX > 50) this.next();
+                                if (this.touchEndX - this.touchStartX > 50) this.prev();
+                            }
                         }" 
-                        class="absolute inset-0 z-10 w-full h-full"
+                        @touchstart="touchStartX = $event.touches[0].clientX"
+                        @touchend="touchEndX = $event.changedTouches[0].clientX; handleSwipe()"
+                        class="absolute inset-0 z-10 w-full h-full group/slider"
                     >
                         <div class="absolute inset-0 flex transition-transform duration-700 ease-out"
                             :style="`transform: translateX(-${currentSlide * 100}%);`">
@@ -105,27 +112,34 @@
                                 class="w-full h-full object-cover mix-blend-multiply flex-shrink-0 blur-[2px] hue-rotate-90">
                         </div>
                         
-                        <!-- Shadow Bottom untuk kontras teks/ikon kontrol -->
-                        <div
-                            class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-gray-900/40 to-transparent pointer-events-none transition-opacity opacity-0 group-hover:opacity-100">
+                        <!-- Large Interaction Zones (Super Clean Mode) -->
+                        <div @click="prev()" 
+                            class="absolute inset-y-0 left-0 w-1/4 z-20 cursor-pointer group/left flex items-center pl-4">
+                            <svg class="w-8 h-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] opacity-40 group-hover/left:opacity-100 group-hover/left:-translate-x-1 transition-all duration-300" 
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
                         </div>
 
-                        <!-- Kontrol Slider (Aktif) -->
-                        <div
-                            class="absolute bottom-6 right-6 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button @click="prev()" aria-label="Slide sebelumnya"
-                                class="w-10 h-10 bg-gray-900 text-white flex items-center justify-center hover:bg-primary transition-colors border-2 border-transparent hover:border-white"><svg
-                                    class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 19l-7-7 7-7" />
-                                </svg></button>
-                            <button @click="next()" aria-label="Slide selanjutnya"
-                                class="w-10 h-10 bg-gray-900 text-white flex items-center justify-center hover:bg-primary transition-colors border-2 border-transparent hover:border-white"><svg
-                                    class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7" />
-                                </svg></button>
+                        <div @click="next()" 
+                            class="absolute inset-y-0 right-0 w-1/4 z-20 cursor-pointer group/right flex items-center justify-end pr-4">
+                            <svg class="w-8 h-8 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] opacity-40 group-hover/right:opacity-100 group-hover/right:translate-x-1 transition-all duration-300" 
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </div>
+
+                        <!-- Minimalist Pagination Dots -->
+                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                            <template x-for="i in totalSlides">
+                                <button @click="currentSlide = i-1" 
+                                    class="h-1 rounded-full transition-all duration-500"
+                                    :class="currentSlide === i-1 ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/60'"></button>
+                            </template>
+                        </div>
+
+                        <!-- Overlay Shadow Gradient for better contrast -->
+                        <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-gray-900/20 to-transparent pointer-events-none"></div>
                     </div>
                 </div>
             </div>
@@ -244,79 +258,60 @@
                     PENGHAPUSAN KERAK</p>
             </div>
 
-            <!-- Grid Dinamis Bukan Sembarang Kotak -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px] lg:auto-rows-[280px]">
+            <!-- Grid Dinamis (Bento Grid 2.0) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[250px] lg:auto-rows-[280px]">
 
-                <!-- Boks 1: Lebar -->
-                <div
-                    class="md:col-span-2 bg-neutral-dark border-4 border-neutral-border p-10 relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
-                    <div
-                        class="absolute right-0 bottom-0 text-[12rem] text-primary opacity-5 font-headline leading-none translate-y-16 translate-x-8 group-hover:scale-110 transition-transform duration-700">
-                        01</div>
+                <!-- Boks 01: Automotive (Wide) -->
+                <div class="md:col-span-2 bg-neutral-dark border-4 border-neutral-border p-8 lg:p-10 relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+                    <div class="absolute right-0 bottom-0 text-[10rem] lg:text-[12rem] text-primary opacity-5 font-headline leading-none translate-y-16 translate-x-8 group-hover:scale-110 transition-transform duration-700">01</div>
                     <div class="relative z-10 flex flex-col h-full justify-between">
                         <div>
-                            <span
-                                class="inline-block bg-gray-900 text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-6">AUTOMOTIVE & GEAR</span>
-                            <h3 class="font-headline font-bold text-primary text-4xl uppercase tracking-tight">BLOK MESIN & KENDARAAN</h3>
+                            <span class="inline-block bg-gray-900 text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-4 lg:mb-6">AUTOMOTIVE & GEAR</span>
+                            <h3 class="font-headline font-bold text-primary text-2xl md:text-4xl uppercase tracking-tight">BLOK MESIN & KENDARAAN</h3>
                         </div>
-                        <p class="text-base font-bold text-slate-700 max-w-md leading-relaxed">Melarutkan kerak oli, gemuk mati, dan kotoran pada blok mesin tanpa merusak cat atau material logam kendaraan Anda.</p>
+                        <p class="text-sm lg:text-base font-bold text-slate-700 max-w-md leading-relaxed">Melarutkan kerak oli, gemuk mati, dan kotoran pada blok mesin tanpa merusak cat atau material logam kendaraan Anda.</p>
                     </div>
                 </div>
 
-                <!-- Boks 2: Tinggi Vertikal -->
-                 <div
-                    class="md:row-span-2 bg-primary text-neutral border-4 border-primary-darkest p-10 relative overflow-hidden group hover:border-secondary transition-colors cursor-pointer">
-                    <div
-                        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEIwMDAwIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiM1YTAwMDAiPjwvcmVjdD4KPC9zdmc+')] opacity-40 mix-blend-multiply">
-                    </div>
-                    <div class="relative z-10 flex flex-col h-full justify-between gap-8">
+                <!-- Boks 02: Kitchenware (Standard) -->
+                <div class="bg-white border-4 border-neutral-border p-8 lg:p-10 relative overflow-hidden group hover:border-gray-900 transition-colors cursor-pointer shadow-sm">
+                    <div class="absolute right-0 bottom-0 text-[8rem] text-gray-900 opacity-5 font-headline leading-none translate-y-12 translate-x-6 group-hover:scale-110 transition-transform duration-700">02</div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
                         <div>
-                            <span
-                                class="inline-block border border-neutral/30 text-neutral-light bg-primary-darkest text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-6">CERAMIC & PORCELAIN</span>
-                            <h3 class="font-headline font-bold text-white text-4xl uppercase tracking-tight">KLOSET & WASTAFEL</h3>
+                            <span class="inline-block bg-secondary-dark text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-4 lg:mb-6">KITCHENWARE & GLASS</span>
+                            <h3 class="font-headline font-bold text-gray-900 text-xl lg:text-2xl uppercase leading-tight">GELAS & ALAT DAPUR</h3>
                         </div>
-                        <p class="text-base font-bold text-neutral-hover opacity-90 leading-relaxed">Solusi ekstrem untuk kamar mandi. Menghancurkan kerak air, jamur, dan lumut pada keramik, kloset, wastafel, hingga gayung secara instan.</p>
-
-                        <div
-                            class="flex items-center gap-2 mt-auto text-secondary-hover font-bold text-xs uppercase tracking-widest group-hover:text-secondary group-hover:translate-x-2 transition-all">
-                            Lihat Galeri Hasil Lapangan <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
+                        <p class="text-xs lg:text-sm font-bold text-slate-600 leading-relaxed">Mencerahkan kembali peralatan dapur, gelas kusam, hingga noda minyak pada stainless steel secara instan.</p>
                     </div>
                 </div>
 
-                <!-- Boks 3 -->
-                 <div
-                    class="bg-white border-4 border-neutral-border p-10 relative flex flex-col justify-between group hover:border-gray-900 transition-colors shadow-sm cursor-pointer">
-                    <div>
-                        <span
-                            class="inline-block bg-secondary-dark text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-6">KITCHENWARE & GLASS</span>
-                        <h3 class="font-headline font-bold text-gray-900 text-2xl uppercase">GELAS & ALAT DAPUR</h3>
-                    </div>
-                    <div
-                        class="absolute bottom-8 right-8 text-neutral-border group-hover:text-gray-900 transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <!-- Boks 03: Fabric (Standard) -->
+                <div class="bg-gray-darkest border-4 border-gray-900 p-8 lg:p-10 relative overflow-hidden group text-neutral-light hover:border-primary transition-colors cursor-pointer">
+                    <div class="absolute right-0 bottom-0 text-[8rem] text-primary opacity-20 font-headline leading-none translate-y-12 translate-x-6 group-hover:scale-110 transition-transform duration-700">03</div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                            <span class="inline-block border border-primary text-primary-hover bg-primary/10 text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-4 lg:mb-6">CLOTHING & FABRIC</span>
+                            <h3 class="font-headline font-bold text-white text-xl lg:text-2xl uppercase leading-tight">NODA PADA PAKAIAN</h3>
+                        </div>
+                        <p class="text-xs lg:text-sm font-bold text-slate-400 leading-relaxed">Penghilang noda jamur, tinta, dan kotoran membandel pada kain putih maupun berwarna dengan pengerjaan cepat.</p>
                     </div>
                 </div>
 
-                <!-- Boks 4 -->
-                 <div
-                    class="bg-gray-darkest border-4 border-gray-900 p-10 relative flex flex-col justify-between group text-neutral-light hover:border-primary transition-colors cursor-pointer">
-                    <div>
-                        <span
-                            class="inline-block border border-primary text-primary-hover bg-primary/10 text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-6">CLOTHING & FABRIC</span>
-                        <h3 class="font-headline font-bold text-white text-2xl uppercase">NODA PADA PAKAIAN</h3>
-                    </div>
-                    <div class="absolute bottom-8 right-8 text-gray-800 group-hover:text-primary transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <!-- Boks 04: Ceramic (Wide) -->
+                <div class="md:col-span-2 bg-primary text-neutral border-4 border-primary-darkest p-8 lg:p-10 relative overflow-hidden group hover:border-secondary transition-colors cursor-pointer">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEIwMDAwIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiM1YTAwMDAiPjwvcmVjdD4KPC9zdmc+')] opacity-40 mix-blend-multiply"></div>
+                    <div class="absolute right-0 bottom-0 text-[10rem] lg:text-[12rem] text-secondary opacity-10 font-headline leading-none translate-y-16 translate-x-8 group-hover:scale-110 transition-transform duration-700">04</div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                            <span class="inline-block border border-neutral/30 text-neutral-light bg-primary-darkest text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 mb-4 lg:mb-6">CERAMIC & PORCELAIN</span>
+                            <h3 class="font-headline font-bold text-white text-2xl md:text-4xl uppercase tracking-tight">KLOSET & WASTAFEL</h3>
+                        </div>
+                        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <p class="text-sm lg:text-base font-bold text-neutral-hover opacity-90 max-w-xl leading-relaxed">Solusi ekstrem untuk kamar mandi. Menghancurkan kerak air, jamur, dan lumut pada keramik, kloset, wastafel, hingga gayung secara instan.</p>
+                            <div class="flex items-center gap-2 text-secondary-hover font-bold text-xs uppercase tracking-widest group-hover:text-secondary group-hover:translate-x-2 transition-all whitespace-nowrap">
+                                Lihat Galeri <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,7 +375,7 @@
                         class="text-secondary font-bold text-sm uppercase tracking-[0.3em] border-l-4 border-secondary pl-4 mb-4">
                         AKSES EKSKLUSIF</p>
                     <h2
-                        class="font-headline font-bold text-4xl lg:text-6xl uppercase tracking-tighter mb-6 leading-[0.9]">
+                        class="font-headline font-bold text-2xl sm:text-3xl md:text-4xl lg:text-6xl uppercase tracking-tighter mb-6 leading-[0.9]">
                         BERHENTI MENGGOSOK.<br>MULAI MENGHANCURKAN.
                     </h2>
                     <p class="font-body text-neutral/80 max-w-xl text-lg font-bold leading-relaxed">Portal CEEKLIN hanya
@@ -390,7 +385,7 @@
 
                  <div class="w-full md:w-2/5 flex flex-col gap-4">
                     <a href="/register"
-                        class="inline-flex items-center justify-center w-full text-center bg-white text-primary hover:bg-neutral border-4 border-white px-10 py-8 font-headline font-bold text-[1.35rem] uppercase tracking-widest transition-all shadow-[15px_15px_0_var(--color-primary-darkest)] hover:shadow-none hover:translate-x-[15px] hover:translate-y-[15px] duration-200 group">
+                        class="inline-flex items-center justify-center w-full text-center bg-white text-primary hover:bg-neutral border-4 border-white px-8 md:px-10 py-6 md:py-8 font-headline font-bold text-xl md:text-[1.35rem] uppercase tracking-widest transition-all shadow-[8px_8px_0_var(--color-primary-darkest)] md:shadow-[15px_15px_0_var(--color-primary-darkest)] hover:shadow-none hover:translate-x-[8px] md:hover:translate-x-[15px] hover:translate-y-[8px] md:hover:translate-y-[15px] duration-200 group">
                         DAFTAR SEBAGAI MITRA
                         <svg class="w-6 h-6 ml-4 group-hover:translate-x-2 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">

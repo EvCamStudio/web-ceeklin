@@ -86,7 +86,7 @@
              x-transition:leave="transition ease-in-out duration-300 transform"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="-translate-x-full"
-             class="relative flex w-full max-w-xs flex-1 flex-col h-full {{ $sidebarClasses }} shadow-[10px_0_0_var(--color-primary)]">
+             class="relative flex w-full max-w-xs flex-1 flex-col h-full overflow-hidden {{ $sidebarClasses }} {{ $isDarkSidebar ? 'shadow-[10px_0_0_var(--color-primary-darkest)]' : 'shadow-[10px_0_0_var(--color-primary)]' }}">
             
             <div class="h-20 flex-shrink-0 flex items-center justify-between px-6 border-b-2 border-neutral-border">
                 <div class="flex flex-col">

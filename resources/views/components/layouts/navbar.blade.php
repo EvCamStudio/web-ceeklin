@@ -1,8 +1,10 @@
 <nav x-data="{ open: false }" class="w-full h-20 bg-neutral border-b-2 border-neutral-border flex justify-between items-center px-6 md:px-12 z-50 sticky top-0">
-    {{-- Logo --}}
-    <a href="/" class="font-headline font-black text-2xl md:text-3xl text-primary tracking-tighter hover:opacity-80 transition-opacity">
-        CEEKLIN
-    </a>
+    {{-- Logo Area --}}
+    <div class="flex items-center min-w-[200px]">
+        <a href="/" class="font-headline font-black text-2xl md:text-3xl text-primary tracking-tighter hover:opacity-80 transition-opacity">
+            CEEKLIN
+        </a>
+    </div>
     
     {{-- Desktop Links --}}
     @if(isset($links))
@@ -12,7 +14,7 @@
     @endif
     
     {{-- Right Actions (Desktop) --}}
-    <div class="hidden md:flex items-center justify-end">
+    <div class="hidden md:flex items-center justify-end min-w-[200px]">
         {{ $slot }}
     </div>
 

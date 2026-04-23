@@ -22,7 +22,7 @@
 
 <div class="flex flex-col gap-1.5 {{ $widthClass }}">
     @if($label)
-        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="{{ $inputId }}">
+        <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="{{ $inputId }}">
             {{ $label }}
         </label>
     @endif

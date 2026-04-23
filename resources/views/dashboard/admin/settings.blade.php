@@ -20,12 +20,12 @@
             <div class="p-6 flex flex-col gap-5">
                 {{-- BACKEND-TODO: populate dari Auth::user() --}}
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="nama-admin">Nama Lengkap</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-admin">Nama Lengkap</label>
                     <input id="nama-admin" type="text" value="Super Administrator"
                         class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="username-admin">Username</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="username-admin">Username</label>
                     <input id="username-admin" type="text" value="admin"
                         class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
                 </div>
@@ -44,17 +44,17 @@
             <div class="p-6 flex flex-col gap-5">
                 {{-- BACKEND-TODO: action ke AdminController@updatePassword + validasi --}}
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="sandi-lama">Kata Sandi Lama</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-lama">Kata Sandi Lama</label>
                     <input id="sandi-lama" type="password" placeholder="••••••••"
                         class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2.5 font-body text-sm font-bold focus:outline-none focus:border-primary transition-colors placeholder:text-gray-400">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="sandi-baru">Kata Sandi Baru</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-baru">Kata Sandi Baru</label>
                     <input id="sandi-baru" type="password" placeholder="••••••••"
                         class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2.5 font-body text-sm font-bold focus:outline-none focus:border-primary transition-colors placeholder:text-gray-400">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="konfirmasi-sandi">Konfirmasi Kata Sandi</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="konfirmasi-sandi">Konfirmasi Kata Sandi</label>
                     <input id="konfirmasi-sandi" type="password" placeholder="••••••••"
                         class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2.5 font-body text-sm font-bold focus:outline-none focus:border-primary transition-colors placeholder:text-gray-400">
                 </div>

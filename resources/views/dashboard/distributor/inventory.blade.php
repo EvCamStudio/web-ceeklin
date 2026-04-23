@@ -17,9 +17,9 @@
 
                 {{-- Produk: Stok Normal --}}
                 <div>
-                    <div class="flex justify-between items-end mb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
                         <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">Industrial Degreaser</span>
-                        <span class="font-headline font-black text-primary text-lg">2.450 / 5.000</span>
+                        <span class="font-headline font-black text-primary text-base sm:text-lg italic">2.450 / 5.000</span>
                     </div>
                     <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-3">
                         <div class="bg-secondary h-full" style="width:49%"></div>
@@ -28,9 +28,9 @@
 
                 {{-- Produk: Stok Normal --}}
                 <div>
-                    <div class="flex justify-between items-end mb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
                         <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">Heavy Duty Solvent</span>
-                        <span class="font-headline font-black text-primary text-lg">1.120 / 2.000</span>
+                        <span class="font-headline font-black text-primary text-base sm:text-lg italic">1.120 / 2.000</span>
                     </div>
                     <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-3">
                         <div class="bg-secondary h-full" style="width:56%"></div>
@@ -39,9 +39,9 @@
 
                 {{-- Produk: Stok Kritis --}}
                 <div>
-                    <div class="flex justify-between items-end mb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
                         <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">Surface Prep</span>
-                        <span class="font-headline font-black text-primary text-lg">450 / 3.000</span>
+                        <span class="font-headline font-black text-primary text-base sm:text-lg italic">450 / 3.000</span>
                     </div>
                     <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-3">
                         <div class="bg-primary h-full" style="width:15%"></div>
@@ -54,9 +54,9 @@
 
                 {{-- Produk: Stok Normal --}}
                 <div>
-                    <div class="flex justify-between items-end mb-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
                         <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">Multi-Purpose Cleaner</span>
-                        <span class="font-headline font-black text-primary text-lg">3.200 / 4.000</span>
+                        <span class="font-headline font-black text-primary text-base sm:text-lg italic">3.200 / 4.000</span>
                     </div>
                     <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-3">
                         <div class="bg-secondary h-full" style="width:80%"></div>
@@ -74,7 +74,7 @@
                 {{-- BACKEND-TODO: action ke InventoryController@requestRestock + @csrf --}}
                 <form class="flex flex-col gap-5">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="produk-restock">Produk</label>
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="produk-restock">Produk</label>
                         <div class="relative">
                             <select id="produk-restock" aria-label="Pilih produk untuk restock"
                                 class="appearance-none w-full bg-neutral-light border-[3px] border-secondary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors cursor-pointer">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="jumlah-restock">Jumlah (unit)</label>
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="jumlah-restock">Jumlah (unit)</label>
                         <input id="jumlah-restock" type="number" placeholder="500" min="1"
                             class="bg-neutral-light border-[3px] border-secondary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors placeholder:text-primary/30">
                     </div>

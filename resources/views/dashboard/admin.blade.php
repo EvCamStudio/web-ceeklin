@@ -11,11 +11,12 @@
 
     <div class="max-w-[1400px] mx-auto w-full">
         <!-- KPI Cards Grid -->
+        <!-- KPI Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-4">
             <!-- Box 1: Sales -->
             <div class="bg-white p-6 border-[3px] border-primary-container shadow-[8px_8px_0_var(--color-primary-darkest)]">
                 <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Total Sales (Nasional)</p>
-                <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">4,821</h3>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">4,821</h3>
                 <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
                     <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                     +12.4% vs Q prev
@@ -25,14 +26,14 @@
             <!-- Box 2: Distributors -->
             <div class="bg-white p-6 border-[3px] border-secondary shadow-[8px_8px_0_var(--color-gray-900)]">
                 <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Active Distributors</p>
-                <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">38</h3>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">38</h3>
                 <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest">Across 12 provinces</p>
             </div>
             
             <!-- Box 3: Revenue -->
             <div class="bg-white p-6 border-[3px] border-primary shadow-[8px_8px_0_var(--color-primary-hover)]">
                 <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Revenue MTD</p>
-                <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">Rp 6.2B</h3>
+                <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 6.2B</h3>
                 <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
                     <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                     +8.1% M/M
@@ -62,7 +63,7 @@
                 </div>
                 
                 <!-- Chart Area -->
-                <div class="h-[300px] w-full relative border-l-[3px] border-b-[3px] border-gray-900 pt-4 pr-4 bg-white/50">
+                <div class="h-[300px] w-full relative border-l-[3px] border-b-[3px] border-gray-900 pt-4 pr-4 bg-white/50 overflow-hidden">
                     <!-- Helper Grid Layout -->
                     <div class="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(var(--color-neutral-border)_1px,transparent_1px)] [background-size:24px_24px]"></div>
                     
@@ -80,27 +81,27 @@
             <!-- Side Content Activity (Col Span 1) -->
             <div class="bg-white border-[4px] border-gray-900 p-6 sm:p-8 shadow-[12px_12px_0_var(--color-gray-900)] h-full flex flex-col">
                 <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Recent Activity</h3>
-                <div class="flex-1 flex flex-col">
-                    <div class="flex flex-col lg:flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
-                        <div>
-                            <p class="font-bold text-sm text-gray-900">PT Tirta Makmur mendaftar</p>
+                <div class="flex-1 flex flex-col gap-1">
+                    <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
+                        <div class="flex-1">
+                            <p class="font-bold text-sm text-gray-900 leading-tight">PT Tirta Makmur mendaftar</p>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Distributor Baru — Jabar</p>
                         </div>
-                        <span class="text-[10px] font-bold text-primary-hover uppercase tracking-widest">2j lalu</span>
+                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">2j lalu</span>
                     </div>
-                    <div class="flex flex-col lg:flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
-                        <div>
-                            <p class="font-bold text-sm text-gray-900">Harga naik ke Rp 1.250.000</p>
+                    <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
+                        <div class="flex-1">
+                            <p class="font-bold text-sm text-gray-900 leading-tight">Harga naik ke Rp 1.250.000</p>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Tier Distributor — Nasional</p>
                         </div>
-                        <span class="text-[10px] font-bold text-primary-hover uppercase tracking-widest">12j lalu</span>
+                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">12j lalu</span>
                     </div>
-                    <div class="flex flex-col lg:flex-col sm:flex-row justify-between py-4 gap-2">
-                        <div>
-                            <p class="font-bold text-sm text-gray-900">Bonus 12.5M dicairkan</p>
+                    <div class="flex flex-col sm:flex-row justify-between py-4 gap-2">
+                        <div class="flex-1">
+                            <p class="font-bold text-sm text-gray-900 leading-tight">Bonus 12.5M dicairkan</p>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">PT Tirta Makmur — Platinum</p>
                         </div>
-                        <span class="text-[10px] font-bold text-primary-hover uppercase tracking-widest">1h lalu</span>
+                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">1h lalu</span>
                     </div>
                 </div>
                 

@@ -13,10 +13,10 @@
 
     <x-layouts.navbar>
         <x-slot:links>
-            <a href="{{ route('home') }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 pb-1">BERANDA</a>
-            <a href="{{ route('specs') }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 pb-1">SPEK PRODUK</a>
-            <a href="{{ route('gallery') }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 pb-1">GALERI</a>
-            <a href="{{ route('contact') }}" class="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 pb-1">KONTAK</a>
+            <a href="{{ route('home') }}" class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">BERANDA</a>
+            <a href="{{ route('specs') }}" class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">SPEK PRODUK</a>
+            <a href="{{ route('gallery') }}" class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">GALERI</a>
+            <a href="{{ route('contact') }}" class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">KONTAK</a>
         </x-slot:links>
 
         <a href="/login" class="font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="p-6 lg:p-8">
-                    <form method="POST" action="/register" novalidate>
+                    <form method="POST" action="/register" enctype="multipart/form-data" novalidate>
                         @csrf
                         
                         {{-- [ STEP 1: DATA DIRI & ALAMAT ] --}}
@@ -98,6 +98,24 @@
                                 <x-ui.input id="nik" name="nik" label="NO. NIK KTP" placeholder="16 digit NIK" required />
                                 <x-ui.input id="name" name="name" label="NAMA LENGKAP" placeholder="Sesuai KTP" required />
                                 <x-ui.input id="phone" name="phone" type="tel" label="NO. WHATSAPP" placeholder="08xx..." required />
+
+                                {{-- Upload KTP --}}
+                                <div class="md:col-span-3 mt-2">
+                                    <label class="text-[9px] font-bold text-primary uppercase tracking-widest block mb-1.5">UNGGAH FOTO KTP</label>
+                                    <div class="relative group">
+                                        <input type="file" name="ktp_photo" id="ktp_photo" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required>
+                                        <div class="border-2 border-dashed border-primary bg-neutral-light p-6 flex flex-col items-center justify-center gap-3 group-hover:bg-neutral-border-light transition-all">
+                                            <svg class="w-8 h-8 text-primary opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <div class="text-center">
+                                                <p class="text-[10px] font-black text-primary uppercase tracking-widest">Pilih File Foto KTP</p>
+                                                <p class="text-[8px] font-bold text-slate-500 mt-1 uppercase">Format: JPG, PNG (Maks. 2MB)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="md:col-span-3">
                                     <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Domisili Pengiriman</p>
@@ -106,30 +124,45 @@
 
                                 <div class="flex flex-col gap-1.5">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="province_id">PROVINSI</label>
-                                    <select id="province_id" name="province_id" class="bg-neutral border-2 border-neutral-border px-3 py-2.5 font-body text-xs font-bold text-gray-900 focus:outline-none focus:border-primary transition-colors appearance-none" required>
-                                        <option value="">PILIH PROVINSI</option>
-                                        <option value="1">Jawa Barat</option>
-                                    </select>
+                                    <div class="relative">
+                                        <select id="province_id" name="province_id" class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer" required>
+                                            <option value="">PILIH PROVINSI</option>
+                                            <option value="1">Jawa Barat</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex flex-col gap-1.5">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="city_id">KOTA / KABUPATEN</label>
-                                    <select id="city_id" name="city_id" class="bg-neutral border-2 border-neutral-border px-3 py-2.5 font-body text-xs font-bold text-gray-900 focus:outline-none focus:border-primary transition-colors appearance-none" required>
-                                        <option value="">PILIH KOTA</option>
-                                        <option value="1">Bandung</option>
-                                    </select>
+                                    <div class="relative">
+                                        <select id="city_id" name="city_id" class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer" required>
+                                            <option value="">PILIH KOTA</option>
+                                            <option value="1">Bandung</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex flex-col gap-1.5">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="district_id">KECAMATAN</label>
-                                    <select id="district_id" name="district_id" class="bg-neutral border-2 border-neutral-border px-3 py-2.5 font-body text-xs font-bold text-gray-900 focus:outline-none focus:border-primary transition-colors appearance-none" required>
-                                        <option value="">PILIH KECAMATAN</option>
-                                    </select>
+                                    <div class="relative">
+                                        <select id="district_id" name="district_id" class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer" required>
+                                            <option value="">PILIH KECAMATAN</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="md:col-span-3">
                                     <div class="flex flex-col gap-1.5">
                                         <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="address">ALAMAT DETAIL</label>
                                         <textarea id="address" name="address" rows="2" required placeholder="Nama jalan, nomor rumah, RT/RW..." 
-                                            class="bg-neutral border-2 border-neutral-border px-3 py-2.5 font-body text-xs font-bold text-gray-900 focus:outline-none focus:border-primary transition-colors resize-none"></textarea>
+                                            class="bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors resize-none"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -148,6 +181,10 @@
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="md:col-span-2">
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Informasi Rekening</p>
+                                    <div class="h-1 w-12 bg-secondary"></div>
+                                </div>
                                 <div class="md:col-span-2">
                                     <x-ui.input id="bank_account_name" name="bank_account_name" label="ATAS NAMA REKENING" placeholder="Contoh: BUDI SANTOSO" class="uppercase" required />
                                 </div>
@@ -168,6 +205,10 @@
                         {{-- [ STEP 3: VERIFIKASI AKUN ] --}}
                         <div x-show="step === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="md:col-span-2">
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keamanan Akses</p>
+                                    <div class="h-1 w-12 bg-secondary"></div>
+                                </div>
                                 <div class="md:col-span-2">
                                     <x-ui.input id="username" name="username" label="USERNAME AKSES" placeholder="Gunakan huruf kecil & angka" required />
                                 </div>

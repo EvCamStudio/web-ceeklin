@@ -9,7 +9,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-darkest)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Total Bonus Saya</p>
-            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">Rp 12.500.000</h3>
+            <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 12.500.000</h3>
             <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 +15% vs bulan lalu
@@ -17,7 +17,7 @@
         </div>
         <div class="bg-white border-[3px] border-secondary shadow-[6px_6px_0_var(--color-gray-900)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Tier Saat Ini</p>
-            <h3 class="font-headline font-black text-4xl text-secondary tracking-tighter">GOLD</h3>
+            <h3 class="font-headline font-black text-3xl md:text-4xl text-secondary tracking-tighter">GOLD</h3>
             <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-2 mt-3">
                 <div class="bg-secondary h-full" style="width:75%"></div>
             </div>
@@ -60,11 +60,11 @@
             </div>
             <div class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 items-start">
                 <div class="flex flex-col gap-1">
-                    <p class="text-[10px] text-secondary font-bold uppercase tracking-widest">Wilayah</p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-widest">Wilayah</p>
                     <p class="font-headline font-black text-primary text-lg">Jawa Barat</p>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <p class="text-[10px] text-secondary font-bold uppercase tracking-widest">Distributor</p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-widest">Distributor</p>
                     <p class="font-bold text-gray-900 text-sm">PT. Industrial Mandiri</p>
                     <p class="text-[10px] text-slate-400 uppercase tracking-widest">Bandung Hub</p>
                 </div>

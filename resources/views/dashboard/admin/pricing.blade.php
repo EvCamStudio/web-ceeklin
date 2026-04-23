@@ -19,7 +19,7 @@
                 <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-black/20 px-2 py-1">Tier 1</span>
             </div>
             <div class="p-6">
-                <label class="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-2" for="harga-distributor">Harga per Unit</label>
+                <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2" for="harga-distributor">Harga per Unit</label>
                 <div class="relative border-[3px] border-primary shadow-[4px_4px_0_var(--color-gray-900)] bg-white">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 font-headline font-black text-lg text-primary/40">Rp</span>
                     {{-- BACKEND-TODO: value dari DB (pricings table, tier=distributor) --}}
@@ -41,7 +41,7 @@
                 <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 bg-black/20 px-2 py-1">Tier 2</span>
             </div>
             <div class="p-6">
-                <label class="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-2" for="harga-reseller">Harga per Unit</label>
+                <label class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-2" for="harga-reseller">Harga per Unit</label>
                 <div class="relative border-[3px] border-secondary shadow-[4px_4px_0_var(--color-gray-900)] bg-white">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 font-headline font-black text-lg text-secondary/40">Rp</span>
                     {{-- BACKEND-TODO: value dari DB (pricings table, tier=reseller) --}}

@@ -46,9 +46,9 @@
                     </svg>
                 </div>
                 {{-- Label Bulan --}}
-                <div class="flex justify-between mt-2 pr-1">
+                <div class="flex justify-between mt-2 pr-1 gap-1">
                     @foreach(['Jan','Feb','Mar','Apr','Mei','Jun','Jul'] as $bulan)
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $bulan }}</span>
+                        <span class="text-[7px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-tight sm:tracking-widest">{{ $bulan }}</span>
                     @endforeach
                 </div>
             </div>

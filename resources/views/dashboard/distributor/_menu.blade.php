@@ -54,7 +54,7 @@
             : ($currentPage === $menu['key']);
 
         $activeClass = $isActive
-            ? 'bg-white/10 text-white border-l-[6px] border-secondary'
+            ? 'bg-white/10 text-secondary border-l-[6px] border-secondary'
             : 'text-white/60 hover:bg-white/5 hover:text-white border-l-[6px] border-transparent';
     @endphp
     <a href="{{ $menu['route'] }}"
@@ -74,7 +74,7 @@
         @php
             $isActive = $currentPage === $menu['key'];
             $activeClass = $isActive
-                ? 'bg-white/10 text-white border-l-[6px] border-secondary'
+                ? 'bg-white/10 text-secondary border-l-[6px] border-secondary'
                 : 'text-white/60 hover:bg-white/5 hover:text-white border-l-[6px] border-transparent';
         @endphp
         <a href="{{ $menu['route'] }}"

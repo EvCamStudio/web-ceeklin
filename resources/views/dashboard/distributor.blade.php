@@ -29,7 +29,7 @@
         {{-- Pendapatan MTD --}}
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-hover)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Pendapatan MTD</p>
-            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">Rp 1,5M</h3>
+            <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 1,5M</h3>
             <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 +5.2% MoM
@@ -83,24 +83,24 @@
             </div>
             {{-- BACKEND-TODO: Loop dari Order::latest()->take(5)->get() --}}
             <div class="divide-y-2 divide-neutral-border">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
+                    <div class="flex-1">
                         <p class="font-bold text-sm text-gray-900">PT. Maju Logistik</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">50 unit — Industrial Degreaser</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">50 unit — Industrial Degreaser</p>
                     </div>
                     <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Diproses</span>
                 </div>
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
+                    <div class="flex-1">
                         <p class="font-bold text-sm text-gray-900">Teknik Karya Supply</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">120 unit — Heavy Duty Solvent</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">120 unit — Heavy Duty Solvent</p>
                     </div>
                     <span class="px-2 py-1 border-2 border-primary text-primary text-[10px] font-bold uppercase tracking-widest">Dikirim</span>
                 </div>
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
+                    <div class="flex-1">
                         <p class="font-bold text-sm text-gray-900">Indo Cipta Chem</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">30 unit — Surface Prep</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">30 unit — Surface Prep</p>
                     </div>
                     <span class="px-2 py-1 border-2 border-green-700 text-green-700 text-[10px] font-bold uppercase tracking-widest">Terkirim</span>
                 </div>

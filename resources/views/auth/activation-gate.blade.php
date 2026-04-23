@@ -13,13 +13,13 @@
 
     <div class="w-full max-w-4xl">
         {{-- Header Minimalis --}}
-        <div class="h-20 flex justify-between items-center mb-8 border-b-4 border-gray-900">
+        <div class="min-h-[5rem] py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b-4 border-gray-900 gap-4">
             <div>
-                <h1 class="font-headline font-black text-3xl text-primary tracking-tighter uppercase leading-none">Aktivasi Akun</h1>
-                <p class="text-[9px] font-bold tracking-[0.2em] text-slate-500 uppercase mt-1">Langkah Terakhir Menjadi Mitra Resmi</p>
+                <h1 class="font-headline font-black text-2xl sm:text-3xl text-primary tracking-tighter uppercase leading-none">Aktivasi Akun</h1>
+                <p class="text-[8px] sm:text-[9px] font-bold tracking-[0.15em] sm:tracking-[0.2em] text-slate-500 uppercase mt-2 sm:mt-1">Langkah Terakhir Menjadi Mitra Resmi</p>
             </div>
-            <form action="/login" method="GET">
-                <button type="submit" class="font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">
+            <form action="/login" method="GET" class="w-full sm:w-auto">
+                <button type="submit" class="w-full sm:w-auto font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">
                     KELUAR
                 </button>
             </form>
@@ -50,17 +50,17 @@
                         }
                     }">
                         <div class="text-center">
-                            <span class="font-headline font-black text-4xl text-primary" x-text="hours.toString().padStart(2, '0')">47</span>
+                            <span class="font-headline font-black text-3xl sm:text-4xl text-primary" x-text="hours.toString().padStart(2, '0')">47</span>
                             <p class="text-[8px] font-bold uppercase tracking-widest mt-1">Jam</p>
                         </div>
-                        <span class="font-headline font-black text-4xl text-primary">:</span>
+                        <span class="font-headline font-black text-3xl sm:text-4xl text-primary">:</span>
                         <div class="text-center">
-                            <span class="font-headline font-black text-4xl text-primary" x-text="minutes.toString().padStart(2, '0')">59</span>
+                            <span class="font-headline font-black text-3xl sm:text-4xl text-primary" x-text="minutes.toString().padStart(2, '0')">59</span>
                             <p class="text-[8px] font-bold uppercase tracking-widest mt-1">Menit</p>
                         </div>
-                        <span class="font-headline font-black text-4xl text-primary">:</span>
+                        <span class="font-headline font-black text-3xl sm:text-4xl text-primary">:</span>
                         <div class="text-center">
-                            <span class="font-headline font-black text-4xl text-primary" x-text="seconds.toString().padStart(2, '0')">59</span>
+                            <span class="font-headline font-black text-3xl sm:text-4xl text-primary" x-text="seconds.toString().padStart(2, '0')">59</span>
                             <p class="text-[8px] font-bold uppercase tracking-widest mt-1">Detik</p>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
 
             {{-- Sisi Kanan: Order Card --}}
             <div class="w-full lg:w-[55%]">
-                <div class="bg-white border-4 border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] overflow-hidden h-full flex flex-col">
+                <div class="bg-white border-4 border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] sm:shadow-[12px_12px_0_var(--color-secondary)] overflow-hidden h-full flex flex-col">
                     <div class="p-5 border-b-4 border-gray-900 bg-gray-900">
                         <h2 class="font-headline font-bold text-sm text-secondary uppercase tracking-widest text-center">RINCIAN PESANAN AKTIVASI</h2>
                     </div>
@@ -99,9 +99,9 @@
                     </div>
 
                     <div class="p-6 flex-grow flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-8 bg-neutral p-4 border-2 border-dashed border-gray-400">
+                        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 bg-neutral p-4 border-2 border-dashed border-gray-400 gap-2">
                             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Transfer</span>
-                            <span class="font-headline font-black text-3xl text-primary tracking-tighter">Rp 750.000</span>
+                            <span class="font-headline font-black text-2xl sm:text-3xl text-primary tracking-tighter">Rp 750.000</span>
                         </div>
 
                         <div class="space-y-4">

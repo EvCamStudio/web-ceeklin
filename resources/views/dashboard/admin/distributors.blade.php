@@ -21,12 +21,12 @@
                 {{-- BACKEND-TODO: action ke DistributorController@store + @csrf --}}
                 <form class="flex flex-col gap-5">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="nama-entitas">Nama Perusahaan</label>
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-entitas">Nama Perusahaan</label>
                         <input id="nama-entitas" type="text" placeholder="CV / PT ..."
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="wilayah">Wilayah</label>
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="wilayah">Wilayah</label>
                         <div class="relative">
                             <select id="wilayah" aria-label="Pilih Wilayah"
                                 class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer">
@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="kontak">Kontak (PIC)</label>
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="kontak">Kontak (PIC)</label>
                         <input id="kontak" type="text" placeholder="Nama & No. HP"
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
                     </div>
@@ -56,49 +56,80 @@
 
         {{-- Tabel Daftar Distributor --}}
         <div class="xl:col-span-2 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
-            <div class="bg-primary px-6 py-3 flex items-center justify-between">
-                <span class="font-headline font-black text-white text-base uppercase tracking-tight">Distributor Aktif</span>
+            <div class="bg-primary px-6 py-3 flex items-center justify-between gap-4">
+                <span class="font-headline font-black text-white text-base uppercase tracking-tight leading-tight">Distributor Aktif</span>
                 {{-- BACKEND-TODO: hitung dari Distributor::active()->count() --}}
-                <span class="text-[10px] font-bold uppercase tracking-widest text-secondary">38 Total</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-white/10 px-2 py-0.5 border border-white/20 whitespace-nowrap">38 Total</span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left" aria-label="Daftar Distributor Aktif">
-                    <thead>
-                        <tr class="bg-neutral-light border-b-2 border-neutral-border">
-                            <th class="py-3 px-6 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Nama Perusahaan</th>
-                            <th class="py-3 px-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</th>
-                            <th class="py-3 px-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-center">Reseller</th>
-                            <th class="py-3 px-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-center">Status</th>
-                        </tr>
-                    </thead>
-                    {{-- BACKEND-TODO: Loop dari Distributor::with('resellers')->paginate(15) --}}
-                    <tbody class="text-sm divide-y-2 divide-neutral-border">
-                        <tr class="hover:bg-neutral-light transition-colors duration-150">
-                            <td class="py-3 px-6 font-bold text-gray-900">PT Tirta Makmur</td>
-                            <td class="py-3 px-4 text-slate-500 font-bold text-xs uppercase tracking-widest">Jawa Barat</td>
-                            <td class="py-3 px-4 font-headline font-black text-xl text-primary text-center">24</td>
-                            <td class="py-3 px-4 text-center">
-                                <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Aktif</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-neutral-light transition-colors duration-150">
-                            <td class="py-3 px-6 font-bold text-gray-900">CV Bintang Selatan</td>
-                            <td class="py-3 px-4 text-slate-500 font-bold text-xs uppercase tracking-widest">Jawa Timur</td>
-                            <td class="py-3 px-4 font-headline font-black text-xl text-primary text-center">18</td>
-                            <td class="py-3 px-4 text-center">
-                                <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Aktif</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-neutral-light transition-colors duration-150">
-                            <td class="py-3 px-6 font-bold text-slate-400">Distributor Abadi</td>
-                            <td class="py-3 px-4 text-slate-400 font-bold text-xs uppercase tracking-widest">Jawa Tengah</td>
-                            <td class="py-3 px-4 font-headline font-black text-xl text-slate-400 text-center">9</td>
-                            <td class="py-3 px-4 text-center">
-                                <span class="px-2 py-1 border-2 border-slate-300 text-slate-400 text-[10px] font-bold uppercase tracking-widest">Nonaktif</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            
+            {{-- Header (Desktop Only) --}}
+            <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-light border-b-2 border-neutral-border">
+                <div class="col-span-5 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Nama Perusahaan</div>
+                <div class="col-span-3 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-center">Reseller</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right">Status</div>
+            </div>
+
+            <div class="divide-y-2 divide-neutral-border">
+                {{-- Item 1 --}}
+                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
+                    <div class="md:col-span-5 w-full min-w-0">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
+                        <div class="font-bold text-gray-900 text-base md:text-sm uppercase truncate">PT Tirta Makmur</div>
+                    </div>
+                    <div class="md:col-span-3 w-full flex justify-between md:block">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Barat</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
+                        <div class="font-headline font-black text-xl text-primary tracking-tighter">24</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                        <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Aktif</span>
+                    </div>
+                </div>
+
+                {{-- Item 2 --}}
+                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
+                    <div class="md:col-span-5 w-full min-w-0">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
+                        <div class="font-bold text-gray-900 text-base md:text-sm uppercase truncate">CV Bintang Selatan</div>
+                    </div>
+                    <div class="md:col-span-3 w-full flex justify-between md:block">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Timur</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
+                        <div class="font-headline font-black text-xl text-primary tracking-tighter">18</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                        <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Aktif</span>
+                    </div>
+                </div>
+
+                {{-- Item 3 --}}
+                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
+                    <div class="md:col-span-5 w-full min-w-0">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
+                        <div class="font-bold text-slate-400 text-base md:text-sm uppercase truncate">Distributor Abadi</div>
+                    </div>
+                    <div class="md:col-span-3 w-full flex justify-between md:block">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-widest">Jawa Tengah</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
+                        <div class="font-headline font-black text-xl text-slate-400 tracking-tighter">9</div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
+                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                        <span class="px-2 py-0.5 border-2 border-slate-300 text-slate-400 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Nonaktif</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

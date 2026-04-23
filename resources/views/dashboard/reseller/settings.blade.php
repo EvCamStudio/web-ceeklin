@@ -23,7 +23,7 @@
                 <x-ui.input id="ahli-waris" label="Ahli Waris" value="Siti Aminah" />
 
                 <div class="flex flex-col gap-1.5 md:col-span-2">
-                    <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="alamat-reseller">Alamat</label>
+                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-reseller">Alamat</label>
                     <textarea id="alamat-reseller" rows="2"
                         class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none">Jl. Raya Bandung No. 12, Kel. Cimahi, Kec. Cimahi Utara, Kota Cimahi, Jawa Barat 40511</textarea>
                 </div>
