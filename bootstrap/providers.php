@@ -4,4 +4,5 @@ use App\Providers\AppServiceProvider;
 
 return [
     AppServiceProvider::class,
+    Laravolt\Indonesia\ServiceProvider::class,
 ];

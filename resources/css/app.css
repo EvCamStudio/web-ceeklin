@@ -104,4 +104,16 @@
         pointer-events: none;
         z-index: 9999;
     }
+
+    /* Hide Number Spinners */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }

@@ -87,7 +87,11 @@
             {{ $menu['name'] }}
         </a>
     @endforeach
-    <a href="/login"
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    <a href="#"
+       onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
        aria-label="Keluar dari Portal Distributor"
        class="flex items-center gap-3 px-5 py-3 text-[10px] font-headline font-bold uppercase tracking-widest text-white/60 hover:text-white border-l-[6px] border-transparent transition-colors duration-150">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

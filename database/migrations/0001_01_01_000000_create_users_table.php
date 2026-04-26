@@ -14,9 +14,31 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('username')->unique();
+            $table->string('email')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('reseller'); // admin, produsen, distributor, reseller
+            $table->string('status')->default('pending'); // active, pending, suspended
+            
+            // Profile Info (Wajib)
+            $table->string('phone');
+            $table->string('nik', 16)->unique();
+            $table->string('ktp_photo');
+            $table->text('address');
+            $table->string('province_id'); // Menyimpan code wilayah
+            $table->string('city_id');     // Menyimpan code wilayah
+            $table->string('district_id'); // Menyimpan code wilayah
+            
+            // Bank Info (Wajib)
+            $table->string('bank_name');
+            $table->string('bank_account_name');
+            $table->string('bank_account_number')->unique();
+            
+            // Referral/Network Info (Opsional)
+            $table->string('referral_code')->nullable();
+            $table->foreignId('upline_id')->nullable()->constrained('users');
+            
             $table->rememberToken();
             $table->timestamps();
         });
