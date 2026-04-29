@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Portal CEEKLIN</title>
+    <title>Masuk - Portal CeeKlin</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -35,47 +35,100 @@
                 </h1>
                 <p class="text-[9px] uppercase font-bold text-secondary tracking-[0.2em]">INDUSTRIAL POWER PORTAL</p>
                 
-                @if($errors->any())
-                    <div class="mt-6 bg-primary-darkest border-l-4 border-secondary p-3 text-left">
-                        <p class="text-neutral font-bold text-[10px] uppercase tracking-widest">{{ $errors->first() }}</p>
+                @if(session('status') === 'pending')
+                    <div class="fixed top-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">
+                        <x-ui.toast type="warning" message="Akun Anda sedang dalam proses peninjauan oleh Admin." />
+                    </div>
+                @elseif(session('status') === 'rejected')
+                    <div class="fixed top-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">
+                        <x-ui.toast type="error" :message="'Akun Ditolak: ' . session('reason')" />
+                    </div>
+                @elseif($errors->any())
+                    <div class="fixed top-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">
+                        <x-ui.toast type="error" :message="$errors->first()" />
                     </div>
                 @endif
             </div>
 
             {{-- BACKEND-TODO: Route aksi form ini sementara diarahakan ke /login biasa. Ganti dengan route('login') Laravel --}}
-            <form class="flex flex-col gap-6" method="POST" action="/login">
+            <form class="flex flex-col gap-6" method="POST" action="/login" novalidate x-data="{
+                errors: { username: '', password: '' },
+                validateForm(e) {
+                    this.errors.username = '';
+                    this.errors.password = '';
+                    const u = document.getElementById('username').value;
+                    const p = document.getElementById('password').value;
+                    let hasError = false;
+                    
+                    if (!u) {
+                        this.errors.username = 'Username wajib diisi';
+                        hasError = true;
+                    }
+                    if (!p) {
+                        this.errors.password = 'Password wajib diisi';
+                        hasError = true;
+                    }
+                    
+                    if (hasError) {
+                        e.preventDefault();
+                    }
+                }
+            }" @submit="validateForm($event)">
                 @csrf
                 
                 <!-- Field Username -->
                 <div>
                     <label for="username" class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">USERNAME</label>
+                    {{-- 
+                        TODO BACKEND:
+                        hideServerError="true" ditambahkan agar pesan error bawaan Laravel (seperti "Identitas tidak cocok")
+                        TIDAK diduplikasi di bawah field ini, karena sudah ditampilkan di komponen x-ui.toast di bagian atas form.
+                        Error pill di bawah field ini murni difokuskan untuk interaksi validasi client-side (Alpine.js).
+                    --}}
                     <x-ui.input 
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="admin, distributor, reseller, atau reseller2" 
+                        placeholder="Masukkan username Anda" 
                         required 
                         autofocus 
                         variant="industrial" 
+                        hideServerError="true"
+                        @input="if(errors['username']) errors['username'] = null"
                     />
                 </div>
 
                 <!-- Field Password -->
-                <div>
+                <div class="relative">
                     <label for="password" class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">PASSWORD</label>
                     <x-ui.input 
                         type="password" 
                         id="password" 
                         name="password" 
-                        placeholder="********" 
+                        placeholder="Masukkan password Anda" 
                         required 
                         variant="industrial" 
+                        hideServerError="true"
+                        @input="if(errors['password']) errors['password'] = null"
                     />
                     
-                    <div class="flex justify-end mt-2">
-                        <a href="#" class="text-[9px] uppercase font-bold text-primary tracking-widest hover:text-secondary transition-colors underline-offset-4 hover:underline">
+                    <div class="flex justify-end mt-2" x-data="{ showReset: false }">
+                        <button type="button" @click="showReset = !showReset"
+                            class="text-[9px] uppercase font-bold text-primary tracking-widest hover:text-secondary transition-colors">
                             LUPA PASSWORD?
-                        </a>
+                        </button>
+                        <div x-show="showReset" x-transition
+                             class="absolute mt-6 right-0 bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-secondary)] p-4 max-w-[220px] z-10"
+                             style="display:none;">
+                            <p class="text-[9px] font-bold text-gray-900 uppercase tracking-widest leading-relaxed mb-2">
+                                Hubungi Admin untuk reset password:
+                            </p>
+                            <a href="https://wa.me/628xxxxxxxxxx?text=Halo%20Admin%2C%20saya%20lupa%20password%20akun%20CeeKlin%20saya." target="_blank"
+                               class="inline-flex items-center gap-1.5 bg-secondary text-white px-3 py-2 font-bold text-[9px] uppercase tracking-widest w-full justify-center hover:bg-secondary-dark transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                Hubungi Admin via WA
+                            </a>
+                        </div>
                     </div>
                 </div>
 

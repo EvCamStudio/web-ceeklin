@@ -40,18 +40,17 @@ Route::get('/activation', function () {
 // DASHBOARDS
 // Pintu masuk dashboard utama (tanpa parameter)
 Route::get('/dashboard', function () {
-    return redirect()->route('dashboard.role', ['role' => auth()->user()->role]);
+    return redirect()->route('dashboard.role', ['role' => auth()->user()->role ?? 'reseller']);
 })->middleware('auth')->name('dashboard');
 
 // Dashboard berparameter (admin/distributor/reseller)
 Route::get('/dashboard/{role}/{page?}', function ($role, $page = 'overview') {
     $allowedRoles = ['admin', 'distributor', 'reseller'];
 
-    // Pages per-role yang diperbolehkan
     $allowedPages = [
-        'admin'       => ['overview', 'pricing', 'bonus', 'distributors', 'sales', 'settings'],
-        'distributor' => ['overview', 'order', 'inventory', 'resellers', 'sales-map', 'settings'],
-        'reseller'    => ['overview', 'order', 'earnings', 'referrals', 'tier', 'settings'],
+        'admin'       => ['overview', 'pricing', 'bonus', 'verify', 'mapping', 'distributors', 'distributor-orders', 'sales', 'settings'],
+        'distributor' => ['overview', 'inventory', 'resellers', 'order', 'sales-map', 'history', 'incoming-orders', 'settings'],
+        'reseller'    => ['overview', 'order', 'history', 'referrals', 'settings'],
     ];
 
     if (!in_array($role, $allowedRoles) || !in_array($page, $allowedPages[$role])) {
@@ -64,3 +63,7 @@ Route::get('/dashboard/{role}/{page?}', function ($role, $page = 'overview') {
 
     return view($view);
 })->name('dashboard.role')->middleware('auth');
+
+Route::view('/register-success', 'auth.register-success')->name('register-success');
+
+Route::view('/components-showcase', 'components-showcase')->name('components-showcase');

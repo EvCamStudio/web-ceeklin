@@ -38,33 +38,23 @@
 
                 <div class="p-8">
                     <p class="text-sm text-slate-600 font-bold leading-relaxed mb-8 text-center">
-                        Akun Anda berhasil dikonfigurasi. Segera lakukan <strong class="text-primary uppercase tracking-widest pl-1">Login Pertama</strong> untuk memulai proses aktivasi wilayah.
+                        Akun Anda telah tersimpan dan saat ini sedang <strong class="text-secondary uppercase tracking-widest pl-1">Menunggu Verifikasi</strong>. Hubungi Admin via WhatsApp untuk mempercepat proses.
                     </p>
 
                     {{-- Status Timeline --}}
                     <div class="bg-neutral border-2 border-neutral-border p-5 mb-8 flex flex-col gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 flex items-center justify-center bg-primary text-white border-2 border-gray-900 flex-shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <div>
-                                <p class="font-headline font-bold text-[10px] uppercase tracking-widest text-gray-900">Data Diri Terverifikasi</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 flex items-center justify-center bg-primary text-white border-2 border-gray-900 flex-shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <div>
-                                <p class="font-headline font-bold text-[10px] uppercase tracking-widest text-gray-900">Rekening Bank Terdaftar</p>
-                            </div>
-                        </div>
                         <div class="flex items-center gap-3 opacity-50">
                             <div class="w-6 h-6 flex items-center justify-center bg-transparent border-2 border-slate-400 text-slate-400 flex-shrink-0">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div>
-                                <p class="font-headline font-bold text-[10px] uppercase tracking-widest text-secondary">Menunggu Aktivasi Stok</p>
+                                <p class="font-headline font-bold text-[10px] uppercase tracking-widest text-secondary">Menunggu Verifikasi Admin</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 opacity-30">
+                            <div class="w-6 h-6 flex items-center justify-center bg-transparent border-2 border-slate-400 text-slate-400 flex-shrink-0"></div>
+                            <div>
+                                <p class="font-headline font-bold text-[10px] uppercase tracking-widest text-slate-500">Masuk & Aktivasi Perdana</p>
                             </div>
                         </div>
                     </div>
@@ -75,13 +65,31 @@
                             ⚠️ Perhatian
                         </p>
                         <p class="text-gray-900 text-xs font-bold leading-relaxed">
-                            Lakukan pembelian komitmen awal dalam <span class="text-primary">48 JAM</span> setelah login. Sistem akan menghapus data pendaftaran jika syarat ini tidak terpenuhi.
+                            Mohon sertakan <span class="text-primary">Nama & NIK</span> Anda saat menghubungi Admin agar proses peninjauan dapat dilakukan lebih cepat.
                         </p>
                     </div>
 
-                    <x-ui.button fullWidth="true" onclick="window.location.href='/login'" class="py-4 text-base">
-                        KEMBALI KE LOGIN &rarr;
-                    </x-ui.button>
+                    {{-- BACKEND-TODO: Ganti wa.me link dengan no admin yang benar dan isi pesannya dinamis --}}
+                    <a href="https://wa.me/628xxxxxxxxxx?text=Halo%20Admin%2C%20saya%20sudah%20mendaftar%20reseller%20dengan%20NIK%3A%20...%20Mohon%20bantu%20verifikasi." target="_blank" aria-label="Hubungi Admin via WhatsApp"
+                        class="w-full bg-secondary text-white px-4 py-4 font-headline font-bold text-base uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                        HUBUNGI ADMIN VIA WA
+                    </a>
+                    
+                    <div class="mt-4 text-center">
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="text-[10px] font-bold text-primary hover:text-secondary uppercase tracking-widest transition-colors">
+                                    KELUAR
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="text-[10px] font-bold text-primary hover:text-secondary uppercase tracking-widest transition-colors">
+                                Ke Halaman Masuk
+                            </a>
+                        @endauth
+                    </div>
                 </div>
             </div>
         </div>

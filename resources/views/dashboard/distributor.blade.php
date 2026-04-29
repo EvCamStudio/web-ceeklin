@@ -9,6 +9,18 @@
         @include('dashboard.distributor._menu')
     </x-slot:menuSlot>
 
+    {{-- 
+        TODO BACKEND:
+        Gunakan Toast Component untuk notifikasi success/error (misal: setelah berhasil login atau simpan data).
+        Silakan panggil komponen ini jika terdapat flash session.
+        Contoh:
+        @if(session('success'))
+            <div class="fixed top-8 right-8 z-[100]">
+                <x-ui.toast type="success" :message="session('success')" />
+            </div>
+        @endif
+    --}}
+
     {{-- KPI Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {{-- Volume Bulanan --}}
@@ -23,8 +35,11 @@
         {{-- Reseller Aktif --}}
         <div class="bg-white border-[3px] border-secondary shadow-[6px_6px_0_var(--color-gray-900)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Reseller Aktif</p>
-            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">24</h3>
-            <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest">Wilayah Jawa Barat</p>
+            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">24 <span class="text-lg text-slate-400">/ 20</span></h3>
+            <p class="text-xs text-green-600 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                Target Minimum Tercapai
+            </p>
         </div>
         {{-- Pendapatan MTD --}}
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-hover)] p-6">
@@ -85,24 +100,31 @@
             <div class="divide-y-2 divide-neutral-border">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
                     <div class="flex-1">
-                        <p class="font-bold text-sm text-gray-900">PT. Maju Logistik</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">50 unit — Industrial Degreaser</p>
+                        <p class="font-bold text-sm text-gray-900">Ahmad Reseller</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">50 pcs — CeeKlin 450ml</p>
                     </div>
-                    <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Diproses</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 border-2 border-primary text-primary text-[10px] font-bold uppercase tracking-widest">Menunggu Diproses</span>
+                        <button class="bg-primary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-primary-hover">Proses</button>
+                    </div>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
                     <div class="flex-1">
-                        <p class="font-bold text-sm text-gray-900">Teknik Karya Supply</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">120 unit — Heavy Duty Solvent</p>
+                        <p class="font-bold text-sm text-gray-900">Budi Subroto</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">100 pcs — CeeKlin 450ml</p>
                     </div>
-                    <span class="px-2 py-1 border-2 border-primary text-primary text-[10px] font-bold uppercase tracking-widest">Dikirim</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Diproses / Dikirim</span>
+                    </div>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
                     <div class="flex-1">
-                        <p class="font-bold text-sm text-gray-900">Indo Cipta Chem</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">30 unit — Surface Prep</p>
+                        <p class="font-bold text-sm text-gray-900">Toko Sinar Jaya</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">50 pcs — CeeKlin 450ml</p>
                     </div>
-                    <span class="px-2 py-1 border-2 border-green-700 text-green-700 text-[10px] font-bold uppercase tracking-widest">Terkirim</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 border-2 border-green-700 text-green-700 text-[10px] font-bold uppercase tracking-widest">Selesai</span>
+                    </div>
                 </div>
             </div>
         </div>

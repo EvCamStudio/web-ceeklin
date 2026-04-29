@@ -124,7 +124,7 @@
             <div class="flex items-center gap-3 md:gap-6">
                 {{-- Search (Hidden on small mobile) --}}
                 <div class="relative hidden sm:block border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]">
-                    <input type="text" placeholder="Search..." class="w-32 md:w-56 bg-white border-none px-4 py-2 font-body text-xs md:text-sm font-bold text-primary focus:ring-0 focus:outline-none">
+                    <input type="text" placeholder="Cari..." class="w-32 md:w-56 bg-white border-none px-4 py-2 font-body text-xs md:text-sm font-bold text-primary focus:ring-0 focus:outline-none">
                 </div>
 
                 {{-- Notif + Avatar --}}

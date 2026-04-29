@@ -27,8 +27,7 @@
         </x-slot:links>
 
         <a href="/login"
-            class="w-full md:w-auto font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300 text-center">PORTAL
-            LOGIN</a>
+            class="w-full md:w-auto font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300 text-center">MASUK</a>
     </x-layouts.navbar>
 
     <main class="flex-grow">
@@ -38,9 +37,9 @@
             <div class="w-full lg:w-[55%] flex flex-col items-start z-10">
                 <h1
                     class="font-headline font-black leading-[0.85] text-primary uppercase text-4xl md:text-6xl lg:text-[5rem] tracking-tighter">
-                    KERAK<br>
-                    BERAKHIR<br>
-                    <span class="text-gray-900">DI SINI.</span>
+                    JAGONYA<br>
+                    PEMBASMI<br>
+                    <span class="text-gray-900">NODA.</span>
                 </h1>
 
                 <div class="mt-8 border-l-[4px] border-secondary pl-6 bg-neutral-dark/40 py-2">
@@ -395,7 +394,7 @@
                     </a>
                     <a href="/login"
                         class="inline-flex items-center justify-center w-full text-center border-4 border-primary-hover text-white hover:bg-primary-hover px-10 py-6 font-headline font-bold text-lg uppercase tracking-widest transition-all mt-4">
-                        SUDAH PUNYA AKSES? LOGIN
+                        SUDAH PUNYA AKUN? MASUK
                     </a>
                 </div>
             </div>

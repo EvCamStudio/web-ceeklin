@@ -9,6 +9,50 @@
         @include('dashboard.admin._menu')
     </x-slot:menuSlot>
 
+    <div class="flex flex-col lg:flex-row gap-6 mb-8">
+        {{-- Set Target Bulanan --}}
+        <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] p-6 lg:w-1/3 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <h3 class="font-headline font-black text-xl text-primary tracking-tighter uppercase">Target Bulanan</h3>
+                </div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Atur syarat pencapaian bonus reseller bulan ini.</p>
+                
+                {{-- BACKEND-TODO: Form submit untuk update setting target bulanan --}}
+                <form action="/dashboard/admin/bonus/set-target" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Target Penjualan (PCS)</label>
+                        <input type="number" name="target_qty" value="1000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Hadiah Bonus (IDR)</label>
+                        <input type="number" name="target_reward" value="2500000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 hover:bg-primary-hover active:translate-y-0.5 transition-all mt-2">
+                        Simpan Pengaturan
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {{-- Info Box --}}
+        <div class="bg-secondary/10 border-[4px] border-secondary p-6 lg:w-2/3 flex flex-col justify-center">
+            <h4 class="font-headline font-black text-lg text-gray-900 uppercase mb-2">Sistem Bonus Aktif</h4>
+            <ul class="space-y-3 mt-2">
+                <li class="flex items-start gap-2 text-sm font-bold text-slate-700">
+                    <svg class="w-5 h-5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                    <span><strong>Bonus Referral:</strong> Otomatis masuk saat ada downline yang melakukan order pertama (Aktivasi 50 pcs).</span>
+                </li>
+                <li class="flex items-start gap-2 text-sm font-bold text-slate-700">
+                    <svg class="w-5 h-5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                    <span><strong>Bonus Target Bulanan:</strong> Hanya diberikan jika akumulasi pemesanan reseller (berdasar pesanan dari distributor) mencapai atau melebihi Target Penjualan dalam bulan berjalan.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     {{-- Tabel Alokasi Bonus -- fullwidth, memanfaatkan lebar layar desktop --}}
     <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
 
@@ -24,9 +68,8 @@
 
         {{-- Kolom Header --}}
         <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-3 border-b-2 border-neutral-border bg-neutral-light">
-            <div class="col-span-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Mitra / Perusahaan</div>
-            <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</div>
-            <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Level</div>
+            <div class="col-span-5 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Mitra / Perusahaan</div>
+            <div class="col-span-3 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</div>
             <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right">Jumlah (IDR)</div>
             <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right">Status</div>
         </div>
@@ -35,17 +78,13 @@
         <div class="divide-y-2 divide-neutral-border">
             {{-- Baris: Cair --}}
             <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-secondary hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-4 w-full min-w-0">
+                <div class="md:col-span-5 w-full min-w-0">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
                     <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">PT Tirta Makmur</div>
                 </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
+                <div class="md:col-span-3 w-full flex justify-between md:block">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
                     <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Barat</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Level Mitra</p>
-                    <span class="text-xs font-bold text-secondary uppercase tracking-widest">Platinum</span>
                 </div>
                 <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
@@ -59,17 +98,13 @@
 
             {{-- Baris: Tertunda --}}
             <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-4 w-full min-w-0">
+                <div class="md:col-span-5 w-full min-w-0">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
                     <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">CV Bintang Selatan</div>
                 </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
+                <div class="md:col-span-3 w-full flex justify-between md:block">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
                     <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Timur</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Level Mitra</p>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Emas</span>
                 </div>
                 <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
@@ -83,17 +118,13 @@
 
             {{-- Baris: Tertunda (2) --}}
             <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-4 w-full min-w-0">
+                <div class="md:col-span-5 w-full min-w-0">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
                     <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">Distributor Abadi</div>
                 </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
+                <div class="md:col-span-3 w-full flex justify-between md:block">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
                     <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Tengah</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Level Mitra</p>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Emas</span>
                 </div>
                 <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>

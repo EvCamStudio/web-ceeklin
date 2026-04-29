@@ -28,7 +28,7 @@
 
         <a href="/login"
             class="font-headline font-bold text-[10px] uppercase tracking-widest bg-primary text-white border-[3px] border-primary px-8 py-2.5 hover:bg-transparent hover:text-primary transition-all duration-300">
-            KEMBALI KE LOGIN
+            SUDAH PUNYA AKUN? MASUK
         </a>
     </x-layouts.navbar>
 
@@ -41,19 +41,19 @@
             const value = input.value;
             
             // Hapus error lama untuk field ini agar reaktif
-            this.errors[name] = null;
+            this.errors = { ...this.errors, [name]: null };
             
             if (input.hasAttribute('required') && !value) {
-                this.errors[name] = 'Bidang ini wajib diisi';
+                this.errors = { ...this.errors, [name]: 'Bidang ini wajib diisi' };
             } else if (name === 'nik' && value) {
                 if (value.length !== 16) {
-                    this.errors[name] = 'NIK harus tepat 16 digit';
+                    this.errors = { ...this.errors, [name]: 'NIK harus tepat 16 digit' };
                 } else {
                     try {
                         const response = await fetch(`/api/check-nik?nik=${value}`);
                         const data = await response.json();
                         if (!data.available) {
-                            this.errors[name] = 'NIK ini sudah terdaftar di sistem kami';
+                            this.errors = { ...this.errors, [name]: 'NIK ini sudah terdaftar di sistem kami' };
                         }
                     } catch (e) { console.error('Gagal cek NIK:', e); }
                 }
@@ -62,7 +62,7 @@
                     const response = await fetch(`/api/check-username?username=${value}`);
                     const data = await response.json();
                     if (!data.available) {
-                        this.errors[name] = 'Username ini sudah digunakan orang lain';
+                        this.errors = { ...this.errors, [name]: 'Username ini sudah digunakan orang lain' };
                     }
                 } catch (e) { console.error('Gagal cek Username:', e); }
             } else if (name === 'bank_account_number' && value) {
@@ -70,13 +70,13 @@
                     const response = await fetch(`/api/check-bank?account=${value}`);
                     const data = await response.json();
                     if (!data.available) {
-                        this.errors[name] = 'Nomor rekening ini sudah terdaftar';
+                        this.errors = { ...this.errors, [name]: 'Nomor rekening ini sudah terdaftar' };
                     }
                 } catch (e) { console.error('Gagal cek Rekening:', e); }
             } else if (name === 'password' && value && value.length < 8) {
-                this.errors[name] = 'Password minimal 8 karakter';
+                this.errors = { ...this.errors, [name]: 'Password minimal 8 karakter' };
             } else if (input.type === 'file' && input.hasAttribute('required') && !input.files.length) {
-                this.errors[name] = 'Foto KTP wajib diunggah';
+                this.errors = { ...this.errors, [name]: 'Foto KTP wajib diunggah' };
             }
         },
         async validateStep(currentStep) {
@@ -219,16 +219,7 @@
                                                 Klik untuk mengganti foto</div>
                                         </div>
                                     </div>
-                                    <div x-show="errors['ktp_photo']"
-                                        class="text-[10px] font-black text-red-600 uppercase tracking-tight flex items-center gap-1 mt-1"
-                                        style="display: none;">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span x-text="errors['ktp_photo']"></span>
-                                    </div>
+                                    <x-ui.error name="ktp_photo" />
                                 </div>
 
                                 <div class="md:col-span-3">
@@ -255,16 +246,7 @@
                                             </svg>
                                         </div>
                                     </div>
-                                    <div x-show="errors['province_id']"
-                                        class="text-[10px] font-black text-red-600 uppercase tracking-tight flex items-center gap-1 mt-1"
-                                        style="display: none;">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span x-text="errors['province_id']"></span>
-                                    </div>
+                                    <x-ui.error name="province_id" />
                                 </div>
                                 <div class="flex flex-col gap-1.5">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
@@ -284,16 +266,7 @@
                                             </svg>
                                         </div>
                                     </div>
-                                    <div x-show="errors['city_id']"
-                                        class="text-[10px] font-black text-red-600 uppercase tracking-tight flex items-center gap-1 mt-1"
-                                        style="display: none;">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span x-text="errors['city_id']"></span>
-                                    </div>
+                                    <x-ui.error name="city_id" />
                                 </div>
                                 <div class="flex flex-col gap-1.5">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
@@ -313,16 +286,7 @@
                                             </svg>
                                         </div>
                                     </div>
-                                    <div x-show="errors['district_id']"
-                                        class="text-[10px] font-black text-red-600 uppercase tracking-tight flex items-center gap-1 mt-1"
-                                        style="display: none;">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span x-text="errors['district_id']"></span>
-                                    </div>
+                                    <x-ui.error name="district_id" />
                                 </div>
 
                                 <div class="md:col-span-3">
@@ -335,16 +299,7 @@
                                             :class="errors['address'] ? 'border-red-600 bg-red-50' : ''"
                                             @blur="validateField($el)"
                                             @input="if (errors['address']) validateField($el)"></textarea>
-                                        <div x-show="errors['address']"
-                                            class="text-[10px] font-black text-red-600 uppercase tracking-tight flex items-center gap-1 mt-1"
-                                            style="display: none;">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd"
-                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                            <span x-text="errors['address']"></span>
-                                        </div>
+                                        <x-ui.error name="address" />
                                     </div>
                                 </div>
                             </div>
@@ -377,8 +332,58 @@
                                         label="ATAS NAMA REKENING" placeholder="Contoh: BUDI SANTOSO" class="uppercase"
                                         required />
                                 </div>
-                                <x-ui.input id="bank_name" name="bank_name" label="NAMA BANK"
-                                    placeholder="BCA / MANDIRI / BNI / BRI" required />
+                                {{-- BACKEND-TODO: Ganti options ini dengan data dari API bank (misal: /api/banks) agar bisa load dinamis --}}
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="bank_name">NAMA BANK</label>
+                                    <div class="relative">
+                                        <select id="bank_name" name="bank_name" required
+                                            class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer"
+                                            :class="errors['bank_name'] ? 'border-red-600 bg-red-50' : ''"
+                                            @change="validateField($el)">
+                                            <option value="">PILIH BANK</option>
+                                            <optgroup label="Bank BUMN">
+                                                <option value="BRI">BRI — Bank Rakyat Indonesia</option>
+                                                <option value="BNI">BNI — Bank Negara Indonesia</option>
+                                                <option value="Mandiri">Bank Mandiri</option>
+                                                <option value="BTN">BTN — Bank Tabungan Negara</option>
+                                                <option value="BSI">BSI — Bank Syariah Indonesia</option>
+                                            </optgroup>
+                                            <optgroup label="Bank Swasta Nasional">
+                                                <option value="BCA">BCA — Bank Central Asia</option>
+                                                <option value="CIMB Niaga">CIMB Niaga</option>
+                                                <option value="Danamon">Bank Danamon</option>
+                                                <option value="Permata">Bank Permata</option>
+                                                <option value="Maybank">Maybank Indonesia</option>
+                                                <option value="OCBC NISP">OCBC NISP</option>
+                                                <option value="Panin">Panin Bank</option>
+                                                <option value="Commonwealth">Commonwealth Bank</option>
+                                                <option value="Sinarmas">Bank Sinarmas</option>
+                                                <option value="Mega">Bank Mega</option>
+                                            </optgroup>
+                                            <optgroup label="Bank Digital">
+                                                <option value="SeaBank">SeaBank</option>
+                                                <option value="Jago">Bank Jago</option>
+                                                <option value="Jenius">Jenius (BTPN)</option>
+                                                <option value="Blu BCA">Blu by BCA</option>
+                                                <option value="Neobank">Neo Commerce</option>
+                                                <option value="Allo Bank">Allo Bank</option>
+                                            </optgroup>
+                                            <optgroup label="Bank Daerah">
+                                                <option value="BPD Jabar">BPD Jawa Barat (BJB)</option>
+                                                <option value="BPD Jateng">BPD Jawa Tengah</option>
+                                                <option value="BPD Jatim">BPD Jawa Timur</option>
+                                                <option value="BPD DIY">BPD DIY</option>
+                                                <option value="BPD Bali">BPD Bali</option>
+                                            </optgroup>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <x-ui.error name="bank_name" />
+                                </div>
                                 <x-ui.input id="bank_account_number" name="bank_account_number" type="text"
                                     inputmode="numeric" label="NOMOR REKENING" placeholder="Masukkan angka saja"
                                     required />
@@ -461,7 +466,6 @@
             fetch('/api/provinces')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Provinces loaded:', data);
                     provinceSelect.innerHTML = '<option value="">PILIH PROVINSI</option>';
                     data.forEach(province => {
                         provinceSelect.innerHTML += `<option value="${province.id}">${province.name}</option>`;

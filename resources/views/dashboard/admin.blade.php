@@ -9,8 +9,19 @@
         @include('dashboard.admin._menu')
     </x-slot:menuSlot>
 
+    {{-- 
+        TODO BACKEND:
+        Gunakan Toast Component untuk notifikasi success/error (misal: setelah berhasil login atau simpan data).
+        Silakan panggil komponen ini jika terdapat flash session.
+        Contoh:
+        @if(session('success'))
+            <div class="fixed top-8 right-8 z-[100]">
+                <x-ui.toast type="success" :message="session('success')" />
+            </div>
+        @endif
+    --}}
+
     <div class="max-w-[1400px] mx-auto w-full">
-        <!-- KPI Cards Grid -->
         <!-- KPI Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-4">
             <!-- Box 1: Sales -->
