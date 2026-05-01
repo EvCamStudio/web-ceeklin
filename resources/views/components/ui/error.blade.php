@@ -7,7 +7,8 @@
 
 @if($name)
     {{-- Client-side error handling (Alpine.js) & Server-side error handling --}}
-    <div x-show="errors['{{ $name }}'] || {{ $hasServerError ? 'true' : 'false' }}" 
+    <div x-data="{ serverError: {{ $hasServerError ? 'true' : 'false' }} }"
+         x-show="($data.errors && $data.errors['{{ $name }}']) || serverError" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-1 scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -16,6 +17,8 @@
          x-transition:leave-end="opacity-0 translate-y-1 scale-95"
          class="absolute top-full left-0 mt-2 z-20 flex flex-col items-start" 
          style="display: none;"
+         @input.window="if ($event.target.name === '{{ $name }}' || $event.target.id === '{{ $name }}') serverError = false"
+         @change.window="if ($event.target.name === '{{ $name }}' || $event.target.id === '{{ $name }}') serverError = false"
          x-cloak>
         
         {{-- Arrow pointing to the input --}}
@@ -26,7 +29,7 @@
             <svg class="w-3.5 h-3.5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span x-text="errors['{{ $name }}'] || '{{ $serverErrorMessage }}'"></span>
+            <span x-text="($data.errors && $data.errors['{{ $name }}']) ? $data.errors['{{ $name }}'] : '{{ $serverErrorMessage }}'"></span>
         </div>
     </div>
 @elseif($message)

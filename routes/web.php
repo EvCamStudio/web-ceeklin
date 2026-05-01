@@ -43,6 +43,19 @@ Route::get('/dashboard', function () {
     return redirect()->route('dashboard.role', ['role' => auth()->user()->role ?? 'reseller']);
 })->middleware('auth')->name('dashboard');
 
+// Admin Verification Specific Routes
+Route::prefix('dashboard/admin/verify')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('admin.verify.index');
+    Route::post('/approve', [App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.verify.approve');
+    Route::post('/reject', [App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('admin.verify.reject');
+});
+
+// Admin Distributor Management Specific Routes
+Route::prefix('dashboard/admin/distributors')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\DistributorController::class, 'index'])->name('admin.distributors.index');
+    Route::post('/store', [App\Http\Controllers\Admin\DistributorController::class, 'store'])->name('admin.distributors.store');
+});
+
 // Dashboard berparameter (admin/distributor/reseller)
 Route::get('/dashboard/{role}/{page?}', function ($role, $page = 'overview') {
     $allowedRoles = ['admin', 'distributor', 'reseller'];

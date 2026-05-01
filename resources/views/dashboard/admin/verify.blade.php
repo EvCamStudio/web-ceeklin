@@ -14,7 +14,14 @@
         waSent: false,
         rejectReason: '',
         selectedDistributorId: '',
-        distributorMap: { '1': 'PT Tirta Makmur (Jawa Barat)', '2': 'CV Bintang Selatan (Jawa Timur)' },
+        distributors: {{ json_encode($distributors) }},
+        get distributorMap() {
+            let map = {};
+            this.distributors.forEach(d => {
+                map[d.id] = d.name;
+            });
+            return map;
+        },
         openVerification(reseller) {
             this.selectedReseller = reseller;
             this.rejectMode = false;
@@ -34,12 +41,61 @@
             this.successMode = false;
             this.waSent = false;
         },
+        async submitApprove(e) {
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.successMode = true;
+                    this.approveMode = false;
+                } else {
+                    alert(data.message || 'Gagal menyetujui reseller.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+            }
+        },
+        async submitReject(e) {
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal menolak reseller.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+            }
+        },
         getWaLink() {
             const phone = (this.selectedReseller?.phone ?? '').replace(/\D/g, '');
             const name = this.selectedReseller?.name ?? '';
             const dist = this.distributorMap[this.selectedDistributorId] ?? '-';
             const msg = `Halo ${name}, akun reseller CeeKlin Anda telah DISETUJUI dan sudah aktif!\n\nDistributor Anda: ${dist}\n\nSilakan login menggunakan username yang Anda daftarkan di https://ceeklin.id/login\n\nJika ada pertanyaan, balas pesan ini. Terima kasih!`;
-            return 'https://wa.me/62' + phone + '?text=' + encodeURIComponent(msg);
+            return 'https://wa.me/62' + (phone.startsWith('0') ? phone.substring(1) : phone) + '?text=' + encodeURIComponent(msg);
         }
     }">
 
@@ -54,7 +110,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
                     <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Menunggu Peninjauan</h2>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">3 Pendaftar Baru</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{{ count($pendingResellers) }} Pendaftar Baru</p>
                 </div>
                 <div class="flex gap-2">
                     <div class="relative">
@@ -81,36 +137,40 @@
                 </div>
 
                 <div class="divide-y-2 divide-neutral-border">
-                    @php
-                    $dummies = [
-                        ['id' => 1, 'name' => 'Ahmad Fauzi', 'nik' => '3273151234567890', 'phone' => '081234567890', 'province' => 'Jawa Barat', 'city' => 'Bandung', 'address' => 'Jl. Merdeka No. 45', 'date' => 'Hari Ini, 09:30', 'ktp' => '/images/hero-bottle.jpeg'],
-                        ['id' => 2, 'name' => 'Budi Santoso', 'nik' => '3374159876543210', 'phone' => '089876543210', 'province' => 'Jawa Tengah', 'city' => 'Semarang', 'address' => 'Jl. Pahlawan 12', 'date' => 'Kemarin, 14:15', 'ktp' => '/images/hero-bottle.jpeg'],
-                        ['id' => 3, 'name' => 'Siti Aminah', 'nik' => '3578151122334455', 'phone' => '085566778899', 'province' => 'Jawa Timur', 'city' => 'Surabaya', 'address' => 'Jl. Diponegoro 9', 'date' => '2 Hari Lalu', 'ktp' => '/images/hero-bottle.jpeg'],
-                    ];
-                    @endphp
-
-                    @foreach($dummies as $reseller)
+                    @foreach($pendingResellers as $reseller)
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pendaftar</p>
-                            <p class="font-bold text-sm text-gray-900 uppercase leading-tight">{{ $reseller['name'] }}</p>
-                            <p class="text-[10px] font-bold text-slate-500 mt-1">{{ $reseller['phone'] }}</p>
+                            <p class="font-bold text-sm text-gray-900 uppercase leading-tight">{{ $reseller->name }}</p>
+                            <p class="text-[10px] font-bold text-slate-500 mt-1">{{ $reseller->phone }}</p>
                         </div>
                         <div class="md:col-span-2 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">NIK</p>
-                            <p class="text-xs font-bold text-gray-900 tracking-widest">{{ $reseller['nik'] }}</p>
+                            <p class="text-xs font-bold text-gray-900 tracking-widest">{{ $reseller->nik }}</p>
                         </div>
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Domisili</p>
-                            <p class="text-xs font-bold text-gray-900 uppercase">{{ $reseller['city'] }}</p>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase mt-0.5">{{ $reseller['province'] }}</p>
+                            <p class="text-xs font-bold text-gray-900 uppercase">{{ $reseller->city_name }}</p>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase mt-0.5">{{ $reseller->province_name }}</p>
                         </div>
                         <div class="md:col-span-2 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tanggal Masuk</p>
-                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-[9px] font-bold uppercase tracking-widest border border-yellow-300">{{ $reseller['date'] }}</span>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-[9px] font-bold uppercase tracking-widest border border-yellow-300">{{ $reseller->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="md:col-span-2 w-full flex justify-start md:justify-end">
-                            <button @click="openVerification({{ json_encode($reseller) }})"
+                            <button @click="openVerification({ 
+                                id: {{ $reseller->id }}, 
+                                name: '{{ $reseller->name }}', 
+                                nik: '{{ $reseller->nik }}', 
+                                phone: '{{ $reseller->phone }}', 
+                                province: '{{ $reseller->province_name }}', 
+                                city: '{{ $reseller->city_name }}', 
+                                address: '{{ str_replace(["\r", "\n"], ' ', $reseller->address) }}',
+                                bank_name: '{{ $reseller->bank_name }}',
+                                bank_account_name: '{{ $reseller->bank_account_name }}',
+                                bank_account_number: '{{ $reseller->bank_account_number }}',
+                                ktp: '{{ Storage::url($reseller->ktp_photo) }}'
+                            })"
                                 class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-primary-hover shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none transition-all">
                                 Tinjau
                             </button>
@@ -173,6 +233,25 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="bg-white border-[3px] border-gray-900 p-5 shadow-[4px_4px_0_var(--color-gray-900)]">
+                            <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-3">Informasi Perbankan</p>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Bank & No. Rekening</p>
+                                        <p class="font-bold text-gray-900 text-sm uppercase" x-text="selectedReseller?.bank_name + ' — ' + selectedReseller?.bank_account_number"></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Atas Nama</p>
+                                    <p class="font-bold text-gray-900 text-sm uppercase" x-text="selectedReseller?.bank_account_name"></p>
+                                    <template x-if="selectedReseller?.bank_account_name && selectedReseller?.bank_account_name.toUpperCase() !== selectedReseller?.name.toUpperCase()">
+                                        <p class="text-[8px] font-bold text-red-600 uppercase mt-1">⚠️ Nama pemilik rekening berbeda dengan nama pendaftar</p>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="w-full md:w-1/2 flex flex-col">
                         <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Lampiran Foto KTP</p>
@@ -213,7 +292,7 @@
                      class="p-6 md:p-8 bg-red-50 border-t-[4px] border-red-600">
                     <p class="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-3">Alasan Penolakan (Wajib Diisi)</p>
                     {{-- BACKEND-TODO: Form action reject --}}
-                    <form action="/dashboard/admin/verify/reject" method="POST">
+                    <form action="{{ route('admin.verify.reject') }}" method="POST" @submit.prevent="submitReject">
                         @csrf
                         <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
                         <textarea name="reason" x-model="rejectReason" rows="3" required
@@ -260,9 +339,9 @@
                         </div>
 
                         {{-- BACKEND-TODO: Form approve + assign distributor --}}
-                        <form action="/dashboard/admin/verify/approve" method="POST"
+                        <form action="{{ route('admin.verify.approve') }}" method="POST"
                               class="flex flex-col gap-6"
-                              @submit.prevent="successMode = true; approveMode = false">
+                              @submit.prevent="submitApprove">
                             @csrf
                             <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
 
@@ -275,21 +354,17 @@
                                     <select name="distributor_id" x-model="selectedDistributorId" required
                                         class="appearance-none w-full bg-white border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer pr-8">
                                         <option value="">-- Pilih Distributor --</option>
-                                        {{-- BACKEND-TODO: optgroup berdasarkan kesesuaian wilayah --}}
-                                        <optgroup label="✓ Distributor Wilayah Sesuai">
-                                            <option value="1">PT Tirta Makmur — Jawa Barat</option>
-                                        </optgroup>
-                                        <optgroup label="Distributor Wilayah Lain (Sementara)">
-                                            <option value="2">CV Bintang Selatan — Jawa Timur</option>
-                                        </optgroup>
+                                        <template x-for="dist in distributors" :key="dist.id">
+                                            <option :value="dist.id" x-text="dist.name"></option>
+                                        </template>
                                     </select>
                                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                 </div>
-                                <div x-show="selectedDistributorId === '2'" x-transition
+                                <div x-show="selectedDistributorId && distributors.find(d => d.id == selectedDistributorId)?.province_id != selectedReseller?.province_id" x-transition
                                      class="mt-2 bg-yellow-50 border-l-[4px] border-yellow-500 p-3">
-                                    <p class="text-[10px] font-bold text-yellow-800 uppercase tracking-widest">⚠️ Distributor Sementara — Reseller akan ditandai sebagai alihan wilayah</p>
+                                    <p class="text-[10px] font-bold text-yellow-800 uppercase tracking-widest">⚠️ Distributor Wilayah Lain — Pastikan alasan pengalihan wilayah sudah sesuai kebijakan</p>
                                 </div>
                             </div>
 

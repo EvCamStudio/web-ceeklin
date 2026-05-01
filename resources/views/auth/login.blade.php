@@ -52,10 +52,9 @@
 
             {{-- BACKEND-TODO: Route aksi form ini sementara diarahakan ke /login biasa. Ganti dengan route('login') Laravel --}}
             <form class="flex flex-col gap-6" method="POST" action="/login" novalidate x-data="{
-                errors: { username: '', password: '' },
+                errors: {},
                 validateForm(e) {
-                    this.errors.username = '';
-                    this.errors.password = '';
+                    this.errors = { username: null, password: null };
                     const u = document.getElementById('username').value;
                     const p = document.getElementById('password').value;
                     let hasError = false;
@@ -89,6 +88,7 @@
                         type="text" 
                         id="username" 
                         name="username" 
+                        value="{{ old('username') }}"
                         placeholder="Masukkan username Anda" 
                         required 
                         autofocus 

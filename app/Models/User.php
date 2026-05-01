@@ -28,7 +28,8 @@ use Illuminate\Notifications\Notifiable;
     'bank_account_name',
     'bank_account_number',
     'referral_code',
-    'upline_id'
+    'upline_id',
+    'reject_reason'
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -47,5 +48,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getProvinceNameAttribute()
+    {
+        return \Laravolt\Indonesia\Models\Province::where('code', $this->province_id)->value('name') ?? $this->province_id;
+    }
+
+    public function getCityNameAttribute()
+    {
+        return \Laravolt\Indonesia\Models\City::where('code', $this->city_id)->value('name') ?? $this->city_id;
+    }
+
+    public function resellers()
+    {
+        return $this->hasMany(User::class, 'upline_id');
+    }
+
+    public function upline()
+    {
+        return $this->belongsTo(User::class, 'upline_id');
     }
 }

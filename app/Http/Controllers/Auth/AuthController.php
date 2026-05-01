@@ -33,6 +33,15 @@ class AuthController extends Controller
             } elseif ($user->role === 'distributor') {
                 return redirect()->route('dashboard.role', ['role' => 'distributor']);
             } elseif ($user->role === 'reseller') {
+                if ($user->status === 'rejected') {
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    return redirect()->route('login')->with([
+                        'status' => 'rejected',
+                        'reason' => $user->reject_reason ?? 'Pendaftaran Anda tidak memenuhi syarat.'
+                    ]);
+                }
                 if ($user->status === 'pending') {
                     return redirect()->route('activation');
                 }
@@ -54,6 +63,11 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Bot check (Honeypot)
+        if ($request->filled('website_url')) {
+            return abort(403, 'Bot detected');
+        }
+
         $validated = $request->validate([
             // Step 1
             'nik' => 'required|string|size:16|unique:users,nik',

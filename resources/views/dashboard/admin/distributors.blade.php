@@ -20,6 +20,7 @@
             password: '',
             successMode: false,
             waSent: false,
+            errors: {},
             resetForm() {
                 this.companyName = '';
                 this.phone = '';
@@ -27,11 +28,47 @@
                 this.password = '';
                 this.successMode = false;
                 this.waSent = false;
+                this.errors = {};
+            },
+            async submitForm(e) {
+                this.errors = {};
+                const form = e.target;
+                
+                // Client-side simple validation
+                if (!this.companyName) this.errors.company_name = ['Nama perusahaan wajib diisi'];
+                if (!form.region.value) this.errors.region = ['Wilayah wajib dipilih'];
+                if (!this.phone) this.errors.phone = ['Nomor WA wajib diisi'];
+                if (!this.username) this.errors.username = ['Username wajib diisi'];
+                if (!this.password) this.errors.password = ['Password wajib diisi'];
+
+                if (Object.keys(this.errors).length > 0) return;
+
+                const formData = new FormData(form);
+                
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        this.successMode = true;
+                    } else {
+                        this.errors = data.errors || { general: [data.message || 'Gagal membuat akun distributor.'] };
+                    }
+                } catch (err) {
+                    console.error(err);
+                    this.errors = { general: ['Terjadi kesalahan jaringan. Silakan coba lagi.'] };
+                }
             },
             getWaLink() {
                 const p = this.phone.replace(/\D/g, '');
                 const msg = `Halo ${this.companyName}, akun distributor CeeKlin Anda telah dibuat.\n\nUsername: ${this.username}\nPassword: ${this.password}\n\nSilakan login di: https://ceeklin.id/login\nUbah password Anda setelah login pertama.\n\nTerima kasih!`;
-                return 'https://wa.me/62' + p + '?text=' + encodeURIComponent(msg);
+                return 'https://wa.me/62' + (p.startsWith('0') ? p.substring(1) : p) + '?text=' + encodeURIComponent(msg);
             }
         }">
             <div class="bg-secondary px-6 py-3">
@@ -40,46 +77,59 @@
             <div class="p-6">
                 {{-- BACKEND-TODO: action ke DistributorController@store --}}
                 <div x-show="!successMode">
-                <form action="/dashboard/admin/distributors/store" method="POST"
+                <form action="{{ route('admin.distributors.store') }}" method="POST"
                       class="flex flex-col gap-5"
-                      @submit.prevent="successMode = true">
+                      novalidate
+                      @submit.prevent="submitForm">
                     @csrf
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-1.5 relative">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-entitas">Nama Perusahaan</label>
                         <input id="nama-entitas" name="company_name" type="text" placeholder="CV / PT ..." x-model="companyName" required
+                            @input="delete errors.company_name"
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
+                        <x-ui.error name="company_name" />
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-1.5 relative">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="wilayah">Wilayah</label>
                         <div class="relative">
                             <select id="wilayah" name="region" aria-label="Pilih Wilayah" required
+                                @change="delete errors.region"
                                 class="appearance-none w-full bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer">
                                 <option value="">Pilih wilayah...</option>
-                                <option value="jabar">JAWA BARAT</option>
-                                <option value="jateng">JAWA TENGAH</option>
-                                <option value="jatim">JAWA TIMUR</option>
-                                <option value="jakarta">DKI JAKARTA</option>
+                                @foreach($provinces as $province)
+                                    <option value="{{ $province->code }}">{{ $province->name }}</option>
+                                @endforeach
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
                             </div>
                         </div>
+                        <x-ui.error name="region" />
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-1.5 relative">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="kontak">No. WA / HP (PIC)</label>
                         <input id="kontak" name="phone" type="text" placeholder="08xxxxxxxxxx" x-model="phone" required
+                            @input="delete errors.phone"
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
+                        <x-ui.error name="phone" />
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-1.5 relative">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="dist-username">Username Akun</label>
                         <input id="dist-username" name="username" type="text" placeholder="tanpa spasi" x-model="username" required
+                            @input="delete errors.username"
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
+                        <x-ui.error name="username" />
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-1.5 relative">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="dist-password">Kata Sandi Awal</label>
                         <input id="dist-password" name="password" type="text" placeholder="Min. 8 karakter" x-model="password" required
+                            @input="delete errors.password"
                             class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary placeholder:text-primary/30 transition-colors">
+                        <x-ui.error name="password" />
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Tampilkan teks agar bisa dicopy ke WA</p>
+                    </div>
+                    <div class="relative">
+                        <x-ui.error name="general" />
                     </div>
                     <button type="submit" aria-label="Buat akun distributor baru"
                         class="w-full bg-primary text-white py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all mt-2">
@@ -136,8 +186,7 @@
         <div class="xl:col-span-2 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
             <div class="bg-primary px-6 py-3 flex items-center justify-between gap-4">
                 <span class="font-headline font-black text-white text-base uppercase tracking-tight leading-tight">Distributor Aktif</span>
-                {{-- BACKEND-TODO: hitung dari Distributor::active()->count() --}}
-                <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-white/10 px-2 py-0.5 border border-white/20 whitespace-nowrap">38 Total</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-white/10 px-2 py-0.5 border border-white/20 whitespace-nowrap">{{ count($distributors) }} Total</span>
             </div>
             
             {{-- Header (Desktop Only) --}}
@@ -149,65 +198,32 @@
             </div>
 
             <div class="divide-y-2 divide-neutral-border">
-                {{-- Item 1 --}}
+                @forelse($distributors as $distributor)
                 <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
                     <div class="md:col-span-5 w-full min-w-0">
                         <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                        <div class="font-bold text-gray-900 text-base md:text-sm uppercase truncate">PT Tirta Makmur</div>
+                        <div class="font-bold text-gray-900 text-base md:text-sm uppercase truncate">{{ $distributor->name }}</div>
                     </div>
                     <div class="md:col-span-3 w-full flex justify-between md:block">
                         <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                        <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Barat</div>
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">{{ $distributor->province_name }}</div>
                     </div>
                     <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
                         <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
-                        <div class="font-headline font-black text-xl text-primary tracking-tighter">24</div>
+                        <div class="font-headline font-black text-xl text-primary tracking-tighter">{{ $distributor->resellers_count }}</div>
                     </div>
                     <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
                         <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                        <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Aktif</span>
+                        <span class="px-2 py-0.5 border-2 {{ $distributor->status === 'active' ? 'border-secondary text-secondary' : 'border-slate-300 text-slate-400' }} text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                            {{ $distributor->status === 'active' ? 'Aktif' : 'Nonaktif' }}
+                        </span>
                     </div>
                 </div>
-
-                {{-- Item 2 --}}
-                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
-                    <div class="md:col-span-5 w-full min-w-0">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                        <div class="font-bold text-gray-900 text-base md:text-sm uppercase truncate">CV Bintang Selatan</div>
-                    </div>
-                    <div class="md:col-span-3 w-full flex justify-between md:block">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                        <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Timur</div>
-                    </div>
-                    <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
-                        <div class="font-headline font-black text-xl text-primary tracking-tighter">18</div>
-                    </div>
-                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                        <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Aktif</span>
-                    </div>
+                @empty
+                <div class="px-6 py-10 text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada distributor terdaftar</p>
                 </div>
-
-                {{-- Item 3 --}}
-                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-3 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
-                    <div class="md:col-span-5 w-full min-w-0">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                        <div class="font-bold text-slate-400 text-base md:text-sm uppercase truncate">Distributor Abadi</div>
-                    </div>
-                    <div class="md:col-span-3 w-full flex justify-between md:block">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                        <div class="text-xs text-slate-400 font-bold uppercase tracking-widest">Jawa Tengah</div>
-                    </div>
-                    <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Reseller</p>
-                        <div class="font-headline font-black text-xl text-slate-400 tracking-tighter">9</div>
-                    </div>
-                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                        <span class="px-2 py-0.5 border-2 border-slate-300 text-slate-400 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Nonaktif</span>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>

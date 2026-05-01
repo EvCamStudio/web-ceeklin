@@ -33,8 +33,20 @@
     </x-layouts.navbar>
 
     {{-- Main Content --}}
+    @php
+        $initialStep = 1;
+        if ($errors->any()) {
+            if ($errors->hasAny(['nik', 'name', 'phone', 'ktp_photo', 'province_id', 'city_id', 'district_id', 'address'])) {
+                $initialStep = 1;
+            } elseif ($errors->hasAny(['bank_account_name', 'bank_name', 'bank_account_number'])) {
+                $initialStep = 2;
+            } elseif ($errors->hasAny(['username', 'password'])) {
+                $initialStep = 3;
+            }
+        }
+    @endphp
     <main class="flex-grow flex items-center justify-center py-8 px-4" x-data="{ 
-        step: 1, 
+        step: {{ $initialStep }}, 
         errors: {},
         async validateField(input) {
             const name = input.name;
@@ -43,53 +55,101 @@
             // Hapus error lama untuk field ini agar reaktif
             this.errors = { ...this.errors, [name]: null };
             
-            if (input.hasAttribute('required') && !value) {
+            if (input.hasAttribute('required') && !value && input.type !== 'file') {
                 this.errors = { ...this.errors, [name]: 'Bidang ini wajib diisi' };
+            } else if (input.type === 'file') {
+                if (input.hasAttribute('required') && !input.files.length) {
+                    this.errors = { ...this.errors, [name]: 'Foto KTP wajib diunggah' };
+                } else if (input.files.length) {
+                    const file = input.files[0];
+                    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                    if (!validTypes.includes(file.type)) {
+                        this.errors = { ...this.errors, [name]: 'Format foto harus JPG atau PNG' };
+                    } else if (file.size > 2 * 1024 * 1024) {
+                        this.errors = { ...this.errors, [name]: 'Ukuran foto maksimal 2MB' };
+                    }
+                }
             } else if (name === 'nik' && value) {
-                if (value.length !== 16) {
+                if (!/^[0-9]+$/.test(value)) {
+                    this.errors = { ...this.errors, [name]: 'NIK harus berupa angka' };
+                } else if (value.length !== 16) {
                     this.errors = { ...this.errors, [name]: 'NIK harus tepat 16 digit' };
                 } else {
                     try {
                         const response = await fetch(`/api/check-nik?nik=${value}`);
-                        const data = await response.json();
-                        if (!data.available) {
-                            this.errors = { ...this.errors, [name]: 'NIK ini sudah terdaftar di sistem kami' };
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (!data.available) {
+                                this.errors = { ...this.errors, [name]: 'NIK ini sudah terdaftar di sistem kami' };
+                            }
                         }
                     } catch (e) { console.error('Gagal cek NIK:', e); }
                 }
+            } else if (name === 'phone' && value) {
+                if (!/^[0-9]+$/.test(value)) {
+                    this.errors = { ...this.errors, [name]: 'Nomor WA harus berupa angka' };
+                } else if (value.length < 9 || value.length > 15) {
+                    this.errors = { ...this.errors, [name]: 'Nomor WA tidak valid' };
+                }
             } else if (name === 'username' && value) {
-                try {
-                    const response = await fetch(`/api/check-username?username=${value}`);
-                    const data = await response.json();
-                    if (!data.available) {
-                        this.errors = { ...this.errors, [name]: 'Username ini sudah digunakan orang lain' };
-                    }
-                } catch (e) { console.error('Gagal cek Username:', e); }
+                if (!/^[a-z0-9_]+$/.test(value)) {
+                    this.errors = { ...this.errors, [name]: 'Hanya huruf kecil, angka & underscore' };
+                } else if (value.length < 4) {
+                    this.errors = { ...this.errors, [name]: 'Username minimal 4 karakter' };
+                } else {
+                    try {
+                        const response = await fetch(`/api/check-username?username=${value}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (!data.available) {
+                                this.errors = { ...this.errors, [name]: 'Username ini sudah digunakan orang lain' };
+                            }
+                        }
+                    } catch (e) { console.error('Gagal cek Username:', e); }
+                }
             } else if (name === 'bank_account_number' && value) {
-                try {
-                    const response = await fetch(`/api/check-bank?account=${value}`);
-                    const data = await response.json();
-                    if (!data.available) {
-                        this.errors = { ...this.errors, [name]: 'Nomor rekening ini sudah terdaftar' };
-                    }
-                } catch (e) { console.error('Gagal cek Rekening:', e); }
-            } else if (name === 'password' && value && value.length < 8) {
-                this.errors = { ...this.errors, [name]: 'Password minimal 8 karakter' };
-            } else if (input.type === 'file' && input.hasAttribute('required') && !input.files.length) {
-                this.errors = { ...this.errors, [name]: 'Foto KTP wajib diunggah' };
+                if (!/^[0-9]+$/.test(value)) {
+                    this.errors = { ...this.errors, [name]: 'Nomor rekening harus berupa angka' };
+                } else {
+                    try {
+                        const response = await fetch(`/api/check-bank?account=${value}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (!data.available) {
+                                this.errors = { ...this.errors, [name]: 'Nomor rekening ini sudah terdaftar' };
+                            }
+                        }
+                    } catch (e) { console.error('Gagal cek Rekening:', e); }
+                }
+            } else if (name === 'password' && value) {
+                if (value.length < 8) {
+                    this.errors = { ...this.errors, [name]: 'Password minimal 8 karakter' };
+                }
+                const confirmInput = document.getElementById('password_confirmation');
+                if (confirmInput && confirmInput.value && value !== confirmInput.value) {
+                    this.errors = { ...this.errors, ['password_confirmation']: 'Konfirmasi password tidak cocok' };
+                } else if (confirmInput && confirmInput.value && value === confirmInput.value) {
+                    this.errors = { ...this.errors, ['password_confirmation']: null };
+                }
+            } else if (name === 'password_confirmation' && value) {
+                const passwordInput = document.getElementById('password');
+                if (passwordInput && value !== passwordInput.value) {
+                    this.errors = { ...this.errors, [name]: 'Konfirmasi password tidak cocok' };
+                }
             }
         },
         async validateStep(currentStep) {
             let isValid = true;
             const stepEl = document.querySelector(`[x-show='step === ${currentStep}']`);
-            const inputs = stepEl.querySelectorAll('input, select, textarea');
-            
-            for (let input of inputs) {
-                await this.validateField(input);
-                if (this.errors[input.name]) isValid = false;
+            if (stepEl) {
+                const inputs = stepEl.querySelectorAll('input, select, textarea');
+                for (let input of inputs) {
+                    await this.validateField(input);
+                    if (this.errors[input.name]) isValid = false;
+                }
             }
 
-            if (isValid) this.step++;
+            if (isValid && currentStep < 3) this.step++;
             return isValid;
         }
     }">
@@ -162,8 +222,14 @@
                 </div>
 
                 <div class="p-6 lg:p-8">
-                    <form method="POST" action="/register" enctype="multipart/form-data" novalidate>
+                    <form id="registerForm" method="POST" action="/register" enctype="multipart/form-data" novalidate 
+                          @submit.prevent="validateStep(step).then(valid => { if(valid && step === 3) document.getElementById('registerForm').submit(); })">
                         @csrf
+                        
+                        {{-- Honeypot field (hidden from users, bot prevention) --}}
+                        <div class="hidden" aria-hidden="true">
+                            <input type="text" name="website_url" tabindex="-1" autocomplete="off">
+                        </div>
 
                         {{-- [ STEP 1: DATA DIRI & ALAMAT ] --}}
                         <div x-show="step === 1" x-transition:enter="transition ease-out duration-300"
@@ -177,15 +243,15 @@
                                 </div>
 
                                 <x-ui.input id="nik" name="nik" label="NO. NIK KTP" placeholder="16 digit NIK" required
-                                    minlength="16" maxlength="16" inputmode="numeric" />
+                                    minlength="16" maxlength="16" inputmode="numeric" value="{{ old('nik') }}" />
                                 <x-ui.input id="name" name="name" label="NAMA LENGKAP" placeholder="Sesuai KTP"
-                                    class="uppercase" required
+                                    class="uppercase" required value="{{ old('name') }}"
                                     @input="$el.value = $el.value.toUpperCase(); if (errors['name']) validateField($el)" />
                                 <x-ui.input id="phone" name="phone" type="text" inputmode="numeric" label="NO. WHATSAPP"
-                                    placeholder="08xx..." required />
+                                    placeholder="08xx..." required value="{{ old('phone') }}" />
 
                                 {{-- Upload KTP --}}
-                                <div class="md:col-span-3 mt-2">
+                                <div class="md:col-span-3 mt-2 relative">
                                     <label
                                         class="text-[9px] font-bold text-primary uppercase tracking-widest block mb-1.5">UNGGAH
                                         FOTO KTP</label>
@@ -228,7 +294,7 @@
                                     <div class="h-1 w-12 bg-secondary"></div>
                                 </div>
 
-                                <div class="flex flex-col gap-1.5">
+                                <div class="flex flex-col gap-1.5 relative">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
                                         for="province_id">PROVINSI</label>
                                     <div class="relative">
@@ -237,6 +303,44 @@
                                             :class="errors['province_id'] ? 'border-red-600 bg-red-50' : ''" required
                                             @change="validateField($el)">
                                             <option value="">PILIH PROVINSI</option>
+                                            @foreach ([
+                                                '11' => 'ACEH',
+                                                '12' => 'SUMATERA UTARA',
+                                                '13' => 'SUMATERA BARAT',
+                                                '14' => 'RIAU',
+                                                '15' => 'JAMBI',
+                                                '16' => 'SUMATERA SELATAN',
+                                                '17' => 'BENGKULU',
+                                                '18' => 'LAMPUNG',
+                                                '19' => 'KEPULAUAN BANGKA BELITUNG',
+                                                '21' => 'KEPULAUAN RIAU',
+                                                '31' => 'DKI JAKARTA',
+                                                '32' => 'JAWA BARAT',
+                                                '33' => 'JAWA TENGAH',
+                                                '34' => 'DI YOGYAKARTA',
+                                                '35' => 'JAWA TIMUR',
+                                                '36' => 'BANTEN',
+                                                '51' => 'BALI',
+                                                '52' => 'NUSA TENGGARA BARAT',
+                                                '53' => 'NUSA TENGGARA TIMUR',
+                                                '61' => 'KALIMANTAN BARAT',
+                                                '62' => 'KALIMANTAN TENGAH',
+                                                '63' => 'KALIMANTAN SELATAN',
+                                                '64' => 'KALIMANTAN TIMUR',
+                                                '65' => 'KALIMANTAN UTARA',
+                                                '71' => 'SULAWESI UTARA',
+                                                '72' => 'SULAWESI TENGAH',
+                                                '73' => 'SULAWESI SELATAN',
+                                                '74' => 'SULAWESI TENGGARA',
+                                                '75' => 'GORONTALO',
+                                                '76' => 'SULAWESI BARAT',
+                                                '81' => 'MALUKU',
+                                                '82' => 'MALUKU UTARA',
+                                                '91' => 'PAPUA BARAT',
+                                                '94' => 'PAPUA'
+                                            ] as $id => $prov)
+                                                <option value="{{ $id }}" {{ old('province_id') == $id ? 'selected' : '' }}>{{ $prov }}</option>
+                                            @endforeach
                                         </select>
                                         <div
                                             class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
@@ -248,7 +352,7 @@
                                     </div>
                                     <x-ui.error name="province_id" />
                                 </div>
-                                <div class="flex flex-col gap-1.5">
+                                <div class="flex flex-col gap-1.5 relative">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
                                         for="city_id">KOTA / KABUPATEN</label>
                                     <div class="relative">
@@ -268,7 +372,7 @@
                                     </div>
                                     <x-ui.error name="city_id" />
                                 </div>
-                                <div class="flex flex-col gap-1.5">
+                                <div class="flex flex-col gap-1.5 relative">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
                                         for="district_id">KECAMATAN</label>
                                     <div class="relative">
@@ -277,6 +381,9 @@
                                             :class="errors['district_id'] ? 'border-red-600 bg-red-50' : ''" required
                                             @change="validateField($el)">
                                             <option value="">PILIH KECAMATAN</option>
+                                            @if(old('district_id'))
+                                                <option value="{{ old('district_id') }}" selected>KECAMATAN TERPILIH</option>
+                                            @endif
                                         </select>
                                         <div
                                             class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
@@ -290,7 +397,7 @@
                                 </div>
 
                                 <div class="md:col-span-3">
-                                    <div class="flex flex-col gap-1.5">
+                                    <div class="flex flex-col gap-1.5 relative">
                                         <label class="text-[9px] font-bold text-primary uppercase tracking-widest"
                                             for="address">ALAMAT DETAIL</label>
                                         <textarea id="address" name="address" rows="2" required
@@ -298,7 +405,7 @@
                                             class="bg-neutral-light border-[3px] border-primary px-3 py-2.5 font-body text-xs font-bold text-primary focus:outline-none focus:border-secondary transition-colors resize-none"
                                             :class="errors['address'] ? 'border-red-600 bg-red-50' : ''"
                                             @blur="validateField($el)"
-                                            @input="if (errors['address']) validateField($el)"></textarea>
+                                            @input="if (errors['address']) validateField($el)">{{ old('address') }}</textarea>
                                         <x-ui.error name="address" />
                                     </div>
                                 </div>
@@ -330,10 +437,10 @@
                                 <div class="md:col-span-2">
                                     <x-ui.input id="bank_account_name" name="bank_account_name"
                                         label="ATAS NAMA REKENING" placeholder="Contoh: BUDI SANTOSO" class="uppercase"
-                                        required />
+                                        required value="{{ old('bank_account_name') }}" />
                                 </div>
                                 {{-- BACKEND-TODO: Ganti options ini dengan data dari API bank (misal: /api/banks) agar bisa load dinamis --}}
-                                <div class="flex flex-col gap-1.5">
+                                <div class="flex flex-col gap-1.5 relative">
                                     <label class="text-[9px] font-bold text-primary uppercase tracking-widest" for="bank_name">NAMA BANK</label>
                                     <div class="relative">
                                         <select id="bank_name" name="bank_name" required
@@ -341,6 +448,9 @@
                                             :class="errors['bank_name'] ? 'border-red-600 bg-red-50' : ''"
                                             @change="validateField($el)">
                                             <option value="">PILIH BANK</option>
+                                            @if(old('bank_name'))
+                                                <option value="{{ old('bank_name') }}" selected>{{ old('bank_name') }}</option>
+                                            @endif
                                             <optgroup label="Bank BUMN">
                                                 <option value="BRI">BRI — Bank Rakyat Indonesia</option>
                                                 <option value="BNI">BNI — Bank Negara Indonesia</option>
@@ -386,7 +496,7 @@
                                 </div>
                                 <x-ui.input id="bank_account_number" name="bank_account_number" type="text"
                                     inputmode="numeric" label="NOMOR REKENING" placeholder="Masukkan angka saja"
-                                    required />
+                                    required value="{{ old('bank_account_number') }}" />
                             </div>
 
                             <div class="mt-12 flex flex-col sm:flex-row justify-between gap-4">
@@ -412,7 +522,7 @@
                                 </div>
                                 <div class="md:col-span-2">
                                     <x-ui.input id="username" name="username" label="USERNAME AKSES"
-                                        placeholder="Gunakan huruf kecil & angka" required />
+                                        placeholder="Gunakan huruf kecil & angka" required value="{{ old('username') }}" />
                                 </div>
                                 <x-ui.input id="password" name="password" type="password" label="PASSWORD"
                                     placeholder="Minimal 8 karakter" required minlength="8" />
@@ -422,7 +532,7 @@
 
                                 <div class="md:col-span-2">
                                     <x-ui.input id="referral_code" name="referral_code" label="KODE REFERRAL (OPSIONAL)"
-                                        placeholder="Kode dari Distributor Wilayah" class="!border-secondary" />
+                                        placeholder="Kode dari Distributor Wilayah" class="!border-secondary" value="{{ old('referral_code') }}" />
                                 </div>
                             </div>
 
