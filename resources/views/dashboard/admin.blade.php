@@ -9,120 +9,201 @@
         @include('dashboard.admin._menu')
     </x-slot:menuSlot>
 
-    {{-- 
-        TODO BACKEND:
-        Gunakan Toast Component untuk notifikasi success/error (misal: setelah berhasil login atau simpan data).
-        Silakan panggil komponen ini jika terdapat flash session.
-        Contoh:
-        @if(session('success'))
-            <div class="fixed top-8 right-8 z-[100]">
-                <x-ui.toast type="success" :message="session('success')" />
-            </div>
-        @endif
-    --}}
-
     <div class="max-w-[1400px] mx-auto w-full">
-        <!-- KPI Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-4">
-            <!-- Box 1: Sales -->
-            <div class="bg-white p-6 border-[3px] border-primary-container shadow-[8px_8px_0_var(--color-primary-darkest)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Total Sales (Nasional)</p>
-                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">4,821</h3>
-                <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
-                    <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    +12.4% vs Q prev
-                </p>
+        <!-- Pusat Aksi Segera Widget -->
+        <div class="animate-in bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-primary-darkest)] p-8 mb-12 flex flex-col gap-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b-4 border-gray-900 pb-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-primary flex items-center justify-center border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-headline font-black text-gray-900 text-2xl uppercase tracking-tighter leading-none">Pusat Aksi Segera</h4>
+                        <p class="text-[11px] text-secondary font-black uppercase tracking-[0.2em] mt-2 italic">Dashboard Operasional Harian</p>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <span class="bg-red-600 text-white px-4 py-1.5 font-headline font-bold text-xs uppercase tracking-widest shadow-[4px_4px_0_rgba(0,0,0,0.2)]">TOTAL: 8 ANTREAN</span>
+                </div>
             </div>
-            
-            <!-- Box 2: Distributors -->
-            <div class="bg-white p-6 border-[3px] border-secondary shadow-[8px_8px_0_var(--color-gray-900)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Active Distributors</p>
-                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">38</h3>
-                <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest">Across 12 provinces</p>
-            </div>
-            
-            <!-- Box 3: Revenue -->
-            <div class="bg-white p-6 border-[3px] border-primary shadow-[8px_8px_0_var(--color-primary-hover)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Revenue MTD</p>
-                <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 6.2B</h3>
-                <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
-                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    +8.1% M/M
-                </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Verifikasi Reseller -->
+                <a href="/dashboard/admin/verify" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Pendaftaran</span>
+                        <span class="bg-red-600 text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-red-600 transition-colors">3 BARU</span>
+                    </div>
+                    <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Verifikasi Reseller</h5>
+                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Review NIK & Wilayah</p>
+                    <div class="mt-4 flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest group-hover:text-white">
+                        <span>Tinjau</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </div>
+                </a>
+
+                <!-- Pesanan Distributor -->
+                <a href="/dashboard/admin/distributors" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-secondary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Logistik</span>
+                        <span class="bg-gray-900 text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-gray-900 transition-colors">5 ORDER</span>
+                    </div>
+                    <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Pesanan Distributor</h5>
+                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Kirim & Input Resi</p>
+                    <div class="mt-4 flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-widest group-hover:text-white">
+                        <span>Proses</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </div>
+                </a>
+
+                <!-- Pencairan Bonus -->
+                <a href="/dashboard/admin/bonus" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary-hover hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Keuangan</span>
+                        <span class="bg-primary text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-primary transition-colors">3 PENGAJUAN</span>
+                    </div>
+                    <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Pencairan Bonus</h5>
+                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Validasi Komisi Mitra</p>
+                    <div class="mt-4 flex items-center gap-2 text-primary-hover font-black text-[10px] uppercase tracking-widest group-hover:text-white">
+                        <span>Transfer</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </div>
+                </a>
+
+                <!-- Sinkronisasi Stok -->
+                <a href="/dashboard/admin/requests" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-gray-900 hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Inventori</span>
+                        <span class="bg-yellow-400 text-gray-900 px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-gray-900 transition-colors">2 SELISIH</span>
+                    </div>
+                    <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Sinkronisasi Stok</h5>
+                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Koreksi Stok Gudang</p>
+                    <div class="mt-4 flex items-center gap-2 text-gray-900 font-black text-[10px] uppercase tracking-widest group-hover:text-white">
+                        <span>Tinjau</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </div>
+                </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mb-10">
-            <!-- Main Content Area: Chart (Col Span 2) -->
-            <div class="lg:col-span-2 bg-neutral-light border-[4px] border-gray-900 px-6 py-8 sm:px-8 shadow-[12px_12px_0_var(--color-primary-darkest)]">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <!-- NEW: Performance Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start mb-20">
+            <!-- Monitoring Transaksi Terkini (Col Span 2) -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex justify-between items-end">
                     <div>
-                        <h3 class="font-headline font-black text-2xl sm:text-3xl text-primary tracking-tighter uppercase relative z-10">National Volume</h3>
-                        <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mt-1">Q3 YTD</p>
+                        <h3 class="font-headline font-black text-3xl text-gray-900 uppercase tracking-tighter leading-none">Aliran Transaksi</h3>
+                        <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-3">Live Updates — Seluruh Indonesia</p>
                     </div>
-                    <!-- Brutalist Select -->
-                    <div class="relative w-full sm:w-auto">
-                        <select aria-label="Pilih Wilayah" class="appearance-none bg-white border-[3px] border-primary text-xs w-full sm:w-auto py-2.5 pl-4 pr-12 font-headline font-bold text-primary focus:outline-none focus:ring-0 focus:border-secondary shadow-[4px_4px_0_var(--color-gray-900)] cursor-pointer">
-                            <option>NATIONAL</option>
-                            <option>JAWA BARAT</option>
-                            <option>JAWA TIMUR</option>
-                        </select>
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
-                            <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
-                        </div>
-                    </div>
+                    <a href="/dashboard/admin/sales" class="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-widest border-b-2 border-slate-200 hover:border-primary transition-all pb-1">Lihat Laporan Lengkap</a>
                 </div>
-                
-                <!-- Chart Area -->
-                <div class="h-[300px] w-full relative border-l-[3px] border-b-[3px] border-gray-900 pt-4 pr-4 bg-white/50 overflow-hidden">
-                    <!-- Helper Grid Layout -->
-                    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(var(--color-neutral-border)_1px,transparent_1px)] [background-size:24px_24px]"></div>
-                    
-                    <svg class="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
-                        <path d="M0,80 L20,65 L40,70 L60,30 L80,45 L100,10" fill="none" stroke="var(--color-primary-container)"
-                            stroke-width="2.5" vector-effect="non-scaling-stroke" />
-                        <path d="M0,80 L20,65 L40,70 L60,30 L80,45 L100,10 L100,100 L0,100 Z" fill="var(--color-primary)"
-                            opacity="0.1" />
-                        <path d="M0,90 L20,85 L40,80 L60,60 L80,65 L100,40" fill="none" stroke="var(--color-secondary)"
-                            stroke-dasharray="4 4" stroke-width="1.5" vector-effect="non-scaling-stroke" />
-                    </svg>
+
+                <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)] overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-900 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Waktu</th>
+                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Mitra / Buyer</th>
+                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center">Volume</th>
+                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Total</th>
+                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y-2 divide-neutral-border">
+                            @foreach([
+                                ['time' => '10 Menit Lalu', 'name' => 'PT Tirta Makmur', 'type' => 'Distributor', 'qty' => 500, 'total' => '6.5M', 'status' => 'LUNAS'],
+                                ['time' => '45 Menit Lalu', 'name' => 'Andi Reseller', 'type' => 'Reseller', 'qty' => 50, 'total' => '750rb', 'status' => 'PENDING'],
+                                ['time' => '2 Jam Lalu', 'name' => 'Budi Santoso', 'type' => 'Distributor', 'qty' => 200, 'total' => '2.6M', 'status' => 'LUNAS'],
+                                ['time' => '5 Jam Lalu', 'name' => 'Sari Wangi', 'type' => 'Reseller', 'qty' => 20, 'total' => '300rb', 'status' => 'LUNAS']
+                            ] as $trx)
+                            <tr class="hover:bg-neutral-light transition-colors group">
+                                <td class="px-6 py-5 text-[10px] font-bold text-slate-500 uppercase italic">{{ $trx['time'] }}</td>
+                                <td class="px-6 py-5">
+                                    <p class="font-headline font-black text-sm uppercase text-gray-900 leading-none">{{ $trx['name'] }}</p>
+                                    <span class="text-[8px] font-black uppercase tracking-widest text-primary">{{ $trx['type'] }}</span>
+                                </td>
+                                <td class="px-6 py-5 text-center font-headline font-black text-lg">{{ $trx['qty'] }} <span class="text-[9px] text-slate-400">PCS</span></td>
+                                <td class="px-6 py-5 text-right font-headline font-black text-lg text-primary">{{ $trx['total'] }}</td>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $trx['status'] === 'LUNAS' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' }} border-2 {{ $trx['status'] === 'LUNAS' ? 'border-green-700/20' : 'border-orange-700/20' }}">
+                                        {{ $trx['status'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Side Content Activity (Col Span 1) -->
-            <div class="bg-white border-[4px] border-gray-900 p-6 sm:p-8 shadow-[12px_12px_0_var(--color-gray-900)] h-full flex flex-col">
-                <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Recent Activity</h3>
-                <div class="flex-1 flex flex-col gap-1">
-                    <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">PT Tirta Makmur mendaftar</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Distributor Baru — Jabar</p>
+            <!-- Leaderboard & System Health (Col Span 1) -->
+            <div class="space-y-8">
+                <div>
+                    <h3 class="font-headline font-black text-3xl text-gray-900 uppercase tracking-tighter leading-none">Top Performa</h3>
+                    <p class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mt-3">Mitra Teraktif Hari Ini</p>
+                </div>
+
+                <div class="bg-gray-900 border-[4px] border-gray-900 p-8 shadow-[10px_10px_0_var(--color-secondary)]">
+                    <div class="space-y-6">
+                        @foreach([
+                            ['rank' => '01', 'name' => 'PT TIRTA MAKMUR', 'val' => '1.2K PCS', 'color' => 'bg-primary'],
+                            ['rank' => '02', 'name' => 'CV SINAR JAYA', 'val' => '850 PCS', 'color' => 'bg-secondary'],
+                            ['rank' => '03', 'name' => 'DISTRIBUTOR BALI', 'val' => '620 PCS', 'color' => 'bg-white/20']
+                        ] as $top)
+                        <div class="flex items-center gap-6">
+                            <span class="font-headline font-black text-3xl text-white/10 italic leading-none">{{ $top['rank'] }}</span>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-end mb-2">
+                                    <p class="text-[9px] font-black text-white uppercase tracking-widest">{{ $top['name'] }}</p>
+                                    <span class="text-[10px] font-headline font-black text-secondary italic">{{ $top['val'] }}</span>
+                                </div>
+                                <div class="h-1.5 w-full bg-white/10 overflow-hidden">
+                                    <div class="h-full {{ $top['color'] }} transition-all duration-1000" style="width: {{ 100 - (int)$top['rank']*20 }}%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">2j lalu</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">Harga naik ke Rp 1.250.000</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Tier Distributor — Nasional</p>
-                        </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">12j lalu</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between py-4 gap-2">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">Bonus 12.5M dicairkan</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">PT Tirta Makmur — Platinum</p>
-                        </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">1h lalu</span>
+                        @endforeach
                     </div>
                 </div>
-                
-                <div class="mt-4 pt-4 border-t-4 border-gray-900">
-                    <button class="w-full text-center text-[10px] font-bold uppercase tracking-widest text-primary hover:text-secondary flex justify-center items-center gap-2 group transition-colors">
-                        LIHAT LOG LENGKAP
-                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                    </button>
+
+                <!-- NEW: Central Inventory Tracker -->
+                <div class="bg-white border-[4px] border-gray-900 p-6 shadow-[8px_8px_0_var(--color-primary-darkest)]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h5 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Stok Gudang Pusat</h5>
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 text-[8px] font-black border border-green-700/20 uppercase">Aman</span>
+                    </div>
+                    <div class="flex items-end gap-3 mb-4">
+                        <h4 class="font-headline font-black text-4xl text-primary leading-none">25,402</h4>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase italic pb-1">Botol Tersedia</span>
+                    </div>
+                    <div class="w-full h-3 bg-neutral-light border-2 border-gray-900 overflow-hidden">
+                        <div class="h-full bg-primary w-[75%] border-r-2 border-gray-900"></div>
+                    </div>
+                    <p class="text-[9px] font-bold text-slate-500 mt-3 uppercase italic">*Produksi selanjutnya dijadwalkan: 05 Mei 2026</p>
+                </div>
+
+                <!-- NEW: Quick System Log -->
+                <div class="bg-neutral-light border-[4px] border-gray-900 p-6 shadow-[8px_8px_0_var(--color-gray-900)]">
+                    <h5 class="text-[10px] font-black text-primary uppercase tracking-widest mb-4">Aktivitas Sistem</h5>
+                    <div class="space-y-4">
+                        @foreach([
+                            ['icon' => '🔑', 'msg' => 'Admin mengubah harga regional Papua', 'time' => '12m'],
+                            ['icon' => '📦', 'msg' => 'Invoice #INV-9022 dikirim ke logistik', 'time' => '45m'],
+                            ['icon' => '🛡️', 'msg' => 'Login terdeteksi dari IP baru (Surabaya)', 'time' => '2h']
+                        ] as $log)
+                        <div class="flex items-start gap-3">
+                            <span class="text-sm shrink-0">{{ $log['icon'] }}</span>
+                            <div class="flex-1">
+                                <p class="text-[10px] font-bold text-gray-800 leading-tight">{{ $log['msg'] }}</p>
+                                <p class="text-[8px] font-black text-slate-400 uppercase mt-1">{{ $log['time'] }} lalu</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </x-layouts.dashboard>

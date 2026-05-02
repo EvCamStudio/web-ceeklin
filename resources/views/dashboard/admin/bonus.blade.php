@@ -3,147 +3,207 @@
         <span class="text-[10px] uppercase font-bold text-secondary tracking-widest mt-1">MASTER ADMIN</span>
     </x-slot:subtitleSlot>
 
-    <x-slot:topbarTitle>PELACAK BONUS</x-slot:topbarTitle>
+    <x-slot:topbarTitle>MANAJEMEN & PENCAIRAN BONUS</x-slot:topbarTitle>
 
     <x-slot:menuSlot>
         @include('dashboard.admin._menu')
     </x-slot:menuSlot>
 
-    <div class="flex flex-col lg:flex-row gap-6 mb-8">
-        {{-- Set Target Bulanan --}}
-        <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] p-6 lg:w-1/3 flex flex-col justify-between">
+    <div class="max-w-[1400px] mx-auto w-full" x-data="{
+        activeTab: 'pencairan',
+        showModal: false,
+        selectedRequest: null,
+        showSuccess: false,
+        successMsg: '',
+        bonusRequests: [
+            { id: 'WD-201', requester: 'Ahmad Fauzi', city: 'Bandung', distributor: 'Pusat Distribusi Bandung', amount: 'Rp 1.050.000', period: 'Mei 2026', date: 'Hari ini, 11:20' },
+            { id: 'WD-199', requester: 'Siti Aminah', city: 'Bekasi', distributor: 'Teknik Karya Supply', amount: 'Rp 450.000', period: 'Mei 2026', date: '2 Jam Lalu' }
+        ],
+        leaderboard: [
+            { id: 1, name: 'Ahmad Fauzi', city: 'Bandung', distributor: 'Pusat Distribusi Bandung', sales: 850, progress: 85, potential: 'Rp 2.125.000' },
+            { id: 2, name: 'Siti Aminah', city: 'Bekasi', distributor: 'Teknik Karya Supply', sales: 420, progress: 42, potential: 'Rp 1.050.000' },
+            { id: 3, name: 'Budi Hermawan', city: 'Cimahi', distributor: 'Pusat Distribusi Bandung', sales: 120, progress: 12, potential: 'Rp 300.000' }
+        ],
+        openModal(req) {
+            this.selectedRequest = req;
+            this.showModal = true;
+        },
+        handleConfirm() {
+            this.showModal = false;
+            this.bonusRequests = this.bonusRequests.filter(r => r.id !== this.selectedRequest.id);
+            this.successMsg = 'Pencairan Bonus Berhasil Diproses!';
+            this.showSuccess = true;
+            setTimeout(() => { this.showSuccess = false; }, 3000);
+        }
+    }">
+        {{-- Header & Tab Switcher --}}
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
             <div>
-                <div class="flex items-center gap-2 mb-4">
-                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <h3 class="font-headline font-black text-xl text-primary tracking-tighter uppercase">Target Bulanan</h3>
-                </div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Atur syarat pencapaian bonus reseller bulan ini.</p>
-                
-                {{-- BACKEND-TODO: Form submit untuk update setting target bulanan --}}
-                <form action="/dashboard/admin/bonus/set-target" method="POST" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Target Penjualan (PCS)</label>
-                        <input type="number" name="target_qty" value="1000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Hadiah Bonus (IDR)</label>
-                        <input type="number" name="target_reward" value="2500000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-white py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 hover:bg-primary-hover active:translate-y-0.5 transition-all mt-2">
-                        Simpan Pengaturan
+                <h2 class="font-headline font-black text-3xl text-primary tracking-tighter uppercase leading-none">Pusat Bonus Reseller</h2>
+                <div class="flex flex-wrap gap-4 mt-6">
+                    <button @click="activeTab = 'pencairan'" 
+                        class="px-5 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] transition-all"
+                        :class="activeTab === 'pencairan' ? 'bg-primary text-white border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'">
+                        💰 Antrean Pencairan
+                        <span class="ml-2 px-1.5 py-0.5 bg-secondary text-gray-900 text-[8px] font-black" x-text="bonusRequests.length"></span>
                     </button>
-                </form>
-            </div>
-        </div>
-
-        {{-- Info Box --}}
-        <div class="bg-secondary/10 border-[4px] border-secondary p-6 lg:w-2/3 flex flex-col justify-center">
-            <h4 class="font-headline font-black text-lg text-gray-900 uppercase mb-2">Sistem Bonus Aktif</h4>
-            <ul class="space-y-3 mt-2">
-                <li class="flex items-start gap-2 text-sm font-bold text-slate-700">
-                    <svg class="w-5 h-5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
-                    <span><strong>Bonus Referral:</strong> Otomatis masuk saat ada downline yang melakukan order pertama (Aktivasi 50 pcs).</span>
-                </li>
-                <li class="flex items-start gap-2 text-sm font-bold text-slate-700">
-                    <svg class="w-5 h-5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
-                    <span><strong>Bonus Target Bulanan:</strong> Hanya diberikan jika akumulasi pemesanan reseller (berdasar pesanan dari distributor) mencapai atau melebihi Target Penjualan dalam bulan berjalan.</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    {{-- Tabel Alokasi Bonus -- fullwidth, memanfaatkan lebar layar desktop --}}
-    <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
-
-        {{-- Header Tabel --}}
-        <div class="bg-primary px-6 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div>
-                <span class="font-headline font-black text-white text-base uppercase tracking-widest leading-tight">Alokasi Komisi Mitra</span>
-                <p class="md:hidden text-[9px] text-white/50 font-bold uppercase tracking-widest mt-0.5">Monitoring Bonus Kuartal</p>
-            </div>
-            {{-- BACKEND-TODO: tambahkan filter kuartal --}}
-            <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-white/10 px-2 py-0.5 border border-white/20">Q3 2024</span>
-        </div>
-
-        {{-- Kolom Header --}}
-        <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-3 border-b-2 border-neutral-border bg-neutral-light">
-            <div class="col-span-5 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Mitra / Perusahaan</div>
-            <div class="col-span-3 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</div>
-            <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right">Jumlah (IDR)</div>
-            <div class="col-span-2 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right">Status</div>
-        </div>
-
-        {{-- BACKEND-TODO: Loop dari BonusAllocation::currentQuarter()->get() --}}
-        <div class="divide-y-2 divide-neutral-border">
-            {{-- Baris: Cair --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-secondary hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">PT Tirta Makmur</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Barat</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter">12.5M</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-green-700 text-green-700 font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Cair</span>
-                </div>
-            </div>
-
-            {{-- Baris: Tertunda --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">CV Bintang Selatan</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Timur</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter opacity-60">8.2M</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Tertunda</span>
-                </div>
-            </div>
-
-            {{-- Baris: Tertunda (2) --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">Distributor Abadi</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Tengah</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter opacity-60">6.4M</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Tertunda</span>
+                    <button @click="activeTab = 'monitoring'" 
+                        class="px-5 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] transition-all"
+                        :class="activeTab === 'monitoring' ? 'bg-primary text-white border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'">
+                        📈 Monitoring Performa
+                    </button>
+                    <button @click="activeTab = 'setting'" 
+                        class="px-5 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] transition-all"
+                        :class="activeTab === 'setting' ? 'bg-gray-900 text-white border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'">
+                        ⚙️ Atur Target
+                    </button>
                 </div>
             </div>
         </div>
 
-        {{-- Aksi Massal --}}
-        <div class="px-6 md:px-8 py-6 md:py-4 border-t-4 border-gray-900 bg-neutral-light flex flex-col md:flex-row items-center justify-between gap-4">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 order-2 md:order-1">2 dari 3 bonus menunggu pencairan</span>
-            <button type="button" aria-label="Cairkan semua bonus yang tertunda"
-                class="w-full md:w-auto bg-secondary text-white px-8 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary active:translate-y-0.5 active:shadow-none transition-all order-1 md:order-2">
-                Cairkan Semua yang Tertunda
-            </button>
+        {{-- Success Alert --}}
+        <div x-show="showSuccess" x-transition x-cloak class="mb-6 bg-green-500 text-white p-4 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-green-700)] flex items-center gap-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            <span class="font-headline font-bold text-sm uppercase tracking-widest" x-text="successMsg"></span>
+        </div>
+
+        {{-- TAB 1: ANTREAN PENCAIRAN --}}
+        <div x-show="activeTab === 'pencairan'" x-transition>
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-900 text-white">
+                        <tr>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Penerima Bonus</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Suplai Oleh</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">ID / Tgl</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Nominal</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y-2 divide-neutral-border">
+                        <template x-for="req in bonusRequests" :key="req.id">
+                            <tr class="hover:bg-neutral-light transition-colors group text-gray-900">
+                                <td class="px-6 py-4">
+                                    <p class="font-headline font-black text-sm uppercase tracking-tight" x-text="req.requester"></p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase" x-text="req.city"></p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-primary uppercase mb-0.5 tracking-tighter">Distributor</span>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase leading-none italic" x-text="req.distributor"></p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-[10px] font-black text-secondary uppercase leading-none" x-text="req.id"></p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-1" x-text="req.date"></p>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <p class="font-headline font-black text-lg text-primary tracking-tighter" x-text="req.amount"></p>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase" x-text="req.period"></p>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button @click="openModal(req)"
+                                        class="bg-gray-900 text-white border-[3px] border-gray-900 px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest shadow-[3px_3px_0_var(--color-primary)] hover:bg-primary transition-all active:translate-y-0.5 active:shadow-none">
+                                        CAIRKAN
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template x-if="bonusRequests.length === 0">
+                            <tr>
+                                <td colspan="5" class="px-6 py-20 text-center">
+                                    <p class="font-headline font-bold text-slate-300 text-xl uppercase italic">Tidak ada antrean pencairan bonus</p>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- TAB 2: MONITORING PERFORMA --}}
+        <div x-show="activeTab === 'monitoring'" x-transition style="display: none;">
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-neutral-light border-b-2 border-gray-900">
+                        <tr>
+                            <th class="px-8 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Nama Reseller</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Suplai Oleh</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest text-center">Pencapaian</th>
+                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Progress Target</th>
+                            <th class="px-8 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest text-right">Potensi Bonus</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y-2 divide-neutral-border">
+                        <template x-for="item in leaderboard" :key="item.id">
+                            <tr class="hover:bg-neutral-light transition-colors">
+                                <td class="px-8 py-6">
+                                    <p class="font-headline font-bold text-sm text-gray-900 uppercase" x-text="item.name"></p>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase" x-text="item.city"></p>
+                                </td>
+                                <td class="px-6 py-6">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase italic leading-tight" x-text="item.distributor"></p>
+                                </td>
+                                <td class="px-6 py-6 text-center">
+                                    <p class="font-headline font-black text-xl text-primary leading-none" x-text="item.sales"></p>
+                                    <p class="text-[8px] font-black uppercase mt-1 text-slate-400">PCS</p>
+                                </td>
+                                <td class="px-6 py-6">
+                                    <div class="w-full bg-slate-100 border-2 border-gray-900 h-6 relative overflow-hidden">
+                                        <div class="absolute inset-0 bg-primary border-r-2 border-gray-900 transition-all duration-500" :style="'width: ' + item.progress + '%'"></div>
+                                        <span class="absolute inset-0 flex items-center justify-center text-[9px] font-black text-gray-900 uppercase mix-blend-difference" x-text="item.progress + '%'"></span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-right">
+                                    <p class="font-headline font-black text-lg text-gray-900 tracking-tighter" x-text="item.potential"></p>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- TAB 3: ATUR TARGET --}}
+        <div x-show="activeTab === 'setting'" x-transition style="display: none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] p-8">
+                    <h3 class="font-headline font-black text-xl text-gray-900 uppercase mb-6">Parameter Bonus Bulanan</h3>
+                    <form class="space-y-6">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-widest block mb-2">Minimal Order (PCS)</label>
+                            <input type="number" value="1000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-3 font-headline font-black text-xl text-primary focus:outline-none focus:border-secondary">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-widest block mb-2">Reward Bonus (IDR)</label>
+                            <input type="number" value="2500000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-3 font-headline font-black text-xl text-primary focus:outline-none focus:border-secondary">
+                        </div>
+                        <button type="button" @click="successMsg = 'Parameter Target Diupdate!'; showSuccess = true; setTimeout(() => showSuccess = false, 3000)" 
+                            class="w-full bg-gray-900 text-white py-4 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-primary)] hover:bg-primary transition-all active:translate-y-1 active:shadow-none">
+                            SIMPAN PERUBAHAN
+                        </button>
+                    </form>
+                </div>
+                <div class="bg-secondary/10 border-[4px] border-secondary p-8 flex flex-col justify-center">
+                    <h4 class="font-headline font-black text-lg text-gray-900 uppercase mb-4">Informasi Sistem Bonus</h4>
+                    <p class="text-sm font-bold text-slate-700 leading-relaxed mb-4">Bonus Referral otomatis masuk ke saldo reseller setelah downline melakukan aktivasi.</p>
+                    <p class="text-sm font-bold text-slate-700 leading-relaxed">Bonus Target dihitung berdasarkan total akumulasi order reseller dalam satu bulan kalender.</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Konfirmasi --}}
+        <div x-show="showModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" x-transition>
+            <div class="bg-white border-[6px] border-gray-900 shadow-[15px_15px_0_var(--color-primary)] w-full max-w-md p-8" @click.away="showModal = false">
+                <h3 class="font-headline font-black text-2xl text-gray-900 uppercase tracking-tighter mb-4">Konfirmasi Pencairan</h3>
+                <p class="text-sm font-bold text-slate-600 mb-8 leading-relaxed">
+                    Apakah Anda yakin ingin mencairkan bonus sebesar <span class="text-primary font-black" x-text="selectedRequest?.amount"></span> untuk <span class="text-primary" x-text="selectedRequest?.requester"></span>?
+                </p>
+                <div class="flex gap-4">
+                    <button @click="showModal = false" class="flex-1 py-4 border-[3px] border-gray-900 font-headline font-bold text-xs uppercase tracking-widest hover:bg-neutral-light transition-colors uppercase">BATAL</button>
+                    <button @click="handleConfirm()" class="flex-1 py-4 bg-primary text-white font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all uppercase">YA, CAIRKAN</button>
+                </div>
+            </div>
         </div>
     </div>
 </x-layouts.dashboard>
