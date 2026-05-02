@@ -61,7 +61,7 @@ Route::get('/dashboard/{role}/{page?}', function ($role, $page = 'overview') {
     $allowedRoles = ['admin', 'distributor', 'reseller'];
 
     $allowedPages = [
-        'admin'       => ['overview', 'pricing', 'bonus', 'verify', 'mapping', 'distributors', 'distributor-orders', 'sales', 'settings'],
+        'admin'       => ['overview', 'pricing', 'bonus', 'verify', 'mapping', 'distributors', 'distributor-orders', 'requests', 'sales', 'settings'],
         'distributor' => ['overview', 'inventory', 'resellers', 'order', 'sales-map', 'history', 'incoming-orders', 'settings'],
         'reseller'    => ['overview', 'order', 'history', 'referrals', 'settings'],
     ];

@@ -123,12 +123,18 @@
 
                         {{-- Sukses Feedback --}}
                         <div x-show="submitted" x-transition style="display:none;"
-                             class="bg-green-50 border-[3px] border-green-600 p-4 text-center">
-                            <svg class="w-8 h-8 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <p class="font-bold text-xs text-green-800 uppercase tracking-widest">Pengajuan terkirim!</p>
-                            <p class="text-[9px] text-green-600 mt-1 font-bold uppercase">Menunggu persetujuan Admin</p>
+                             class="bg-green-50 border-[3px] border-green-600 p-5 text-center shadow-[4px_4px_0_var(--color-green-600)]">
+                            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <p class="font-headline font-black text-sm text-green-800 uppercase tracking-tighter">Pengajuan Terkirim!</p>
+                            <p class="text-[9px] text-green-600 mt-1 font-bold uppercase leading-relaxed">Admin akan memverifikasi selisih stok Anda dalam waktu maksimal 1x24 jam.</p>
+                            <button type="button" @click="submitted = false; stokNyata = ''; alasan = ''"
+                                class="mt-4 text-[9px] font-black text-green-700 underline uppercase tracking-widest hover:text-green-900">
+                                Buat Pengajuan Baru
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -147,31 +153,37 @@
                 {{-- BACKEND-TODO: Loop dari StockLog::where('distributor_id', Auth::id())->latest()->take(10)->get() --}}
                 @php
                 $logs = [
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1088',           'qty' => '+2.000', 'date' => '5 Apr 2026',  'color' => 'text-green-600'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Ahmad Fauzi (ORD-201)',  'qty' => '-100',   'date' => 'Hari Ini',    'color' => 'text-red-600'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Budi Santoso (ORD-195)', 'qty' => '-50',    'date' => 'Kemarin',     'color' => 'text-red-600'],
-                    ['type' => 'adj', 'desc' => 'Koreksi Stok — disetujui Admin',            'qty' => '-200',   'date' => '20 Mar 2026', 'color' => 'text-orange-600'],
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1081',            'qty' => '+3.000', 'date' => '22 Mar 2026', 'color' => 'text-green-600'],
+                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1088',           'qty' => '+2.000', 'date' => '5 Apr 2026',  'color' => 'text-green-600', 'status' => 'Selesai'],
+                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Ahmad Fauzi (ORD-201)',  'qty' => '-100',   'date' => 'Hari Ini',    'color' => 'text-red-600', 'status' => 'Selesai'],
+                    ['type' => 'adj', 'desc' => 'Koreksi Stok (Manual Sync) — Hilang',       'qty' => '-15',    'date' => 'Kemarin',     'color' => 'text-orange-600', 'status' => 'Menunggu'],
+                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Budi Santoso (ORD-195)', 'qty' => '-50',    'date' => 'Kemarin',     'color' => 'text-red-600', 'status' => 'Selesai'],
+                    ['type' => 'adj', 'desc' => 'Koreksi Stok — disetujui Admin',            'qty' => '-200',   'date' => '20 Mar 2026', 'color' => 'text-orange-600', 'status' => 'Disetujui'],
+                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1081',            'qty' => '+3.000', 'date' => '22 Mar 2026', 'color' => 'text-green-600', 'status' => 'Selesai'],
                 ];
                 @endphp
                 @foreach($logs as $log)
-                <div class="flex items-center justify-between px-6 py-3 hover:bg-neutral-light transition-colors gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4 hover:bg-neutral-light transition-colors gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 flex items-center justify-center flex-shrink-0 bg-neutral border-2 border-neutral-border">
                             @if($log['type'] === 'in')
-                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
                             @elseif($log['type'] === 'out')
-                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg>
+                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
                             @else
-                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                             @endif
                         </div>
                         <div>
-                            <p class="font-bold text-xs text-gray-900 uppercase leading-tight">{{ $log['desc'] }}</p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{{ $log['date'] }}</p>
+                            <p class="font-headline font-bold text-xs text-gray-900 uppercase leading-tight tracking-tight">{{ $log['desc'] }}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $log['date'] }}</p>
+                                @if($log['status'] !== 'Selesai')
+                                    <span class="text-[8px] font-black px-1.5 py-0.5 border {{ $log['status'] === 'Menunggu' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : 'bg-green-100 text-green-700 border-green-300' }} uppercase">{{ $log['status'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                    <span class="font-headline font-black text-base {{ $log['color'] }} flex-shrink-0">{{ $log['qty'] }} PCS</span>
+                    <span class="font-headline font-black text-lg {{ $log['color'] }} flex-shrink-0 tracking-tighter">{{ $log['qty'] }} PCS</span>
                 </div>
                 @endforeach
             </div>

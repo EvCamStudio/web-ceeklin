@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import 'tailwindcss';
+[x-cloak] { display: none !important; }
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -105,6 +106,30 @@
         z-index: 9999;
     }
 
+    /* Button & Card Micro-animations */
+    .btn-brutal {
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .btn-brutal:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0 0 0 transparent !important;
+    }
+
+    .card-brutal {
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card-brutal:hover {
+        transform: translateY(-4px);
+    }
+
+    @keyframes pulse-soft {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+    .animate-pulse-soft {
+        animation: pulse-soft 2s ease-in-out infinite;
+    }
+
     /* Hide Number Spinners */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
@@ -116,4 +141,21 @@
         -moz-appearance: textfield;
         appearance: textfield;
     }
+
+    /* Micro-Animations */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+        animation: slideUp 0.4s ease-out forwards;
+        opacity: 0;
+    }
+
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    .stagger-5 { animation-delay: 0.25s; }
 }
