@@ -105,8 +105,14 @@
                 <span class="flex-1">{{ $menu['name'] }}</span>
                 {{-- Badge untuk Pesanan Masuk --}}
                 @if($menu['key'] === 'incoming-orders')
-                    {{-- BACKEND-TODO: ganti 3 dengan count pesanan pending dari DB --}}
-                    <span class="bg-secondary text-gray-900 text-[8px] font-black px-1.5 py-0.5 rounded-sm leading-none">3</span>
+                    @php
+                        $pendingCount = \App\Models\ResellerOrder::where('distributor_id', auth()->id())
+                            ->where('status', 'Menunggu Konfirmasi')
+                            ->count();
+                    @endphp
+                    @if($pendingCount > 0)
+                        <span class="bg-secondary text-gray-900 text-[8px] font-black px-1.5 py-0.5 rounded-sm leading-none">{{ $pendingCount }}</span>
+                    @endif
                 @endif
             </a>
         @endforeach

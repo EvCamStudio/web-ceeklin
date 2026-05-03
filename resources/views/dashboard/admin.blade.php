@@ -24,30 +24,30 @@
     <div class="max-w-[1400px] mx-auto w-full">
         <!-- KPI Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-4">
-            <!-- Box 1: Sales -->
+            <!-- Box 1: Resellers -->
             <div class="bg-white p-6 border-[3px] border-primary-container shadow-[8px_8px_0_var(--color-primary-darkest)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Total Sales (Nasional)</p>
-                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">4,821</h3>
+                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Total Reseller Aktif</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">{{ number_format($resellersCount) }}</h3>
                 <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
-                    <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    +12.4% vs Q prev
+                    <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    Nasional
                 </p>
             </div>
             
             <!-- Box 2: Distributors -->
             <div class="bg-white p-6 border-[3px] border-secondary shadow-[8px_8px_0_var(--color-gray-900)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Active Distributors</p>
-                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">38</h3>
-                <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest">Across 12 provinces</p>
+                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Distributor Aktif</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">{{ number_format($distributorsCount) }}</h3>
+                <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest">Tersebar di {{ $provincesCount }} Provinsi</p>
             </div>
             
-            <!-- Box 3: Revenue -->
+            <!-- Box 3: Pending Verifications -->
             <div class="bg-white p-6 border-[3px] border-primary shadow-[8px_8px_0_var(--color-primary-hover)]">
-                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Revenue MTD</p>
-                <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 6.2B</h3>
+                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-2">Antrean Verifikasi</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter">{{ number_format($pendingVerificationsCount) }}</h3>
                 <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
-                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    +8.1% M/M
+                    <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Butuh Peninjauan
                 </p>
             </div>
         </div>
@@ -93,27 +93,19 @@
             <div class="bg-white border-[4px] border-gray-900 p-6 sm:p-8 shadow-[12px_12px_0_var(--color-gray-900)] h-full flex flex-col">
                 <h3 class="font-headline font-bold text-xl text-primary uppercase tracking-tight mb-6">Recent Activity</h3>
                 <div class="flex-1 flex flex-col gap-1">
+                    @forelse($recentActivity as $activity)
                     <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
                         <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">PT Tirta Makmur mendaftar</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Distributor Baru — Jabar</p>
+                            <p class="font-bold text-sm text-gray-900 leading-tight">{{ $activity['title'] }}</p>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">{{ $activity['subtitle'] }}</p>
                         </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">2j lalu</span>
+                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">{{ $activity['time'] }}</span>
                     </div>
-                    <div class="flex flex-col sm:flex-row justify-between py-4 border-b-2 border-neutral-border gap-2">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">Harga naik ke Rp 1.250.000</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Tier Distributor — Nasional</p>
-                        </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">12j lalu</span>
+                    @empty
+                    <div class="py-10 text-center">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum ada aktivitas terbaru</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row justify-between py-4 gap-2">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-gray-900 leading-tight">Bonus 12.5M dicairkan</p>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">PT Tirta Makmur — Platinum</p>
-                        </div>
-                        <span class="text-[9px] font-bold text-primary-hover uppercase tracking-[0.2em] bg-neutral-light px-2 py-1 h-fit">1h lalu</span>
-                    </div>
+                    @endforelse
                 </div>
                 
                 <div class="mt-4 pt-4 border-t-4 border-gray-900">

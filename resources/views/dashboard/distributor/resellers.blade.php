@@ -23,73 +23,37 @@
 
         {{-- BACKEND-TODO: Loop dari Reseller::where('distributor_id', Auth::id())->paginate(15) --}}
         <div class="divide-y-2 divide-neutral-border">
-            {{-- Item 1 --}}
+            @forelse($resellers as $reseller)
             <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-4 items-start md:items-center border-l-[5px] border-secondary hover:bg-neutral-light transition-colors duration-150">
                 <div class="md:col-span-4 w-full">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Reseller</p>
-                    <div class="font-bold text-sm text-gray-900 uppercase">PT. Maju Logistik</div>
+                    <div class="font-bold text-sm text-gray-900 uppercase">{{ $reseller->name }}</div>
                 </div>
                 <div class="md:col-span-3 w-full flex justify-between md:block">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Lokasi</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Bandung</div>
+                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">{{ $reseller->city_name }}</div>
                 </div>
                 <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Pesanan Terakhir</p>
-                    <div class="text-xs text-slate-500 font-bold">12 Okt 2024</div>
+                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Kontak</p>
+                    <div class="text-xs text-slate-500 font-bold">{{ $reseller->phone }}</div>
                 </div>
                 <div class="md:col-span-1 w-full flex justify-between md:block md:text-center">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Aktif</span>
+                    <span class="px-2 py-0.5 border-2 {{ $reseller->status === 'active' ? 'border-secondary text-secondary' : 'border-slate-300 text-slate-400' }} text-[10px] font-bold uppercase tracking-widest">
+                        {{ $reseller->status === 'active' ? 'Aktif' : 'Nonaktif' }}
+                    </span>
                 </div>
                 <div class="md:col-span-1 w-full flex justify-between md:block md:text-center">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Ket.</p>
                     <span class="text-[9px] font-bold text-slate-400">—</span>
                 </div>
             </div>
-
-            {{-- Item 2 --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-4 items-start md:items-center border-l-[5px] border-secondary hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-4 w-full">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Reseller</p>
-                    <div class="font-bold text-sm text-gray-900 uppercase">Teknik Karya Supply</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Lokasi</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Bekasi</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Pesanan Terakhir</p>
-                    <div class="text-xs text-slate-500 font-bold">05 Okt 2024</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-center">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Aktif</span>
-                </div>
+            @empty
+            <div class="px-6 py-10 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada reseller terdaftar di jaringan Anda</p>
             </div>
-
-            {{-- Item 3: Contoh Reseller Sementara --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 md:py-4 items-start md:items-center border-l-[5px] border-yellow-400 hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-4 w-full">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Reseller</p>
-                    <div class="font-bold text-sm text-gray-900 uppercase">Indo Cipta Chem</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Lokasi</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Cirebon</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Pesanan Terakhir</p>
-                    <div class="text-xs text-slate-500 font-bold">22 Agu 2024</div>
-                </div>
-                <div class="md:col-span-1 w-full flex justify-between md:block md:text-center">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Aktif</span>
-                </div>
-                <div class="md:col-span-1 w-full flex justify-between md:block md:text-center">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Ket.</p>
-                    <span class="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 border border-yellow-400 text-[8px] font-black uppercase tracking-wider whitespace-nowrap">Sementara</span>
-                </div>
-            </div>
+            @endforelse
         </div>
+>
     </div>
 </x-layouts.dashboard>

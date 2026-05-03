@@ -47,9 +47,13 @@
                 </div>
                 {{-- Label Bulan --}}
                 <div class="flex justify-between mt-2 pr-1 gap-1">
-                    @foreach(['Jan','Feb','Mar','Apr','Mei','Jun','Jul'] as $bulan)
-                        <span class="text-[7px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-tight sm:tracking-widest">{{ $bulan }}</span>
-                    @endforeach
+                    @forelse($monthlyTrend as $trend)
+                        <span class="text-[7px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-tight sm:tracking-widest">{{ date('M', strtotime($trend->period . '-01')) }}</span>
+                    @empty
+                        @foreach(['Jan','Feb','Mar','Apr','Mei','Jun','Jul'] as $bulan)
+                            <span class="text-[7px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-tight sm:tracking-widest">{{ $bulan }}</span>
+                        @endforeach
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -61,22 +65,25 @@
             </div>
             <div class="p-6 flex flex-col gap-5">
                 {{-- BACKEND-TODO: data dari SalesReport::regionalBreakdown($quarter) --}}
-                @foreach([
-                    ['label' => 'Jawa Barat',  'nilai' => 1845, 'pct' => 72, 'warna' => 'bg-primary'],
-                    ['label' => 'Jawa Timur',  'nilai' => 1380, 'pct' => 54, 'warna' => 'bg-secondary'],
-                    ['label' => 'DKI Jakarta', 'nilai' => 976,  'pct' => 38, 'warna' => 'bg-secondary'],
-                    ['label' => 'Jawa Tengah', 'nilai' => 620,  'pct' => 24, 'warna' => 'bg-slate-400'],
-                ] as $wilayah)
+                @forelse($regionalBreakdown as $wilayah)
+                    @php
+                        $maxVolume = $regionalBreakdown->max('volume') ?: 1;
+                        $pct = ($wilayah->volume / $maxVolume) * 100;
+                    @endphp
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <span class="font-bold text-xs text-gray-900">{{ $wilayah['label'] }}</span>
-                            <span class="font-headline font-black text-base text-primary tracking-tighter">{{ number_format($wilayah['nilai']) }}</span>
+                            <span class="font-bold text-xs text-gray-900">{{ $wilayah->region }}</span>
+                            <span class="font-headline font-black text-base text-primary tracking-tighter">{{ number_format($wilayah->volume) }}</span>
                         </div>
                         <div class="bg-neutral-border-light border-2 border-neutral-border h-3 w-full">
-                            <div class="{{ $wilayah['warna'] }} h-full transition-all" style="width:{{ $wilayah['pct'] }}%"></div>
+                            <div class="bg-primary h-full transition-all" style="width:{{ $pct }}%"></div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="py-10 text-center">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum ada data wilayah</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 

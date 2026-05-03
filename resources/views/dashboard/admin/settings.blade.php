@@ -18,15 +18,14 @@
                 <span class="font-headline font-black text-white text-base uppercase tracking-tight">Profil Admin</span>
             </div>
             <div class="p-6 flex flex-col gap-5">
-                {{-- BACKEND-TODO: populate dari Auth::user() --}}
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-admin">Nama Lengkap</label>
-                    <input id="nama-admin" type="text" value="Super Administrator"
+                    <input id="nama-admin" type="text" value="{{ Auth::user()->name }}"
                         class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="username-admin">Username</label>
-                    <input id="username-admin" type="text" value="admin"
+                    <input id="username-admin" type="text" value="{{ Auth::user()->username }}"
                         class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
                 </div>
                 <button type="button" aria-label="Simpan perubahan profil"

@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\RegionController;
+use App\Http\Controllers\Distributor\DistributorDashboardController;
 
 // Region Routes (API)
 Route::get('/api/provinces', [RegionController::class, 'getProvinces']);
@@ -43,17 +44,62 @@ Route::get('/dashboard', function () {
     return redirect()->route('dashboard.role', ['role' => auth()->user()->role ?? 'reseller']);
 })->middleware('auth')->name('dashboard');
 
-// Admin Verification Specific Routes
-Route::prefix('dashboard/admin/verify')->middleware(['auth'])->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('admin.verify.index');
-    Route::post('/approve', [App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.verify.approve');
-    Route::post('/reject', [App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('admin.verify.reject');
+// Admin Distributor Management Specific Routes
+Route::prefix('dashboard/admin')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\AdminDashboardController::class, 'overview'])->name('admin.overview');
+    Route::get('/mapping', [App\Http\Controllers\Admin\AdminDashboardController::class, 'mapping'])->name('admin.mapping');
+    Route::post('/mapping/migrate', [App\Http\Controllers\Admin\AdminDashboardController::class, 'migrateReseller'])->name('admin.mapping.migrate');
+    Route::get('/pricing', [App\Http\Controllers\Admin\AdminDashboardController::class, 'pricing'])->name('admin.pricing');
+    Route::post('/pricing/update', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updatePricing'])->name('admin.pricing.update');
+    Route::get('/bonus', [App\Http\Controllers\Admin\AdminDashboardController::class, 'bonus'])->name('admin.bonus');
+    Route::post('/bonus/update', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateBonusSettings'])->name('admin.bonus.update');
+    Route::get('/distributor-orders', [App\Http\Controllers\Admin\AdminDashboardController::class, 'distributorOrders'])->name('admin.distributor-orders');
+    Route::post('/distributor-orders/update-status', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateDistributorOrderStatus'])->name('admin.distributor-orders.update');
+    Route::get('/sales', [App\Http\Controllers\Admin\AdminDashboardController::class, 'sales'])->name('admin.sales');
+    Route::get('/settings', [App\Http\Controllers\Admin\AdminDashboardController::class, 'settings'])->name('admin.settings');
+    
+    Route::prefix('distributors')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\DistributorController::class, 'index'])->name('admin.distributors.index');
+        Route::post('/store', [App\Http\Controllers\Admin\DistributorController::class, 'store'])->name('admin.distributors.store');
+    });
+
+    Route::prefix('verify')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('admin.verify.index');
+        Route::post('/approve', [App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.verify.approve');
+        Route::post('/reject', [App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('admin.verify.reject');
+    });
 });
 
-// Admin Distributor Management Specific Routes
-Route::prefix('dashboard/admin/distributors')->middleware(['auth'])->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\DistributorController::class, 'index'])->name('admin.distributors.index');
-    Route::post('/store', [App\Http\Controllers\Admin\DistributorController::class, 'store'])->name('admin.distributors.store');
+// Distributor Dashboard Routes
+Route::prefix('dashboard/distributor')->middleware(['auth'])->group(function () {
+    Route::get('/', [DistributorDashboardController::class, 'overview'])->name('distributor.overview');
+    Route::get('/inventory', [DistributorDashboardController::class, 'inventory'])->name('distributor.inventory');
+    Route::get('/incoming-orders', [DistributorDashboardController::class, 'incomingOrders'])->name('distributor.incoming-orders');
+    Route::post('/incoming-orders/update-status', [DistributorDashboardController::class, 'updateOrderStatus'])->name('distributor.incoming-orders.update');
+    Route::post('/incoming-orders/cancel', [DistributorDashboardController::class, 'cancelOrder'])->name('distributor.incoming-orders.cancel');
+    Route::get('/order', [DistributorDashboardController::class, 'order'])->name('distributor.order');
+    Route::post('/order/store', [DistributorDashboardController::class, 'storeOrder'])->name('distributor.order.store');
+    Route::get('/resellers', [DistributorDashboardController::class, 'resellers'])->name('distributor.resellers');
+    Route::get('/sales-map', [DistributorDashboardController::class, 'salesMap'])->name('distributor.sales-map');
+    Route::get('/history', [DistributorDashboardController::class, 'history'])->name('distributor.history');
+    Route::get('/settings', [DistributorDashboardController::class, 'settings'])->name('distributor.settings');
+    Route::post('/settings/update-profile', [DistributorDashboardController::class, 'updateProfile'])->name('distributor.settings.profile');
+    Route::post('/settings/update-password', [DistributorDashboardController::class, 'updatePassword'])->name('distributor.settings.password');
+    Route::post('/settings/update-bank', [DistributorDashboardController::class, 'updateBank'])->name('distributor.settings.bank');
+});
+
+// Reseller Dashboard Routes
+Route::prefix('dashboard/reseller')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'overview'])->name('reseller.overview');
+    Route::get('/order', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'order'])->name('reseller.order');
+    Route::post('/order/store', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'storeOrder'])->name('reseller.order.store');
+    Route::get('/history', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'history'])->name('reseller.history');
+    Route::post('/history/confirm', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'confirmReceived'])->name('reseller.history.confirm');
+    Route::get('/referrals', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'referrals'])->name('reseller.referrals');
+    Route::get('/settings', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'settings'])->name('reseller.settings');
+    Route::post('/settings/update-profile', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateProfile'])->name('reseller.settings.profile');
+    Route::post('/settings/update-password', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updatePassword'])->name('reseller.settings.password');
+    Route::post('/settings/update-bank', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateBank'])->name('reseller.settings.bank');
 });
 
 // Dashboard berparameter (admin/distributor/reseller)
@@ -68,6 +114,19 @@ Route::get('/dashboard/{role}/{page?}', function ($role, $page = 'overview') {
 
     if (!in_array($role, $allowedRoles) || !in_array($page, $allowedPages[$role])) {
         abort(404);
+    }
+
+    // Redirect to named routes if available
+    if ($role === 'admin' && in_array($page, ['overview', 'mapping', 'pricing', 'bonus', 'distributor-orders', 'sales', 'settings'])) {
+        return redirect()->route("admin.{$page}");
+    }
+
+    if ($role === 'distributor') {
+        return redirect()->route("distributor.{$page}");
+    }
+
+    if ($role === 'reseller') {
+        return redirect()->route("reseller.{$page}");
     }
 
     $view = $page === 'overview'

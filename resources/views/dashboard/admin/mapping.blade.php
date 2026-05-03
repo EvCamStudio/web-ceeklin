@@ -39,88 +39,51 @@
         {{-- Grid Distributor --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             
-            {{-- Distributor Card 1 (Stok Habis / Kritis) --}}
-            <div class="bg-white border-[4px] border-red-600 shadow-[8px_8px_0_var(--color-red-600)]">
-                <div class="bg-red-600 px-6 py-3 flex justify-between items-center">
-                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">PT. Maju Logistik</span>
-                    <span class="bg-white text-red-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border border-red-800">STOK HABIS</span>
+            @forelse($distributors as $distributor)
+            {{-- Distributor Card --}}
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
+                <div class="bg-primary px-6 py-3 flex justify-between items-center">
+                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">{{ $distributor->name }}</span>
+                    <span class="bg-secondary text-gray-900 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest">{{ $distributor->status === 'active' ? 'AKTIF' : 'NONAKTIF' }}</span>
                 </div>
-                <div class="p-6 bg-red-50/50 border-b-2 border-red-200">
-                    <p class="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1">Status Gudang</p>
+                <div class="p-6 bg-neutral-light border-b-2 border-neutral-border">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Informasi Wilayah</p>
                     <div class="flex items-center gap-4">
-                        <h3 class="font-headline font-black text-3xl text-red-600 tracking-tighter">0 <span class="text-lg text-red-400">PCS</span></h3>
-                        <p class="text-xs font-bold text-red-600">Butuh pengalihan reseller segera!</p>
+                        <h3 class="font-headline font-black text-xl text-primary tracking-tighter">{{ $distributor->province_name ?? 'N/A' }}</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ count($distributor->resellers) }} Reseller Terikat</p>
                     </div>
                 </div>
                 
                 <div class="p-4 bg-white">
-                    <p class="text-[10px] font-bold text-gray-900 uppercase tracking-widest mb-3">Daftar Reseller Terikat (3)</p>
+                    <p class="text-[10px] font-bold text-gray-900 uppercase tracking-widest mb-3">Daftar Reseller Terikat ({{ count($distributor->resellers) }})</p>
                     
                     <div class="divide-y-2 divide-neutral-border">
-                        @php
-                            $resellersMaju = [
-                                ['id' => 101, 'name' => 'Ahmad Fauzi', 'city' => 'Bandung', 'status' => 'Menunggu Aktivasi'],
-                                ['id' => 102, 'name' => 'Toko Sinar Jaya', 'city' => 'Cimahi', 'status' => 'Aktif'],
-                                ['id' => 103, 'name' => 'Budi Subroto', 'city' => 'Bandung', 'status' => 'Aktif'],
-                            ];
-                        @endphp
-
-                        @foreach($resellersMaju as $reseller)
+                        @foreach($distributor->resellers as $reseller)
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 gap-3 hover:bg-neutral-light transition-colors px-2">
                             <div>
-                                <p class="font-bold text-sm text-gray-900 uppercase">{{ $reseller['name'] }}</p>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase mt-0.5">{{ $reseller['city'] }} — {{ $reseller['status'] }}</p>
+                                <p class="font-bold text-sm text-gray-900 uppercase">{{ $reseller->name }}</p>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase mt-0.5">{{ $reseller->city_name }} — {{ $reseller->status === 'active' ? 'Aktif' : 'Menunggu' }}</p>
                             </div>
-                            <button @click.prevent="openMigration({{ json_encode($reseller) }})"
-                                class="bg-gray-900 text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-secondary transition-colors shrink-0">
+                            <button @click.prevent="openMigration({{ json_encode(['id' => $reseller->id, 'name' => $reseller->name, 'city' => $reseller->city_name]) }})"
+                                class="bg-transparent text-gray-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-gray-900 hover:text-white transition-colors shrink-0">
                                 Alihkan
                             </button>
                         </div>
                         @endforeach
-                    </div>
-                </div>
-            </div>
 
-            {{-- Distributor Card 2 (Aman) --}}
-            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
-                <div class="bg-primary px-6 py-3 flex justify-between items-center">
-                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">Teknik Karya Supply</span>
-                    <span class="bg-secondary text-gray-900 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest">STOK AMAN</span>
-                </div>
-                <div class="p-6 bg-neutral-light border-b-2 border-neutral-border">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status Gudang</p>
-                    <div class="flex items-center gap-4">
-                        <h3 class="font-headline font-black text-3xl text-primary tracking-tighter">1.250 <span class="text-lg text-slate-400">PCS</span></h3>
-                        <p class="text-xs font-bold text-green-600">Siap menerima pelimpahan</p>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-white">
-                    <p class="text-[10px] font-bold text-gray-900 uppercase tracking-widest mb-3">Daftar Reseller Terikat (2)</p>
-                    
-                    <div class="divide-y-2 divide-neutral-border">
-                        @php
-                            $resellersKarya = [
-                                ['id' => 104, 'name' => 'Citra Mandiri', 'city' => 'Bekasi', 'status' => 'Aktif'],
-                                ['id' => 105, 'name' => 'Toko Barokah', 'city' => 'Bekasi', 'status' => 'Aktif'],
-                            ];
-                        @endphp
-
-                        @foreach($resellersKarya as $reseller)
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 gap-3 hover:bg-neutral-light transition-colors px-2">
-                            <div>
-                                <p class="font-bold text-sm text-gray-900 uppercase">{{ $reseller['name'] }}</p>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase mt-0.5">{{ $reseller['city'] }} — {{ $reseller['status'] }}</p>
-                            </div>
-                            <button @click.prevent="openMigration({{ json_encode($reseller) }})"
-                                class="bg-transparent text-gray-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-gray-900 hover:text-white transition-colors shrink-0">
-                                Pindah
-                            </button>
+                        @if(count($distributor->resellers) === 0)
+                        <div class="py-4 text-center">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum ada reseller terikat</p>
                         </div>
-                        @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
+            @empty
+            <div class="col-span-full py-20 text-center bg-white border-[4px] border-dashed border-slate-300">
+                <p class="font-bold text-slate-400 uppercase tracking-widest">Belum ada distributor untuk dipetakan</p>
+            </div>
+            @endforelse
 
         </div>
 
@@ -144,7 +107,7 @@
             <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] w-full max-w-2xl flex flex-col mx-auto">
 
                 {{-- Modal Body --}}
-                <form action="/dashboard/admin/mapping/migrate" method="POST">
+                <form action="{{ route('admin.mapping.migrate') }}" method="POST">
                     @csrf
                     <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
                     
@@ -162,9 +125,9 @@
                                 <select name="distributor_id" x-model="targetDistributor" required
                                     class="w-full appearance-none bg-white border-[3px] border-gray-900 px-4 py-3 font-bold text-sm text-gray-900 focus:outline-none focus:border-primary cursor-pointer shadow-[4px_4px_0_var(--color-gray-900)]">
                                     <option value="" disabled selected>-- Pilih Distributor yang Tersedia --</option>
-                                    {{-- BACKEND-TODO: Loop from Distributor where stock > 50 --}}
-                                    <option value="2">Teknik Karya Supply (Bekasi) — Sisa: 1.250 pcs</option>
-                                    <option value="3">Indo Cipta Chem (Cirebon) — Sisa: 800 pcs</option>
+                                    @foreach($distributors as $dist)
+                                        <option value="{{ $dist->id }}">{{ $dist->name }} ({{ $dist->province_name }})</option>
+                                    @endforeach
                                 </select>
                                 <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-900">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>

@@ -20,29 +20,36 @@
                     <span class="text-[9px] font-bold text-white/50 uppercase tracking-widest">Update: Hari ini 08:30</span>
                 </div>
                 <div class="p-6 flex flex-col gap-6">
-                    {{-- BACKEND-TODO: Loop dari Inventory::where('distributor_id', Auth::id())->get() --}}
-
                     {{-- Produk: CeeKlin 450ml --}}
                     <div>
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
                             <div>
                                 <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">CeeKlin 450ml</span>
-                                <span class="ml-2 px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-bold uppercase tracking-wider border border-yellow-300">Stok Menengah</span>
+                                @if($user->stock < 1000)
+                                    <span class="ml-2 px-1.5 py-0.5 bg-red-100 text-red-800 text-[8px] font-bold uppercase tracking-wider border border-red-300">Stok Rendah</span>
+                                @elseif($user->stock < 2500)
+                                    <span class="ml-2 px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-bold uppercase tracking-wider border border-yellow-300">Stok Menengah</span>
+                                @else
+                                    <span class="ml-2 px-1.5 py-0.5 bg-green-100 text-green-800 text-[8px] font-bold uppercase tracking-wider border border-green-300">Stok Aman</span>
+                                @endif
                             </div>
-                            <span class="font-headline font-black text-primary text-base sm:text-lg italic">2.450 / 5.000 PCS</span>
+                            <span class="font-headline font-black text-primary text-base sm:text-lg italic">{{ number_format($user->stock, 0, ',', '.') }} / 5.000 PCS</span>
                         </div>
                         <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-4 relative overflow-hidden">
-                            <div class="bg-secondary h-full transition-all duration-500" style="width:49%"></div>
+                            <div class="bg-secondary h-full transition-all duration-500" style="width:{{ $stockPercentage }}%"></div>
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-[8px] font-black text-gray-900/60 uppercase tracking-widest">49%</span>
+                                <span class="text-[8px] font-black text-gray-900/60 uppercase tracking-widest">{{ round($stockPercentage) }}%</span>
                             </div>
                         </div>
                         <div class="flex justify-between mt-1">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase">Stok Aman: ≥ 1.000 PCS</p>
-                            <p class="text-[9px] text-yellow-600 font-bold uppercase">⚠ Segera restock</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">Target Stok: 5.000 PCS</p>
+                            @if($user->stock < 1000)
+                                <p class="text-[9px] text-red-600 font-bold uppercase">⚠ Segera restock</p>
+                            @endif
                         </div>
                     </div>
                 </div>
+
 
                 {{-- Footer Link ke Restock --}}
                 <div class="px-6 pb-5">
@@ -144,17 +151,7 @@
                 <span class="text-[9px] font-bold text-white/50 uppercase tracking-widest">30 hari terakhir</span>
             </div>
             <div class="divide-y-2 divide-neutral-border">
-                {{-- BACKEND-TODO: Loop dari StockLog::where('distributor_id', Auth::id())->latest()->take(10)->get() --}}
-                @php
-                $logs = [
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1088',           'qty' => '+2.000', 'date' => '5 Apr 2026',  'color' => 'text-green-600'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Ahmad Fauzi (ORD-201)',  'qty' => '-100',   'date' => 'Hari Ini',    'color' => 'text-red-600'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Budi Santoso (ORD-195)', 'qty' => '-50',    'date' => 'Kemarin',     'color' => 'text-red-600'],
-                    ['type' => 'adj', 'desc' => 'Koreksi Stok — disetujui Admin',            'qty' => '-200',   'date' => '20 Mar 2026', 'color' => 'text-orange-600'],
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1081',            'qty' => '+3.000', 'date' => '22 Mar 2026', 'color' => 'text-green-600'],
-                ];
-                @endphp
-                @foreach($logs as $log)
+                @forelse($logs as $log)
                 <div class="flex items-center justify-between px-6 py-3 hover:bg-neutral-light transition-colors gap-4">
                     <div class="flex items-center gap-3">
                         <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
@@ -173,7 +170,11 @@
                     </div>
                     <span class="font-headline font-black text-base {{ $log['color'] }} flex-shrink-0">{{ $log['qty'] }} PCS</span>
                 </div>
-                @endforeach
+                @empty
+                <div class="px-6 py-10 text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada riwayat stok</p>
+                </div>
+                @endforelse
             </div>
         </div>
 

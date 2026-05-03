@@ -13,39 +13,40 @@
                 <span class="font-headline font-black text-white text-base uppercase tracking-tight">Profil Distributor</span>
             </div>
             <div class="p-6">
-                {{-- BACKEND-TODO: Populate dari Auth::user()->distributor atau Distributor::where('user_id', Auth::id())->first() --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-perusahaan">Nama Perusahaan</label>
-                        <input id="nama-perusahaan" type="text" value="PT. Industrial Mandiri"
-                            class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
+                <form action="/dashboard/distributor/settings/update-profile" method="POST">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-perusahaan">Nama Perusahaan</label>
+                            <input id="nama-perusahaan" name="name" type="text" value="{{ $user->name }}"
+                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="email-dist">Email</label>
+                            <input id="email-dist" name="email" type="email" value="{{ $user->email }}"
+                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="telp-dist">No. Telepon</label>
+                            <input id="telp-dist" name="phone" type="tel" value="{{ $user->phone }}"
+                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="wilayah-dist">Wilayah Operasi</label>
+                            <input id="wilayah-dist" type="text" value="{{ $user->province_name ?? 'Nasional' }}" disabled
+                                class="bg-neutral-border-light border-[3px] border-neutral-border px-4 py-2.5 font-body text-sm text-slate-400 cursor-not-allowed">
+                        </div>
+                        <div class="flex flex-col gap-1.5 md:col-span-2">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-gudang">Alamat Gudang</label>
+                            <textarea id="alamat-gudang" name="address" rows="2"
+                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none">{{ $user->address }}</textarea>
+                        </div>
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="email-dist">Email</label>
-                        <input id="email-dist" type="email" value="ops@industrialmandiri.co.id"
-                            class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors">
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="telp-dist">No. Telepon</label>
-                        <input id="telp-dist" type="tel" value="021-55501234"
-                            class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors">
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="wilayah-dist">Wilayah Operasi</label>
-                        {{-- Wilayah tidak bisa diubah sendiri, hanya Admin --}}
-                        <input id="wilayah-dist" type="text" value="Jawa Barat" disabled
-                            class="bg-neutral-border-light border-[3px] border-neutral-border px-4 py-2.5 font-body text-sm text-slate-400 cursor-not-allowed">
-                    </div>
-                    <div class="flex flex-col gap-1.5 md:col-span-2">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-gudang">Alamat Gudang</label>
-                        <textarea id="alamat-gudang" rows="2"
-                            class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none">Jl. Industri No. 45, Cikarang, Bekasi, Jawa Barat 17530</textarea>
-                    </div>
-                </div>
-                <button type="button" aria-label="Simpan perubahan profil perusahaan"
-                    class="mt-6 bg-primary text-white px-8 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
-                    Simpan Perubahan
-                </button>
+                    <button type="submit" aria-label="Simpan perubahan profil perusahaan"
+                        class="mt-6 bg-primary text-white px-8 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
+                        Simpan Perubahan
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -58,21 +59,23 @@
                     <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Kata Sandi</span>
                 </div>
                 <div class="p-5 flex flex-col gap-4">
-                    {{-- BACKEND-TODO: action ke DistributorController@updatePassword --}}
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-lama-dist">Sandi Lama</label>
-                        <input id="sandi-lama-dist" type="password" placeholder="••••••••"
-                            class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-body text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-300">
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-baru-dist">Sandi Baru</label>
-                        <input id="sandi-baru-dist" type="password" placeholder="Min. 8 karakter"
-                            class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-body text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-300">
-                    </div>
-                    <button type="button" aria-label="Perbarui kata sandi"
-                        class="w-full bg-gray-900 text-white py-2.5 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-primary-darkest)] hover:bg-gray-700 active:translate-y-0.5 active:shadow-none transition-all mt-1">
-                        Perbarui Sandi
-                    </button>
+                    <form action="/dashboard/distributor/settings/update-password" method="POST">
+                        @csrf
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-lama-dist">Sandi Lama</label>
+                            <input id="sandi-lama-dist" name="current_password" type="password" placeholder="••••••••"
+                                class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-body text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-300">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="sandi-baru-dist">Sandi Baru</label>
+                            <input id="sandi-baru-dist" name="new_password" type="password" placeholder="Min. 8 karakter"
+                                class="bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-body text-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-300">
+                        </div>
+                        <button type="submit" aria-label="Perbarui kata sandi"
+                            class="w-full bg-gray-900 text-white py-2.5 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-primary-darkest)] hover:bg-gray-700 active:translate-y-0.5 active:shadow-none transition-all mt-1">
+                            Perbarui Sandi
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -82,28 +85,32 @@
                     <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Info Rekening</span>
                 </div>
                 <div class="p-5 flex flex-col gap-4">
-                    {{-- BACKEND-TODO: dari distributor->bank_account --}}
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-bank">Nama Bank</label>
-                        <input id="nama-bank" type="text" value="BCA"
-                            class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors">
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="no-rekening">Nomor Rekening</label>
-                        <input id="no-rekening" type="text" value="1234567890"
-                            class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm text-primary focus:outline-none focus:border-primary transition-colors">
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="atas-nama">Atas Nama</label>
-                        <input id="atas-nama" type="text" value="PT. INDUSTRIAL MANDIRI"
-                            class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors">
-                    </div>
-                    <button type="button" aria-label="Perbarui informasi rekening bank"
-                        class="w-full bg-secondary text-white py-2.5 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all mt-1">
-                        Perbarui Rekening
-                    </button>
+                    <form action="/dashboard/distributor/settings/update-bank" method="POST">
+                        @csrf
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="nama-bank">Nama Bank</label>
+                            <input id="nama-bank" name="bank_name" type="text" value="{{ $user->bank_name }}"
+                                class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="no-rekening">Nomor Rekening</label>
+                            <input id="no-rekening" name="bank_account_number" type="text" value="{{ $user->bank_account_number }}"
+                                class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm text-primary focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="atas-nama">Atas Nama</label>
+                            <input id="atas-nama" name="bank_account_name" type="text" value="{{ $user->bank_account_name }}"
+                                class="bg-neutral-light border-[3px] border-secondary px-4 py-2 font-body text-sm font-bold text-primary focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <button type="submit" aria-label="Perbarui informasi rekening bank"
+                            class="w-full bg-secondary text-white py-2.5 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all mt-1">
+                            Perbarui Rekening
+                        </button>
+                    </form>
                 </div>
             </div>
+        </div>
+
         </div>
     </div>
 </x-layouts.dashboard>

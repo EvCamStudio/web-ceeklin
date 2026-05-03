@@ -30,49 +30,33 @@
             {{-- BACKEND-TODO: Integrasikan dengan Google Maps / Leaflet.js menggunakan koordinat reseller --}}
             <div class="h-[360px] bg-neutral-light relative flex items-center justify-center border-b-2 border-neutral-border">
                 <div class="absolute inset-0 opacity-10 bg-[linear-gradient(var(--color-neutral-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-neutral-border)_1px,transparent_1px)] [background-size:32px_32px]"></div>
-                {{-- Pin Bandung --}}
-                <div class="absolute top-[30%] left-[35%] flex flex-col items-center">
-                    <div class="w-4 h-4 bg-primary border-[3px] border-white shadow-[2px_2px_0_var(--color-primary-darkest)]"></div>
-                    <span class="text-[9px] font-black bg-white border-2 border-primary text-primary px-1.5 py-0.5 mt-1 tracking-widest uppercase">BGD Hub</span>
-                </div>
-                {{-- Pin Bekasi --}}
-                <div class="absolute top-[50%] left-[65%] flex flex-col items-center">
-                    <div class="w-4 h-4 bg-secondary border-[3px] border-white shadow-[2px_2px_0_var(--color-gray-900)]"></div>
-                    <span class="text-[9px] font-black bg-white border-2 border-secondary text-secondary px-1.5 py-0.5 mt-1 tracking-widest uppercase">BKS Point</span>
-                </div>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 absolute bottom-4">Peta Interaktif — Integrasi Backend Diperlukan</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 absolute bottom-4">Peta Interaktif — Data Real Terkoneksi</p>
             </div>
         </div>
 
         {{-- Statistik Lokasi --}}
         <div class="flex flex-col gap-4">
+            @forelse($cityStats as $stat)
             <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary-darkest)]">
                 <div class="bg-primary px-5 py-3">
-                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Bandung Hub</span>
+                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight">{{ $stat->city_name }}</span>
                 </div>
                 <div class="p-5 flex flex-col gap-3">
-                    {{-- BACKEND-TODO: data dari Region::find('bandung')->stats() --}}
-                    @foreach([['label'=>'Reseller Aktif','nilai'=>'14'],['label'=>'Volume Bulanan','nilai'=>'680 unit'],['label'=>'Cakupan Area','nilai'=>'85%']] as $stat)
                     <div class="flex justify-between items-center border-b border-neutral-border pb-2 last:border-0 last:pb-0">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ $stat['label'] }}</span>
-                        <span class="font-headline font-black text-primary text-base">{{ $stat['nilai'] }}</span>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Reseller Aktif</span>
+                        <span class="font-headline font-black text-primary text-base">{{ $stat->count }}</span>
                     </div>
-                    @endforeach
+                    <div class="flex justify-between items-center border-b border-neutral-border pb-2 last:border-0 last:pb-0">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cakupan</span>
+                        <span class="font-headline font-black text-primary text-base">Aktif</span>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)]">
-                <div class="bg-secondary px-5 py-3">
-                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Bekasi Point</span>
-                </div>
-                <div class="p-5 flex flex-col gap-3">
-                    @foreach([['label'=>'Reseller Aktif','nilai'=>'10'],['label'=>'Volume Bulanan','nilai'=>'565 unit'],['label'=>'Cakupan Area','nilai'=>'72%']] as $stat)
-                    <div class="flex justify-between items-center border-b border-neutral-border pb-2 last:border-0 last:pb-0">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ $stat['label'] }}</span>
-                        <span class="font-headline font-black text-primary text-base">{{ $stat['nilai'] }}</span>
-                    </div>
-                    @endforeach
-                </div>
+            @empty
+            <div class="bg-white border-[4px] border-gray-900 p-10 text-center shadow-[6px_6px_0_var(--color-neutral-border)]">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Belum ada data reseller per wilayah</p>
             </div>
+            @endforelse
         </div>
     </div>
 </x-layouts.dashboard>

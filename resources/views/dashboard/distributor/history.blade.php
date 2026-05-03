@@ -43,61 +43,50 @@
 
             {{-- BACKEND-TODO: Loop dari DistributorOrder::where('distributor_id', Auth::id())->orderBy('created_at', 'desc')->get() --}}
             <div class="divide-y-2 divide-neutral-border">
-                @php
-                $orders = [
-                    ['id' => 'ORD-1092', 'qty' => 5000, 'total' => 'Rp 65.000.000', 'status' => 'Selesai', 'date' => '12 Apr 2026', 'statusClass' => 'border-green-600 text-green-700', 'leftBorder' => 'border-green-600'],
-                    ['id' => 'ORD-1088', 'qty' => 2000, 'total' => 'Rp 26.000.000', 'status' => 'Dikirim', 'date' => '5 Apr 2026', 'statusClass' => 'border-blue-500 text-blue-700', 'leftBorder' => 'border-blue-500'],
-                    ['id' => 'ORD-1081', 'qty' => 3000, 'total' => 'Rp 39.000.000', 'status' => 'Selesai', 'date' => '22 Mar 2026', 'statusClass' => 'border-green-600 text-green-700', 'leftBorder' => 'border-green-600'],
-                    ['id' => 'ORD-1074', 'qty' => 1000, 'total' => 'Rp 13.000.000', 'status' => 'Selesai', 'date' => '10 Mar 2026', 'statusClass' => 'border-green-600 text-green-700', 'leftBorder' => 'border-green-600'],
-                ];
-                @endphp
-
-                @foreach($orders as $order)
-                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center border-l-[5px] {{ $order['leftBorder'] }} hover:bg-neutral-light transition-colors duration-150">
+                @forelse($history as $item)
+                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center border-l-[5px] {{ $item->leftBorder }} hover:bg-neutral-light transition-colors duration-150">
                     {{-- No. Order --}}
                     <div class="md:col-span-2 w-full">
                         <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Order</p>
-                        <p class="font-headline font-black text-sm text-gray-900 tracking-tight">{{ $order['id'] }}</p>
+                        <p class="font-headline font-black text-sm text-gray-900 tracking-tight">{{ $item->id }}</p>
+                        <span class="text-[8px] font-bold uppercase text-slate-400">{{ $item->type }}</span>
                     </div>
                     {{-- Volume --}}
                     <div class="md:col-span-2 w-full flex justify-between md:block md:text-center">
                         <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Volume</p>
-                        <p class="font-headline font-black text-xl text-primary tracking-tighter">{{ number_format($order['qty'], 0, ',', '.') }}</p>
+                        <p class="font-headline font-black text-xl text-primary tracking-tighter">{{ number_format($item->qty, 0, ',', '.') }}</p>
                     </div>
                     {{-- Total --}}
                     <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
                         <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
-                        <p class="font-bold text-sm text-gray-900">{{ $order['total'] }}</p>
+                        <p class="font-bold text-sm text-gray-900">Rp {{ number_format($item->total, 0, ',', '.') }}</p>
                     </div>
                     {{-- Status --}}
                     <div class="md:col-span-3 w-full flex justify-between md:block">
                         <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                        <span class="px-2 py-1 border-2 {{ $order['statusClass'] }} text-[9px] font-bold uppercase tracking-widest block w-max">{{ $order['status'] }}</span>
+                        <span class="px-2 py-1 border-2 {{ $item->color }} text-[9px] font-bold uppercase tracking-widest block w-max">{{ $item->status }}</span>
                     </div>
                     {{-- Tanggal --}}
                     <div class="md:col-span-3 w-full flex justify-between md:block md:text-right">
                         <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tanggal</p>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">{{ $order['date'] }}</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">{{ $item->date->format('d M Y') }}</p>
                     </div>
                 </div>
-                @endforeach
-            </div>
-
-            {{-- Empty State (jika tidak ada data) --}}
-            {{-- 
-            <div class="py-20 text-center">
-                <div class="w-16 h-16 bg-neutral-border mx-auto mb-4 flex items-center justify-center">
-                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
+                @empty
+                <div class="py-20 text-center">
+                    <div class="w-16 h-16 bg-neutral-border mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <p class="font-headline font-bold text-sm text-slate-500 uppercase tracking-widest">Belum Ada Riwayat Pesanan</p>
                 </div>
-                <p class="font-headline font-bold text-sm text-slate-500 uppercase tracking-widest">Belum Ada Riwayat Pesanan</p>
+                @endforelse
             </div>
-            --}}
-
+ 
             {{-- Footer Summary --}}
             <div class="px-6 py-4 border-t-[4px] border-gray-900 bg-neutral-light flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Menampilkan {{ count($orders) }} transaksi terakhir</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Menampilkan {{ $history->count() }} transaksi terakhir</span>
                 <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-secondary transition-colors flex items-center gap-1">
                     Lihat Semua Transaksi
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>

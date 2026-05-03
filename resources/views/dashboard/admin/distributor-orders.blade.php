@@ -52,34 +52,25 @@
                 </div>
 
                 <div class="divide-y-2 divide-neutral-border">
-                    {{-- BACKEND-TODO: Loop from DistributorOrder::orderBy('created_at', 'desc')->get() --}}
-                    @php
-                    $dummies = [
-                        ['id' => 'ORD-1092', 'name' => 'PT Tirta Makmur', 'city' => 'Bandung, Jawa Barat', 'qty' => 5000, 'status' => 'Menunggu Proses', 'statusColor' => 'bg-red-100 text-red-800 border-red-300', 'date' => 'Hari Ini, 08:15'],
-                        ['id' => 'ORD-1091', 'name' => 'CV Bintang Selatan', 'city' => 'Surabaya, Jawa Timur', 'qty' => 2500, 'status' => 'Diproses', 'statusColor' => 'bg-yellow-100 text-yellow-800 border-yellow-300', 'date' => 'Kemarin, 14:30'],
-                        ['id' => 'ORD-1088', 'name' => 'Distributor Abadi', 'city' => 'Semarang, Jawa Tengah', 'qty' => 1000, 'status' => 'Dikirim', 'statusColor' => 'bg-blue-100 text-blue-800 border-blue-300', 'date' => '2 Hari Lalu'],
-                    ];
-                    @endphp
-
-                    @foreach($dummies as $order)
+                    @forelse($orders as $order)
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
                         <div class="md:col-span-2 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Order</p>
-                            <p class="font-headline font-black text-sm text-gray-900 tracking-tight">{{ $order['id'] }}</p>
+                            <p class="font-headline font-black text-sm text-gray-900 tracking-tight">{{ $order->order_number }}</p>
                         </div>
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Distributor</p>
-                            <p class="font-bold text-xs text-gray-900 uppercase leading-tight">{{ $order['name'] }}</p>
-                            <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase">{{ $order['city'] }}</p>
+                            <p class="font-bold text-xs text-gray-900 uppercase leading-tight">{{ $order->user->name }}</p>
+                            <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase">{{ $order->user->city_name }}</p>
                         </div>
                         <div class="md:col-span-2 w-full md:text-center">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Volume</p>
-                            <p class="text-sm font-headline font-black text-primary">{{ number_format($order['qty'], 0, ',', '.') }}</p>
+                            <p class="text-sm font-headline font-black text-primary">{{ number_format($order->quantity, 0, ',', '.') }}</p>
                         </div>
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status & Waktu</p>
-                            <span class="px-2 py-1 {{ $order['statusColor'] }} text-[9px] font-bold uppercase tracking-widest border block w-max mb-1">{{ $order['status'] }}</span>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $order['date'] }}</p>
+                            <span class="px-2 py-1 {{ $order->statusColor }} text-[9px] font-bold uppercase tracking-widest border block w-max mb-1">{{ $order->status }}</span>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $order->created_at->diffForHumans() }}</p>
                         </div>
                         <div class="md:col-span-2 w-full flex justify-start md:justify-end">
                             <button @click="openOrder({{ json_encode($order) }})" class="bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-neutral-light shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none transition-all">
@@ -87,7 +78,11 @@
                             </button>
                         </div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="py-20 text-center">
+                        <p class="font-headline font-black text-slate-300 text-lg uppercase tracking-widest">Belum ada pesanan masuk</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -99,7 +94,7 @@
             <div class="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                 <div>
                     <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Kelola Pengiriman</h2>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1" x-text="'NO. ORDER: ' + selectedOrder?.id"></p>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1" x-text="'NO. ORDER: ' + selectedOrder?.order_number"></p>
                 </div>
                 <button @click="goBack()" class="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-[3px] border-gray-900 hover:bg-neutral-light transition-colors shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -114,12 +109,12 @@
                     <div class="bg-white border-[3px] border-gray-900 p-5 shadow-[4px_4px_0_var(--color-gray-900)] grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">Informasi Pemesan</p>
-                            <h4 class="font-headline font-black text-xl text-primary uppercase mb-2" x-text="selectedOrder?.name"></h4>
-                            <p class="font-bold text-gray-900 text-sm uppercase" x-text="selectedOrder?.city"></p>
+                            <h4 class="font-headline font-black text-xl text-primary uppercase mb-2" x-text="selectedOrder?.user?.name"></h4>
+                            <p class="font-bold text-gray-900 text-sm uppercase" x-text="selectedOrder?.user?.city_name"></p>
                         </div>
                         <div>
                             <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">Pesanan Restock</p>
-                            <h4 class="font-headline font-black text-3xl text-gray-900 tracking-tighter uppercase"><span x-text="selectedOrder?.qty"></span> <span class="text-lg text-slate-400">PCS</span></h4>
+                            <h4 class="font-headline font-black text-3xl text-gray-900 tracking-tighter uppercase"><span x-text="selectedOrder?.quantity"></span> <span class="text-lg text-slate-400">PCS</span></h4>
                             <p class="text-[10px] font-bold text-slate-500 uppercase mt-1">CeeKlin 450ml</p>
                         </div>
                     </div>

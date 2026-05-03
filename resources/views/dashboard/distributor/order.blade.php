@@ -66,10 +66,10 @@
                     <span class="font-headline font-black text-white text-base uppercase tracking-tight">Alamat Pengiriman (Gudang Anda)</span>
                 </div>
                 <div class="p-6">
-                    {{-- BACKEND-TODO: Isi dari Auth::user()->warehouse_address --}}
+                    {{-- Alamat Pengiriman --}}
                     <div class="p-4 bg-neutral-light border-l-[5px] border-secondary text-sm mb-4">
-                        <p class="font-bold text-gray-900">Gudang PT. Industrial Mandiri</p>
-                        <p class="text-slate-500 mt-1">Jl. Industri No. 45, Cikarang, Bekasi, Jawa Barat 17530</p>
+                        <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
+                        <p class="text-slate-500 mt-1">{{ Auth::user()->address ?? 'Alamat belum diatur' }}</p>
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="catatan-pengiriman">Catatan Pengiriman (Opsional)</label>

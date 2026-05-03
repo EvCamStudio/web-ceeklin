@@ -7,13 +7,13 @@
 
 
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start" x-data="{ 
+    <form action="{{ route('reseller.order.store') }}" method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start" x-data="{ 
         qty: 50, 
-        price: 20000, // Harga Modal Reseller
+        price: {{ $resellerPrice }}, 
         get total() { return Math.max(50, this.qty) * this.price; },
         formatRupiah(number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number); }
     }">
-
+        @csrf
         {{-- Panel Kiri: Produk + Distributor --}}
         <div class="lg:col-span-2 flex flex-col gap-6">
 
@@ -36,12 +36,12 @@
                         
                         <div class="flex items-center justify-between w-full md:contents">
                             <div class="md:flex-1">
-                                <p class="font-headline font-black text-base md:text-lg text-primary" x-text="formatRupiah(price)">Rp 20.000 <span class="hidden md:inline text-xs text-slate-400 font-normal">/ pcs</span></p>
+                                <p class="font-headline font-black text-base md:text-lg text-primary" x-text="formatRupiah(price)"></p>
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
                                 <button type="button" @click="if(qty > 50) qty--" aria-label="Kurangi jumlah"
                                     class="w-10 h-10 md:w-8 md:h-8 border-[2px] border-primary text-primary flex items-center justify-center font-bold hover:bg-primary hover:text-white transition-colors text-xl md:text-base">−</button>
-                                <input type="number" x-model.number="qty" min="50" aria-label="Jumlah Pesanan"
+                                <input type="number" name="quantity" x-model.number="qty" min="50" aria-label="Jumlah Pesanan"
                                     class="w-20 md:w-24 text-center bg-neutral-light border-b-2 border-primary py-1 font-headline font-bold text-base md:text-lg focus:outline-none">
                                 <button type="button" @click="qty++" aria-label="Tambah jumlah"
                                     class="w-10 h-10 md:w-8 md:h-8 border-[2px] border-primary text-primary flex items-center justify-center font-bold hover:bg-primary hover:text-white transition-colors text-xl md:text-base">+</button>
@@ -58,14 +58,16 @@
                 </div>
                 <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="border-l-[5px] border-secondary pl-4">
-                        <p class="font-bold text-sm text-gray-900 uppercase">PT. Industrial Mandiri</p>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Jawa Barat — Bandung Hub</p>
+                        <p class="font-bold text-sm text-gray-900 uppercase">{{ $upline->name ?? 'Belum Ditentukan' }}</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{{ $upline->province_name ?? '-' }} — {{ $upline->city_name ?? '-' }}</p>
                     </div>
-                    <button type="button" aria-label="Hubungi distributor via WhatsApp"
+                    @if($upline && $upline->phone)
+                    <a href="https://wa.me/62{{ ltrim($upline->phone, '0') }}" target="_blank" aria-label="Hubungi distributor via WhatsApp"
                         class="w-full sm:w-auto bg-secondary text-white px-4 py-2 font-headline font-bold text-[10px] uppercase tracking-widest border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         WhatsApp
-                    </button>
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -98,7 +100,7 @@
                     <svg x-show="qty < 50" style="display: none;" class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <p class="text-[10px] font-bold uppercase tracking-widest" :class="qty >= 50 ? 'text-secondary' : 'text-red-500'" x-text="qty >= 50 ? 'Minimum order 50pcs terpenuhi ✓' : 'Minimum order 50pcs belum terpenuhi!'"></p>
                 </div>
-                <button type="button" aria-label="Kirim pesanan ke distributor" :disabled="qty < 50"
+                <button type="submit" aria-label="Kirim pesanan ke distributor" :disabled="qty < 50"
                     class="w-full bg-primary text-white py-4 font-headline font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Kirim Pesanan
@@ -106,5 +108,5 @@
                 <p class="text-[10px] text-slate-400 text-center mt-2 uppercase tracking-widest">Order dikirim ke distributor untuk dikonfirmasi</p>
             </div>
         </div>
-    </div>
+    </form>
 </x-layouts.dashboard>

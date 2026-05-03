@@ -29,7 +29,8 @@ use Illuminate\Notifications\Notifiable;
     'bank_account_number',
     'referral_code',
     'upline_id',
-    'reject_reason'
+    'reject_reason',
+    'stock'
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -68,5 +69,14 @@ class User extends Authenticatable
     public function upline()
     {
         return $this->belongsTo(User::class, 'upline_id');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if ($user->role === 'reseller' && empty($user->referral_code)) {
+                $user->referral_code = 'CK-' . strtoupper(bin2hex(random_bytes(3)));
+            }
+        });
     }
 }

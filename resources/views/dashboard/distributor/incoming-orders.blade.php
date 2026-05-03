@@ -69,52 +69,55 @@
 
                 {{-- BACKEND-TODO: Loop dari Order::where('distributor_id', Auth::id())->orderBy('created_at', 'desc')->get() --}}
                 <div class="divide-y-2 divide-neutral-border">
-                    @php
-                    $dummies = [
-                        ['id' => 'ORD-201', 'reseller' => 'Ahmad Fauzi', 'city' => 'Bandung', 'qty' => 100, 'total' => 'Rp 1.500.000', 'status' => 'Menunggu Proses', 'date' => 'Hari ini, 10:30', 'statusClass' => 'border-red-400 text-red-700 bg-red-50'],
-                        ['id' => 'ORD-198', 'reseller' => 'Budi Santoso', 'city' => 'Cimahi', 'qty' => 50, 'total' => 'Rp 750.000', 'status' => 'Dikemas', 'date' => 'Kemarin, 14:00', 'statusClass' => 'border-yellow-500 text-yellow-800 bg-yellow-50'],
-                        ['id' => 'ORD-195', 'reseller' => 'Siti Aminah', 'city' => 'Bekasi', 'qty' => 75, 'total' => 'Rp 1.125.000', 'status' => 'Dikirim', 'date' => '2 Hari Lalu', 'statusClass' => 'border-blue-500 text-blue-700 bg-blue-50'],
-                        ['id' => 'ORD-190', 'reseller' => 'Toko Jaya Abadi', 'city' => 'Depok', 'qty' => 50, 'total' => 'Rp 750.000', 'status' => 'Selesai', 'date' => '5 Hari Lalu', 'statusClass' => 'border-green-600 text-green-700 bg-green-50'],
-                    ];
-                    @endphp
-
-                    @foreach($dummies as $order)
+                    @forelse($orders as $order)
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors duration-150">
                         {{-- Reseller --}}
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reseller</p>
-                            <p class="font-bold text-sm text-gray-900 uppercase leading-tight">{{ $order['reseller'] }}</p>
-                            <p class="text-[9px] font-bold text-slate-500 mt-0.5 uppercase">{{ $order['city'] }}</p>
+                            <p class="font-bold text-sm text-gray-900 uppercase leading-tight">{{ $order->reseller->name }}</p>
+                            <p class="text-[9px] font-bold text-slate-500 mt-0.5 uppercase">{{ $order->reseller->city_name }}</p>
                         </div>
                         {{-- Volume --}}
                         <div class="md:col-span-2 w-full flex justify-between md:block md:text-center">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Volume</p>
-                            <p class="font-headline font-black text-lg text-primary tracking-tighter">{{ $order['qty'] }}</p>
+                            <p class="font-headline font-black text-lg text-primary tracking-tighter">{{ number_format($order->quantity, 0, ',', '.') }}</p>
                         </div>
                         {{-- Total --}}
                         <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
-                            <p class="font-bold text-sm text-gray-900">{{ $order['total'] }}</p>
+                            <p class="font-bold text-sm text-gray-900">Rp {{ number_format($order->total_price, 0, ',', '.') }}</p>
                         </div>
                         {{-- Status --}}
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                            <span class="px-2 py-1 border-2 {{ $order['statusClass'] }} text-[9px] font-bold uppercase tracking-widest block w-max mb-1">{{ $order['status'] }}</span>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $order['date'] }}</p>
+                            <span class="px-2 py-1 border-2 {{ $order->statusColor }} text-[9px] font-bold uppercase tracking-widest block w-max mb-1">{{ $order->status }}</span>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $order->created_at->diffForHumans() }}</p>
                         </div>
                         {{-- Aksi --}}
                         <div class="md:col-span-2 w-full flex justify-start md:justify-end">
-                            @if($order['status'] !== 'Selesai' && $order['status'] !== 'Dibatalkan')
-                                <button @click="openOrder({{ json_encode($order) }})"
+                            @if($order->status !== 'Selesai' && $order->status !== 'Ditolak')
+                                <button @click="openOrder({ 
+                                    id: '{{ $order->order_number }}', 
+                                    db_id: {{ $order->id }},
+                                    reseller: '{{ $order->reseller->name }}', 
+                                    city: '{{ $order->reseller->city_name }}', 
+                                    qty: {{ $order->quantity }}, 
+                                    total: 'Rp {{ number_format($order->total_price, 0, ',', '.') }}', 
+                                    status: '{{ $order->status }}' 
+                                })"
                                     class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-primary-hover shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none transition-all">
                                     Proses
                                 </button>
                             @else
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $order['status'] === 'Selesai' ? 'Tuntas ✓' : 'Dibatalkan' }}</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $order->status === 'Selesai' ? 'Tuntas ✓' : 'Dibatalkan' }}</span>
                             @endif
                         </div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="px-6 py-10 text-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada pesanan masuk</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

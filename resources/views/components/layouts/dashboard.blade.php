@@ -147,6 +147,32 @@
         </main>
     </div>
 
+    {{-- Global Toast Notifications --}}
+    <div class="fixed top-6 right-6 z-[200] flex flex-col gap-4 pointer-events-none">
+        @if(session('success'))
+            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
+                <x-ui.toast type="success" :message="session('success')" />
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
+                <x-ui.toast type="error" :message="session('error')" />
+            </div>
+        @endif
+
+        @if(session('warning'))
+            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
+                <x-ui.toast type="warning" :message="session('warning')" />
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)" x-transition>
+                <x-ui.toast type="error" message="Ada kesalahan pada input Anda. Silakan periksa kembali." />
+            </div>
+        @endif
+    </div>
 </div>
 </body>
 </html>

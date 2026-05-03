@@ -20,15 +20,15 @@
                 <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Atur syarat pencapaian bonus reseller bulan ini.</p>
                 
                 {{-- BACKEND-TODO: Form submit untuk update setting target bulanan --}}
-                <form action="/dashboard/admin/bonus/set-target" method="POST" class="space-y-4">
+                <form action="{{ route('admin.bonus.update') }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
                         <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Target Penjualan (PCS)</label>
-                        <input type="number" name="target_qty" value="1000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
+                        <input type="number" name="target_qty" value="{{ $targetQty }}" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
                     </div>
                     <div>
                         <label class="text-[9px] font-bold text-gray-900 uppercase tracking-widest block mb-1">Hadiah Bonus (IDR)</label>
-                        <input type="number" name="target_reward" value="2500000" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
+                        <input type="number" name="reward_amount" value="{{ $targetReward }}" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-2 font-headline font-black text-lg text-primary focus:outline-none focus:border-secondary">
                     </div>
                     <button type="submit" class="w-full bg-primary text-white py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 hover:bg-primary-hover active:translate-y-0.5 transition-all mt-2">
                         Simpan Pengaturan
@@ -76,65 +76,33 @@
 
         {{-- BACKEND-TODO: Loop dari BonusAllocation::currentQuarter()->get() --}}
         <div class="divide-y-2 divide-neutral-border">
-            {{-- Baris: Cair --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-secondary hover:bg-neutral-light transition-colors duration-150">
+            @forelse($bonusAllocations as $bonus)
+            {{-- Baris Bonus --}}
+            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] {{ $bonus->status === 'paid' ? 'border-green-600' : 'border-secondary' }} hover:bg-neutral-light transition-colors duration-150">
                 <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">PT Tirta Makmur</div>
+                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mitra</p>
+                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">{{ $bonus->user->name }}</div>
                 </div>
                 <div class="md:col-span-3 w-full flex justify-between md:block">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Barat</div>
+                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">{{ $bonus->user->province_name }}</div>
                 </div>
                 <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter">12.5M</div>
+                    <div class="font-headline font-black text-xl text-primary tracking-tighter">Rp {{ number_format($bonus->amount, 0, ',', '.') }}</div>
                 </div>
                 <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
                     <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-green-700 text-green-700 font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Cair</span>
+                    <span class="px-2 py-0.5 border-2 {{ $bonus->status === 'paid' ? 'border-green-700 text-green-700' : 'border-secondary text-secondary' }} font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
+                        {{ $bonus->status === 'paid' ? 'Cair' : 'Tertunda' }}
+                    </span>
                 </div>
             </div>
-
-            {{-- Baris: Tertunda --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">CV Bintang Selatan</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Timur</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter opacity-60">8.2M</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Tertunda</span>
-                </div>
+            @empty
+            <div class="py-10 text-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum ada alokasi bonus</p>
             </div>
-
-            {{-- Baris: Tertunda (2) --}}
-            <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 md:px-8 py-6 md:py-4 items-start md:items-center border-l-[5px] border-transparent hover:bg-neutral-light transition-colors duration-150">
-                <div class="md:col-span-5 w-full min-w-0">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perusahaan</p>
-                    <div class="font-headline font-bold text-base md:text-sm text-gray-900 uppercase truncate">Distributor Abadi</div>
-                </div>
-                <div class="md:col-span-3 w-full flex justify-between md:block">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Wilayah</p>
-                    <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Jawa Tengah</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bonus</p>
-                    <div class="font-headline font-black text-xl text-primary tracking-tighter opacity-60">6.4M</div>
-                </div>
-                <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                    <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                    <span class="px-2 py-0.5 border-2 border-secondary text-secondary font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">Tertunda</span>
-                </div>
-            </div>
+            @endforelse
         </div>
 
         {{-- Aksi Massal --}}
