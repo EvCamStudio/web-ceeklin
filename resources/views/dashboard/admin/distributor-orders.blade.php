@@ -87,6 +87,7 @@
                                 
                                 <button @click="openOrder({ 
                                     id: '{{ $order->order_number }}', 
+                                    db_id: {{ $order->id }},
                                     name: '{{ $order->user->name }}', 
                                     city: '{{ $order->user->city_name }}', 
                                     qty: {{ $order->quantity }}, 
@@ -187,7 +188,7 @@
                         <div class="p-8 italic">
                             <form action="{{ route('admin.distributor-orders.update-status') }}" method="POST" class="space-y-6 italic">
                                 @csrf
-                                <input type="hidden" name="order_number" :value="selectedOrder?.id">
+                                <input type="hidden" name="order_id" :value="selectedOrder?.db_id">
                                 <select name="status" x-model="newStatus" class="w-full bg-neutral-light border-[3px] border-gray-900 px-4 py-3 font-headline font-black text-xs uppercase tracking-widest text-primary focus:outline-none focus:border-secondary italic">
                                     <option value="Menunggu">Menunggu</option>
                                     <option value="Dikemas">Dikemas</option>
@@ -197,7 +198,7 @@
 
                                 <div x-show="newStatus === 'Dikirim'" class="space-y-4 italic">
                                     <input type="text" name="courier" placeholder="Nama Kurir / Ekspedisi" class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest italic">
-                                    <input type="text" name="receipt_number" placeholder="Nomor Resi" class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest italic">
+                                    <input type="text" name="tracking_number" placeholder="Nomor Resi" class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest italic">
                                 </div>
 
                                 <button type="submit" class="w-full bg-primary text-white py-4 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none italic">

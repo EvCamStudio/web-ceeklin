@@ -59,7 +59,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Verifikasi Reseller -->
-                <a href="/dashboard/admin/verify" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                <a href="{{ route('admin.verify.index') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 italic">Pendaftaran</span>
                         <span class="bg-red-600 text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-red-600 transition-colors">{{ $pendingVerificationsCount }} BARU</span>
@@ -73,7 +73,7 @@
                 </a>
 
                 <!-- Pesanan Distributor -->
-                <a href="/dashboard/admin/distributors" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-secondary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                <a href="{{ route('admin.distributors.index') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-secondary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 italic">Logistik</span>
                     </div>
@@ -86,7 +86,7 @@
                 </a>
 
                 <!-- Pencairan Bonus -->
-                <a href="/dashboard/admin/bonus" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary-hover hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                <a href="{{ route('admin.bonus') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary-hover hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 italic">Keuangan</span>
                     </div>
@@ -99,7 +99,7 @@
                 </a>
 
                 <!-- Sinkronisasi Stok -->
-                <a href="/dashboard/admin/requests" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-gray-900 hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
+                <a href="{{ route('admin.requests') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-gray-900 hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 italic">Inventori</span>
                     </div>
@@ -122,7 +122,7 @@
                         <h3 class="font-headline font-black text-3xl text-gray-900 uppercase tracking-tighter leading-none italic">Aliran Transaksi</h3>
                         <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-3">Live Updates — Seluruh Indonesia</p>
                     </div>
-                    <a href="/dashboard/admin/sales" class="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-widest border-b-2 border-slate-200 hover:border-primary transition-all pb-1">Lihat Laporan Lengkap</a>
+                    <a href="{{ route('admin.sales') }}" class="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-widest border-b-2 border-slate-200 hover:border-primary transition-all pb-1">Lihat Laporan Lengkap</a>
                 </div>
 
                 <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)] overflow-hidden">
@@ -136,23 +136,23 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y-2 divide-neutral-border">
-                            {{-- BACKEND-DATA: Placeholder loop for now, as real loop might need specific structure --}}
-                            @foreach([
-                                ['time' => '10 Menit Lalu', 'name' => 'PT Tirta Makmur', 'type' => 'Distributor', 'qty' => 500, 'total' => '6.5M', 'status' => 'LUNAS'],
-                                ['time' => '45 Menit Lalu', 'name' => 'Andi Reseller', 'type' => 'Reseller', 'qty' => 50, 'total' => '750rb', 'status' => 'PENDING'],
-                                ['time' => '2 Jam Lalu', 'name' => 'Budi Santoso', 'type' => 'Distributor', 'qty' => 200, 'total' => '2.6M', 'status' => 'LUNAS'],
-                                ['time' => '5 Jam Lalu', 'name' => 'Sari Wangi', 'type' => 'Reseller', 'qty' => 20, 'total' => '300rb', 'status' => 'LUNAS']
-                            ] as $trx)
+                            @forelse($recentTransactions ?? [] as $trx)
                             <tr class="hover:bg-neutral-light transition-colors group italic">
                                 <td class="px-6 py-5 text-[10px] font-bold text-slate-500 uppercase italic">{{ $trx['time'] }}</td>
                                 <td class="px-6 py-5">
                                     <p class="font-headline font-black text-sm uppercase text-gray-900 leading-none italic">{{ $trx['name'] }}</p>
-                                    <span class="text-[8px] font-black uppercase tracking-widest text-primary">{{ $trx['type'] }}</span>
+                                    <span class="text-[8px] font-black uppercase tracking-widest {{ $trx['type'] === 'Distributor' ? 'text-primary' : 'text-secondary' }}">{{ $trx['type'] }}</span>
                                 </td>
                                 <td class="px-6 py-5 text-center font-headline font-black text-lg">{{ $trx['qty'] }} <span class="text-[9px] text-slate-400">PCS</span></td>
                                 <td class="px-6 py-5 text-right font-headline font-black text-lg text-primary italic">{{ $trx['total'] }}</td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="4" class="py-10 text-center italic">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada transaksi terkini.</p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

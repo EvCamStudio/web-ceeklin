@@ -32,12 +32,40 @@ class AdminDashboardController extends Controller
                 ];
             });
 
+        // Fetch recent transactions from both distributor and reseller orders
+        $distributorOrders = \App\Models\DistributorOrder::with('user')->latest()->take(5)->get()->map(function($order) {
+            return [
+                'time' => $order->created_at->diffForHumans(),
+                'name' => $order->user->name,
+                'type' => 'Distributor',
+                'qty' => $order->quantity,
+                'total' => 'Rp ' . number_format($order->quantity * 13000, 0, ',', '.'),
+                'status' => strtoupper($order->status),
+                'created_at' => $order->created_at
+            ];
+        });
+
+        $resellerOrders = \App\Models\ResellerOrder::with('reseller')->latest()->take(5)->get()->map(function($order) {
+            return [
+                'time' => $order->created_at->diffForHumans(),
+                'name' => $order->reseller->name ?? 'N/A',
+                'type' => 'Reseller',
+                'qty' => $order->quantity,
+                'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
+                'status' => strtoupper($order->status),
+                'created_at' => $order->created_at
+            ];
+        });
+
+        $recentTransactions = $distributorOrders->concat($resellerOrders)->sortByDesc('created_at')->take(5);
+
         return view('dashboard.admin', compact(
             'distributorsCount',
             'resellersCount',
             'pendingVerificationsCount',
             'provincesCount',
-            'recentActivity'
+            'recentActivity',
+            'recentTransactions'
         ));
     }
 
@@ -118,7 +146,36 @@ class AdminDashboardController extends Controller
                 return $item;
             });
 
-        return view('dashboard.admin.sales', compact('monthlyTrend', 'regionalBreakdown'));
+        // Summary Stats
+        $totalVolume = \App\Models\DistributorOrder::where('status', 'Selesai')->sum('quantity');
+        $totalOmzet = $totalVolume * 13000; // Fallback price
+        $totalTransactions = \App\Models\DistributorOrder::count();
+        
+        $recentTransactions = \App\Models\DistributorOrder::with('user')
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function($order) {
+                $order->invoice_number = $order->order_number;
+                $order->total_price = $order->quantity * 13000;
+                return $order;
+            });
+
+        // Simple growth calculation
+        $lastMonthVolume = \App\Models\DistributorOrder::where('status', 'Selesai')
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->sum('quantity');
+        $growth = $lastMonthVolume > 0 ? (($totalVolume - $lastMonthVolume) / $lastMonthVolume) * 100 : 0;
+
+        return view('dashboard.admin.sales', compact(
+            'monthlyTrend', 
+            'regionalBreakdown',
+            'totalVolume',
+            'totalOmzet',
+            'totalTransactions',
+            'recentTransactions',
+            'growth'
+        ));
     }
 
     public function settings()
@@ -188,5 +245,10 @@ class AdminDashboardController extends Controller
         $reseller->update(['upline_id' => $request->distributor_id]);
 
         return redirect()->route('admin.mapping')->with('success', 'Reseller berhasil dimigrasikan.');
+    }
+
+    public function requests()
+    {
+        return view('dashboard.admin.requests');
     }
 }

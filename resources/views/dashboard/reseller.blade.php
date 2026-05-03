@@ -67,7 +67,14 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         {{-- Aksi Cepat --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4">
+            <a href="{{ route('reseller.order') }}"
+               class="bg-secondary border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] p-5 flex flex-col xl:flex-row items-center gap-3 hover:bg-secondary-dark transition-colors group">
+                <div class="w-10 h-10 bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <span class="font-headline font-black text-white uppercase text-[10px] text-center xl:text-left">Buat Pesanan</span>
+            </a>
             <a href="{{ route('reseller.history') }}"
                class="bg-white border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex flex-col xl:flex-row items-center gap-3 hover:bg-neutral-light transition-colors group">
                 <div class="w-10 h-10 bg-primary/10 flex items-center justify-center flex-shrink-0">

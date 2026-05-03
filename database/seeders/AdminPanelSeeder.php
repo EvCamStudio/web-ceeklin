@@ -25,7 +25,9 @@ class AdminPanelSeeder extends Seeder
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'admin',
                 'status' => 'active',
-                'phone' => '08123456789'
+                'phone' => '08123456789',
+                'province_id' => '12', // Sumatera Utara
+                'city_id' => '1271', // Medan
             ]
         );
 
@@ -37,7 +39,15 @@ class AdminPanelSeeder extends Seeder
                 'role' => 'distributor',
                 'status' => 'active',
                 'phone' => '081222333444',
-                'province_id' => '32', // Jawa Barat
+                'nik' => '1100223344556677',
+                'ktp_photo' => 'ktp_photos/default.jpg',
+                'address' => 'Jl. Meulaboh No. 1, Aceh',
+                'province_id' => '11', // Aceh
+                'city_id' => '1105',   // Aceh Barat
+                'district_id' => '1105010',
+                'bank_name' => 'BCA',
+                'bank_account_name' => 'PT DISTRIBUTOR SUKSES',
+                'bank_account_number' => '888000111',
                 'stock' => 1000
             ]
         );
@@ -50,9 +60,16 @@ class AdminPanelSeeder extends Seeder
                 'role' => 'reseller',
                 'status' => 'active',
                 'phone' => '081333444555',
-                'province_id' => '32',
-                'city_id' => '3273', // Bandung
-                'upline_id' => User::where('role', 'distributor')->first()->id ?? null
+                'nik' => '3200112233445566',
+                'ktp_photo' => 'ktp_photos/default_r.jpg',
+                'address' => 'Jl. Braga No. 10, Bandung',
+                'province_id' => '32', // Jawa Barat
+                'city_id' => '3273',   // Kota Bandung
+                'district_id' => '3273010',
+                'bank_name' => 'BCA',
+                'bank_account_name' => 'RESELLER BERKAH',
+                'bank_account_number' => '777000222',
+                'upline_id' => User::where('username', 'distributor')->first()->id ?? null
             ]
         );
 

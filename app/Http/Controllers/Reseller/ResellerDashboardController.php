@@ -50,6 +50,17 @@ class ResellerDashboardController extends Controller
     public function order()
     {
         $user = Auth::user();
+
+        // Security: Ensure only resellers can see this page
+        if ($user->role !== 'reseller') {
+            return redirect()->route('dashboard')->with('error', 'Hanya Reseller yang dapat mengakses halaman ini.');
+        }
+
+        // Security: Ensure reseller has a distributor (upline)
+        if (!$user->upline_id) {
+            return redirect()->route('reseller.overview')->with('error', 'Akun Anda belum terhubung dengan Distributor manapun. Silakan hubungi Admin.');
+        }
+
         $upline = $user->upline;
         $resellerPrice = Pricing::where('tier', 'reseller')->latest()->first()->price ?? 1450000;
 
@@ -58,11 +69,22 @@ class ResellerDashboardController extends Controller
 
     public function storeOrder(Request $request)
     {
+        $user = Auth::user();
+
+        // Security: Ensure only resellers can order through this method
+        if ($user->role !== 'reseller') {
+            return back()->with('error', 'Hanya Reseller yang dapat melakukan pemesanan ini.');
+        }
+
+        // Security: Ensure reseller has a distributor (upline)
+        if (!$user->upline_id) {
+            return back()->with('error', 'Akun Anda belum terhubung dengan Distributor manapun. Silakan hubungi Admin.');
+        }
+
         $request->validate([
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $user = Auth::user();
         $resellerPrice = Pricing::where('tier', 'reseller')->latest()->first()->price ?? 1450000;
         $totalPrice = $request->quantity * $resellerPrice;
 

@@ -54,9 +54,10 @@ Route::prefix('dashboard/admin')->middleware(['auth'])->group(function () {
     Route::get('/bonus', [App\Http\Controllers\Admin\AdminDashboardController::class, 'bonus'])->name('admin.bonus');
     Route::post('/bonus/update', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateBonusSettings'])->name('admin.bonus.update');
     Route::get('/distributor-orders', [App\Http\Controllers\Admin\AdminDashboardController::class, 'distributorOrders'])->name('admin.distributor-orders');
-    Route::post('/distributor-orders/update-status', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateDistributorOrderStatus'])->name('admin.distributor-orders.update');
+    Route::post('/distributor-orders/update-status', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateDistributorOrderStatus'])->name('admin.distributor-orders.update-status');
     Route::get('/sales', [App\Http\Controllers\Admin\AdminDashboardController::class, 'sales'])->name('admin.sales');
     Route::get('/settings', [App\Http\Controllers\Admin\AdminDashboardController::class, 'settings'])->name('admin.settings');
+    Route::get('/requests', [App\Http\Controllers\Admin\AdminDashboardController::class, 'requests'])->name('admin.requests');
     
     Route::prefix('distributors')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\DistributorController::class, 'index'])->name('admin.distributors.index');
@@ -78,10 +79,12 @@ Route::prefix('dashboard/distributor')->middleware(['auth'])->group(function () 
     Route::post('/incoming-orders/update-status', [DistributorDashboardController::class, 'updateOrderStatus'])->name('distributor.incoming-orders.update');
     Route::post('/incoming-orders/cancel', [DistributorDashboardController::class, 'cancelOrder'])->name('distributor.incoming-orders.cancel');
     Route::get('/order', [DistributorDashboardController::class, 'order'])->name('distributor.order');
+    Route::get('/order/store', function() { return redirect()->route('distributor.order'); }); // Fallback for refreshes
     Route::post('/order/store', [DistributorDashboardController::class, 'storeOrder'])->name('distributor.order.store');
     Route::get('/resellers', [DistributorDashboardController::class, 'resellers'])->name('distributor.resellers');
     Route::get('/sales-map', [DistributorDashboardController::class, 'salesMap'])->name('distributor.sales-map');
     Route::get('/history', [DistributorDashboardController::class, 'history'])->name('distributor.history');
+    Route::post('/history/confirm', [DistributorDashboardController::class, 'confirmReceived'])->name('distributor.history.confirm');
     Route::get('/settings', [DistributorDashboardController::class, 'settings'])->name('distributor.settings');
     Route::post('/settings/update-profile', [DistributorDashboardController::class, 'updateProfile'])->name('distributor.settings.profile');
     Route::post('/settings/update-password', [DistributorDashboardController::class, 'updatePassword'])->name('distributor.settings.password');
@@ -92,6 +95,7 @@ Route::prefix('dashboard/distributor')->middleware(['auth'])->group(function () 
 Route::prefix('dashboard/reseller')->middleware(['auth'])->group(function () {
     Route::get('/', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'overview'])->name('reseller.overview');
     Route::get('/order', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'order'])->name('reseller.order');
+    Route::get('/order/store', function() { return redirect()->route('reseller.order'); }); // Fallback for refreshes
     Route::post('/order/store', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'storeOrder'])->name('reseller.order.store');
     Route::get('/history', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'history'])->name('reseller.history');
     Route::post('/history/confirm', [App\Http\Controllers\Reseller\ResellerDashboardController::class, 'confirmReceived'])->name('reseller.history.confirm');

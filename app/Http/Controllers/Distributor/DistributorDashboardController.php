@@ -89,6 +89,10 @@ class DistributorDashboardController extends Controller
 
     public function order()
     {
+        if (Auth::user()->role !== 'distributor') {
+            return redirect()->route('dashboard')->with('error', 'Hanya Distributor yang dapat mengakses halaman ini.');
+        }
+
         // This is for distributor ordering from factory
         $orders = DistributorOrder::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
@@ -116,18 +120,24 @@ class DistributorDashboardController extends Controller
         
         // Purchase History (from Factory/Admin)
         $purchases = DistributorOrder::where('user_id', $user->id)
-            ->where('status', 'Selesai')
+            ->whereIn('status', ['Diproses', 'Dikirim', 'Selesai'])
             ->get()
             ->map(function($order) {
+                $statusColors = [
+                    'Diproses' => 'border-yellow-500 text-yellow-700',
+                    'Dikirim' => 'border-orange-500 text-orange-700',
+                    'Selesai' => 'border-blue-500 text-blue-700',
+                ];
                 return (object)[
                     'id' => $order->order_number,
+                    'db_id' => $order->id,
                     'type' => 'Pembelian',
                     'qty' => $order->quantity,
                     'total' => $order->total_price,
                     'status' => $order->status,
                     'date' => $order->updated_at,
-                    'color' => 'border-blue-500 text-blue-700',
-                    'leftBorder' => 'border-blue-500'
+                    'color' => $statusColors[$order->status] ?? 'border-gray-500 text-gray-700',
+                    'leftBorder' => explode(' ', $statusColors[$order->status] ?? 'border-gray-500')[0]
                 ];
             });
 
@@ -139,6 +149,7 @@ class DistributorDashboardController extends Controller
             ->map(function($order) {
                 return (object)[
                     'id' => $order->order_number,
+                    'db_id' => $order->id,
                     'type' => 'Penjualan',
                     'qty' => $order->quantity,
                     'total' => $order->total_price,
@@ -152,6 +163,29 @@ class DistributorDashboardController extends Controller
         $history = $purchases->concat($sales)->sortByDesc('date');
 
         return view('dashboard.distributor.history', compact('history'));
+    }
+
+    public function confirmReceived(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required'
+        ]);
+
+        $order = DistributorOrder::where('order_number', $request->order_id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        if ($order->status === 'Selesai') {
+            return back()->with('error', 'Pesanan ini sudah selesai.');
+        }
+
+        // Update status and increment stock
+        $order->update(['status' => 'Selesai']);
+        
+        $user = Auth::user();
+        $user->increment('stock', $order->quantity);
+
+        return back()->with('success', 'Pesanan berhasil dikonfirmasi. Stok Anda telah diperbarui.');
     }
 
     public function settings()
@@ -213,6 +247,10 @@ class DistributorDashboardController extends Controller
 
     public function storeOrder(Request $request)
     {
+        if (Auth::user()->role !== 'distributor') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
         $request->validate([
             'qty' => 'required|integer|min:1000'
         ]);
@@ -225,7 +263,7 @@ class DistributorDashboardController extends Controller
             'order_number' => 'RE-' . strtoupper(uniqid()),
             'quantity' => $request->qty,
             'total_price' => $total,
-            'status' => 'Menunggu Konfirmasi'
+            'status' => 'Menunggu Proses'
         ]);
 
         return back()->with('success', 'Pesanan restock berhasil dikirim ke pabrik.');
