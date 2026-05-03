@@ -9,220 +9,467 @@
         @include('dashboard.admin._menu')
     </x-slot:menuSlot>
 
-    <div class="max-w-[1400px] mx-auto w-full" x-data="{
+    <div class="max-w-[1400px] mx-auto w-full pb-20" x-data="{
         viewMode: 'list',
         selectedOrder: null,
         newStatus: '',
         searchQuery: '',
+        filterStatus: 'Semua Status',
+        
+        // UI State
+        forceCompleteMode: false,
+        waSent: false,
+
         dummies: [
-            {id: 'ORD-1092', name: 'PT Tirta Makmur', phone: '081234567890', city: 'Bandung, Jawa Barat', qty: 5000, status: 'Menunggu Proses', statusColor: 'bg-red-100 text-red-800 border-red-300', date: 'Hari Ini, 08:15'},
-            {id: 'ORD-1091', name: 'CV Bintang Selatan', phone: '08987654321', city: 'Surabaya, Jawa Timur', qty: 2500, status: 'Diproses', statusColor: 'bg-yellow-100 text-yellow-800 border-yellow-300', date: 'Kemarin, 14:30'},
-            {id: 'ORD-1088', name: 'Distributor Abadi', phone: '08111222333', city: 'Semarang, Jawa Tengah', qty: 1000, status: 'Dikirim', statusColor: 'bg-blue-100 text-blue-800 border-blue-300', date: '2 Hari Lalu'},
+            {id: 'ORD-1092', name: 'PT Tirta Makmur', phone: '081234567890', city: 'Bandung, Jawa Barat', qty: 5000, status: 'Menunggu', date: 'Hari Ini, 08:15', items: 'CeeKlin 450ml (x5000)', total: 'Rp 65.000.000', method: 'Transfer Bank (Manual)', note: 'Mohon segera diproses untuk restock gudang pusat.'},
+            {id: 'ORD-1091', name: 'CV Bintang Selatan', phone: '08987654321', city: 'Surabaya, Jawa Timur', qty: 2500, status: 'Dikemas', date: 'Kemarin, 14:30', items: 'CeeKlin 450ml (x2500)', total: 'Rp 32.500.000', method: 'VA Mandiri', note: ''},
+            {id: 'ORD-1088', name: 'Distributor Abadi', phone: '08111222333', city: 'Semarang, Jawa Tengah', qty: 1000, status: 'Dikirim', date: '2 Hari Lalu', items: 'CeeKlin 450ml (x1000)', total: 'Rp 13.000.000', method: 'Transfer Bank (Manual)', note: 'Barang kirim ke gudang blok B.'},
+            {id: 'ORD-1085', name: 'Heru Perkasa', phone: '08555666777', city: 'Bekasi, Jawa Barat', qty: 1000, status: 'Selesai', date: '5 Hari Lalu', items: 'CeeKlin 450ml (x1000)', total: 'Rp 13.000.000', method: 'QRIS', note: ''},
         ],
+
+        filteredOrders() {
+            return this.dummies.filter(order => {
+                const matchesStatus = this.filterStatus === 'Semua Status' || order.status === this.filterStatus;
+                const matchesSearch = order.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                     order.id.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                                     order.city.toLowerCase().includes(this.searchQuery.toLowerCase());
+                return matchesStatus && matchesSearch;
+            });
+        },
+
         openOrder(order) {
             this.selectedOrder = order;
             this.newStatus = order.status;
+            this.forceCompleteMode = false;
+            this.waSent = false;
             this.viewMode = 'detail';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
+
         goBack() {
             this.viewMode = 'list';
             this.selectedOrder = null;
+            this.forceCompleteMode = false;
         },
-        get filteredOrders() {
-            if (!this.searchQuery) return this.dummies;
-            return this.dummies.filter(o => 
-                o.id.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                o.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            );
-        },
-        getWaLink() {
+
+        getWaLink(mode = 'normal') {
             const phone = (this.selectedOrder?.phone ?? '').replace(/\D/g, '');
             const id = this.selectedOrder?.id ?? '';
             const status = this.newStatus;
-            const msg = `Halo, Admin CeeKlin di sini.\n\nUpdate pesanan ${id}:\nStatus saat ini: *${status.toUpperCase()}*\n\nTerima kasih atas kerja samanya!`;
+            
+            let msg = `Halo, Admin CeeKlin di sini.\n\nUpdate pesanan ${id}:\nStatus saat ini: *${status.toUpperCase()}*\n\nTerima kasih atas kerja samanya!`;
+            
+            if(mode === 'manual_complete') {
+                msg = `Halo ${this.selectedOrder?.name}, pesanan ${id} telah kami selesaikan secara manual di sistem karena barang sudah terkirim/diterima kurir.\n\nMohon cek stok di panel Distributor Anda. Jika ada kendala, hubungi kami segera. Terima kasih!`;
+            }
+            
             return 'https://wa.me/' + (phone.startsWith('0') ? '62' + phone.substring(1) : phone) + '?text=' + encodeURIComponent(msg);
         }
     }">
-        {{-- VIEW LIST: Tabel Pesanan --}}
-        <div x-show="viewMode === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            {{-- Header Data --}}
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Antrean Restock</h2>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Kelola Pengiriman ke Gudang Distributor</p>
+        {{-- ========================= --}}
+        {{-- VIEW: LIST PESANAN MASUK --}}
+        {{-- ========================= --}}
+        <div x-show="viewMode === 'list'"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0">
+
+            {{-- Header & Stats Summary --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 items-end">
+                <div class="lg:col-span-7">
+                    <h2 class="font-headline font-black text-4xl text-primary tracking-tighter uppercase leading-none italic">Antrean Restock</h2>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+                        Kelola Distribusi Stok ke Gudang Distributor Wilayah
+                    </p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:min-w-[250px]">
-                        <input type="text" x-model="searchQuery" placeholder="Cari No. Order / Distributor..." 
-                            class="w-full bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10">
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
+                
+                <div class="lg:col-span-5 grid grid-cols-3 gap-4">
+                    <div class="bg-white border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_var(--color-primary-darkest)]">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Menunggu</p>
+                        <p class="font-headline font-black text-2xl text-primary leading-none">05</p>
                     </div>
-                    <select class="appearance-none bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer">
-                        <option>Semua Status</option>
-                        <option>Menunggu Proses</option>
-                        <option>Sedang Diproses</option>
-                        <option>Dikirim</option>
-                    </select>
+                    <div class="bg-white border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_var(--color-secondary)]">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Dikemas</p>
+                        <p class="font-headline font-black text-2xl text-secondary leading-none">08</p>
+                    </div>
+                    <div class="bg-primary border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_var(--color-gray-900)]">
+                        <p class="text-[8px] font-black text-white/50 uppercase tracking-widest mb-1">Dikirim</p>
+                        <p class="font-headline font-black text-2xl text-white leading-none">03</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
-                <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-900 border-b-2 border-gray-900">
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest">No. Order</div>
-                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Distributor</div>
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Volume (PCS)</div>
-                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Status & Waktu</div>
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Aksi</div>
+            {{-- Toolbar: Search, Filter --}}
+            <div class="bg-white border-[4px] border-gray-900 p-6 mb-8 shadow-[8px_8px_0_rgba(0,0,0,0.05)] flex flex-col xl:flex-row justify-between gap-6">
+                <div class="flex flex-col md:flex-row gap-4 flex-1">
+                    <div class="relative flex-1 max-w-md">
+                        <input type="text" x-model="searchQuery" placeholder="Cari Distributor, Wilayah, atau No. Order..." 
+                            class="w-full bg-neutral-light border-[3px] border-gray-900 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary transition-all">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <select aria-label="Filter Status" x-model="filterStatus" class="bg-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-900 focus:outline-none focus:border-secondary cursor-pointer min-w-[160px]">
+                            <option value="Semua Status">Semua Status</option>
+                            <option value="Menunggu">Menunggu</option>
+                            <option value="Dikemas">Dikemas</option>
+                            <option value="Dikirim">Dikirim</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Update Terakhir: {{ now()->format('H:i') }}</span>
+                    <button class="bg-primary text-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all">Export Laporan</button>
+                </div>
+            </div>
 
-                <div class="divide-y-2 divide-neutral-border">
-                    <template x-for="(order, index) in filteredOrders" :key="order.id">
-                        <div :class="'animate-in stagger-' + (index % 5 + 1)"
-                             class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
-                            <div class="md:col-span-2 w-full">
-                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Order</p>
-                                <p class="font-headline font-black text-sm text-gray-900 tracking-tight" x-text="order.id"></p>
+            {{-- Order Cards --}}
+            <div class="space-y-6">
+                <template x-for="order in filteredOrders()" :key="order.id">
+                    <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] group hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                        <div class="flex flex-col lg:flex-row">
+                            {{-- ID & Info Column --}}
+                            <div class="lg:w-80 p-6 bg-neutral-light border-b-[4px] lg:border-b-0 lg:border-r-[4px] border-gray-900 relative">
+                                <div class="flex justify-between items-start mb-4">
+                                    <span class="bg-gray-900 text-white text-[9px] font-black px-2 py-1 uppercase tracking-widest" x-text="order.id"></span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" x-text="order.date"></span>
+                                </div>
+                                <h4 class="font-headline font-black text-xl text-primary uppercase leading-tight italic" x-text="order.name"></h4>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase" x-text="order.city"></span>
+                                </div>
                             </div>
-                            <div class="md:col-span-3 w-full">
-                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Distributor</p>
-                                <p class="font-bold text-xs text-gray-900 uppercase leading-tight" x-text="order.name"></p>
-                                <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase" x-text="order.city"></p>
-                            </div>
-                            <div class="md:col-span-2 w-full md:text-center">
-                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Volume</p>
-                                <p class="text-sm font-headline font-black text-primary" x-text="new Intl.NumberFormat('id-ID').format(order.qty)"></p>
-                            </div>
-                            <div class="md:col-span-3 w-full">
-                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status & Waktu</p>
-                                <span class="px-2 py-1 text-[9px] font-bold uppercase tracking-widest border block w-max mb-1" :class="order.statusColor" x-text="order.status"></span>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase" x-text="order.date"></p>
-                            </div>
-                            <div class="md:col-span-2 w-full flex justify-start md:justify-end">
-                                <button @click="openOrder(order)" class="bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-2 border-gray-900 hover:bg-neutral-light shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none transition-all">
-                                    Kelola
-                                </button>
+
+                            {{-- Order Content --}}
+                            <div class="flex-1 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 sm:gap-8">
+                                <div class="w-full sm:w-auto">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 italic">Volume Produk</p>
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-gray-100 border-2 border-gray-900 flex items-center justify-center">
+                                            <img src="/images/hero-bottle.jpeg" class="w-8 opacity-50 grayscale mix-blend-multiply">
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm text-gray-900" x-text="order.items"></p>
+                                            <p class="text-[9px] font-bold text-green-600 uppercase tracking-widest">Pembayaran Terverifikasi ✓</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap sm:flex-nowrap gap-6 sm:gap-10 w-full sm:w-auto justify-between items-center pt-6 sm:pt-0 border-t-2 sm:border-t-0 border-dashed border-gray-200">
+                                    <div class="text-left sm:text-right">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
+                                        <p class="font-headline font-black text-xl text-primary tracking-tighter italic" x-text="order.total"></p>
+                                    </div>
+                                    <div class="text-center min-w-[100px]">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                                        <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block"
+                                            :class="{
+                                                'border-red-500 text-red-600 bg-red-50': order.status === 'Menunggu',
+                                                'border-yellow-500 text-yellow-700 bg-yellow-50': order.status === 'Dikemas',
+                                                'border-blue-500 text-blue-600 bg-blue-50': order.status === 'Dikirim',
+                                                'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai'
+                                            }" x-text="order.status"></span>
+                                    </div>
+                                    
+                                    <button @click="openOrder(order)" 
+                                        class="w-full sm:w-auto bg-primary text-white px-6 py-4 font-headline font-black text-[10px] uppercase tracking-widest shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3">
+                                        <span>Kelola Pengiriman</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7-7 7M3 12h18"/></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </template>
+                    </div>
+                </template>
+
+                {{-- No Results State --}}
+                <div x-show="filteredOrders().length === 0" class="py-20 text-center bg-white border-[4px] border-dashed border-gray-200 shadow-[8px_8px_0_rgba(0,0,0,0.02)]">
+                    <div class="w-20 h-20 bg-neutral-light border-2 border-gray-900 flex items-center justify-center mx-auto mb-4 grayscale">
+                        <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tidak ada pesanan distributor yang sesuai filter.</p>
+                </div>
+            </div>
+
+            {{-- Pagination --}}
+            <div class="mt-12 flex justify-center">
+                <div class="flex gap-2">
+                    <button class="w-10 h-10 border-[3px] border-gray-900 flex items-center justify-center font-black bg-white shadow-[4px_4px_0_var(--color-gray-900)] grayscale opacity-50">&lt;</button>
+                    <button class="w-10 h-10 border-[3px] border-gray-900 flex items-center justify-center font-black bg-primary text-white shadow-[4px_4px_0_var(--color-gray-900)]">1</button>
+                    <button class="w-10 h-10 border-[3px] border-gray-900 flex items-center justify-center font-black bg-white shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-neutral-light transition-colors">2</button>
+                    <button class="w-10 h-10 border-[3px] border-gray-900 flex items-center justify-center font-black bg-white shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-neutral-light transition-colors">&gt;</button>
                 </div>
             </div>
         </div>
 
-        {{-- VIEW DETAIL: Form Kelola Order (Inline) --}}
-        <div x-show="viewMode === 'detail'" x-cloak style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            
-            {{-- Tombol Kembali & Header --}}
-            <div class="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-                <div>
-                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Kelola Pengiriman</h2>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1" x-text="'NO. ORDER: ' + selectedOrder?.id"></p>
+        {{-- ======================== --}}
+        {{-- VIEW: DETAIL / PROSES   --}}
+        {{-- ======================== --}}
+        <div x-show="viewMode === 'detail'" style="display: none;"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-x-10"
+             x-transition:enter-end="opacity-100 translate-x-0">
+
+            {{-- Sticky Action Header --}}
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
+                <div class="flex items-center gap-6">
+                    <x-ui.back-button @click="goBack()" />
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 class="font-headline font-black text-4xl text-primary tracking-tighter uppercase italic leading-none" x-text="selectedOrder?.id"></h2>
+                        </div>
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-2" x-text="'Distributor: ' + selectedOrder?.name + ' • ' + selectedOrder?.date"></p>
+                    </div>
                 </div>
-                <button @click="goBack()" class="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-[3px] border-gray-900 hover:bg-neutral-light transition-colors shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Kembali ke Antrean
-                </button>
+
+                <div class="flex gap-4 w-full lg:w-auto">
+                    <button class="flex-1 lg:flex-none bg-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-light transition-all shadow-[4px_4px_0_var(--color-gray-900)]">Cetak Surat Jalan</button>
+                    <a :href="getWaLink()" target="_blank" class="flex-1 lg:flex-none bg-[#25D366] text-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#1DA851] shadow-[4px_4px_0_var(--color-gray-900)] transition-all flex items-center justify-center gap-2">WhatsApp Distributor</a>
+                </div>
             </div>
 
-            <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] w-full max-w-3xl flex flex-col mx-auto">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
                 
-                {{-- Info Ringkas Order --}}
-                <div class="p-6 md:p-8 flex-1 flex flex-col gap-6 bg-neutral border-b-[4px] border-gray-900">
-                    <div class="bg-white border-[3px] border-gray-900 p-5 shadow-[4px_4px_0_var(--color-gray-900)] grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">Informasi Pemesan</p>
-                            <h4 class="font-headline font-black text-xl text-primary uppercase mb-2" x-text="selectedOrder?.name"></h4>
-                            <p class="font-bold text-gray-900 text-sm uppercase" x-text="selectedOrder?.city"></p>
+                {{-- LEFT COLUMN: ORDER INFO --}}
+                <div class="xl:col-span-8 space-y-8">
+                    
+                    {{-- 1. Status Stepper --}}
+                    <div class="bg-white border-[4px] border-gray-900 p-8 shadow-[10px_10px_0_rgba(0,0,0,0.05)]">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 relative">
+                            {{-- Connector Line --}}
+                            <div class="hidden md:block absolute top-6 left-10 right-10 h-[4px] bg-neutral-light -z-10">
+                                <div class="h-full bg-primary transition-all duration-700" 
+                                     :style="'width: ' + (['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(newStatus) * 33.33) + '%'"></div>
+                            </div>
+                            
+                            @foreach(['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'] as $i => $step)
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="w-12 h-12 flex items-center justify-center border-[4px] transition-all duration-500"
+                                     :class="['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(newStatus) >= {{ $i }} ? 'bg-primary border-gray-900 text-white shadow-[4px_4px_0_rgba(0,0,0,0.2)]' : 'bg-white border-neutral-light text-slate-300'">
+                                    @if($i == 0) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    @elseif($i == 1) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                    @elseif($i == 2) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                                    @else <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    @endif
+                                </div>
+                                <span class="text-[9px] font-black uppercase tracking-widest text-center"
+                                      :class="['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(newStatus) >= {{ $i }} ? 'text-gray-900' : 'text-slate-300'">{{ $step }}</span>
+                            </div>
+                            @endforeach
                         </div>
-                        <div>
-                            <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">Pesanan Restock</p>
-                            <h4 class="font-headline font-black text-3xl text-gray-900 tracking-tighter uppercase"><span x-text="new Intl.NumberFormat('id-ID').format(selectedOrder?.qty)"></span> <span class="text-lg text-slate-400">PCS</span></h4>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase mt-1">CeeKlin 450ml</p>
+                    </div>
+
+                    {{-- 2. Shipping & Payment Details (Point 2) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)]">
+                            <div class="bg-gray-900 px-6 py-3">
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest italic">Informasi Distributor</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="w-14 h-14 bg-primary text-white flex items-center justify-center font-headline font-black text-2xl border-4 border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]">
+                                        <span x-text="selectedOrder?.name.charAt(0)"></span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-headline font-black text-xl text-primary uppercase italic" x-text="selectedOrder?.name"></h4>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest" x-text="selectedOrder?.phone"></p>
+                                    </div>
+                                </div>
+                                <div class="space-y-4 pt-4 border-t-2 border-dashed border-gray-200">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Alamat Gudang:</p>
+                                    <p class="text-sm font-bold text-gray-900 leading-relaxed uppercase" x-text="selectedOrder?.city + ', INDONESIA. JL. DISTRIBUSI NO. 12, PUSAT PERGUDANGAN BLOK B.'"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-secondary)]">
+                            <div class="bg-secondary px-6 py-3">
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest italic">Rincian Pembayaran</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-5">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase">Metode Bayar</span>
+                                        <span class="text-xs font-black text-primary uppercase" x-text="selectedOrder?.method"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase">Status Bayar</span>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[8px] font-black uppercase border border-green-600">Lunas / Terverifikasi ✓</span>
+                                    </div>
+                                    <div class="pt-5 border-t-2 border-dashed border-gray-200">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
+                                            <span class="text-xs font-bold text-gray-900" x-text="selectedOrder?.total"></span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Biaya Layanan</span>
+                                            <span class="text-xs font-bold text-gray-900">Rp 0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center pt-4 mt-2 border-t-2 border-gray-900">
+                                            <span class="text-[10px] font-black text-primary uppercase italic tracking-widest">Total Tagihan</span>
+                                            <span class="text-3xl font-headline font-black text-primary tracking-tighter" x-text="selectedOrder?.total"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 3. Item List --}}
+                    <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_rgba(0,0,0,0.05)]">
+                        <div class="bg-gray-900 px-6 py-4">
+                            <h3 class="font-headline font-black text-white text-base uppercase tracking-tight italic">Produk Pesanan</h3>
+                        </div>
+                        <div class="p-0">
+                            <div class="flex items-center gap-8 p-8 border-b-2 border-neutral-light">
+                                <div class="w-24 h-24 bg-gray-100 border-[3px] border-gray-900 flex items-center justify-center p-2 shadow-[4px_4px_0_var(--color-primary)]">
+                                    <img src="/images/hero-bottle.jpeg" class="w-full h-auto">
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div>
+                                            <h4 class="font-headline font-black text-2xl text-primary uppercase italic leading-none">CeeKlin 450ml</h4>
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">SKU: CK-450-DIST</p>
+                                        </div>
+                                        <div class="flex gap-10 text-right">
+                                            <div>
+                                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Harga Unit (Dist)</p>
+                                                <p class="font-bold text-sm text-gray-900 uppercase">Rp 13.000</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Jumlah (Restock)</p>
+                                                <p class="font-headline font-black text-xl text-primary tracking-tighter italic" x-text="new Intl.NumberFormat('id-ID').format(selectedOrder?.qty) + ' PCS'"></p>
+                                            </div>
+                                            <div>
+                                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
+                                                <p class="font-bold text-sm text-gray-900" x-text="selectedOrder?.total"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Catatan Distributor (Point 2) --}}
+                        <div class="bg-neutral-light p-6">
+                            <div class="flex items-start gap-4">
+                                <svg class="w-5 h-5 text-secondary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div>
+                                    <p class="text-[9px] font-black text-secondary uppercase tracking-widest mb-1 italic">Catatan Distributor:</p>
+                                    <p class="text-xs font-bold text-gray-600 italic leading-relaxed" x-text="selectedOrder?.note ? '“' + selectedOrder?.note + '”' : '“Tidak ada catatan tambahan.”'"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Form Update Status --}}
-                <form action="/dashboard/admin/distributor-orders/update-status" method="POST">
-                    @csrf
-                    <input type="hidden" name="order_id" :value="selectedOrder?.id">
+                {{-- RIGHT COLUMN: ACTION PANEL --}}
+                <div class="xl:col-span-4 space-y-8 sticky top-10">
                     
-                    <div class="p-6 md:p-8 flex flex-col gap-4 bg-white">
-                        <label class="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Update Progres Pengiriman</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            
-                            {{-- Radio: Menunggu --}}
-                            <label class="relative cursor-pointer">
-                                <input type="radio" name="status" value="Menunggu Proses" x-model="newStatus" class="peer sr-only">
-                                <div class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 peer-checked:border-red-600 peer-checked:bg-red-50 transition-colors text-center">
-                                    <p class="font-headline font-bold text-xs uppercase text-gray-500 peer-checked:text-red-700">Menunggu</p>
-                                </div>
-                            </label>
-
-                            {{-- Radio: Diproses --}}
-                            <label class="relative cursor-pointer">
-                                <input type="radio" name="status" value="Diproses" x-model="newStatus" class="peer sr-only">
-                                <div class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 peer-checked:border-yellow-500 peer-checked:bg-yellow-50 transition-colors text-center">
-                                    <p class="font-headline font-bold text-xs uppercase text-gray-500 peer-checked:text-yellow-700">Diproses</p>
-                                </div>
-                            </label>
-
-                            {{-- Radio: Dikirim --}}
-                            <label class="relative cursor-pointer">
-                                <input type="radio" name="status" value="Dikirim" x-model="newStatus" class="peer sr-only">
-                                <div class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-colors text-center">
-                                    <p class="font-headline font-bold text-xs uppercase text-gray-500 peer-checked:text-blue-700">Dikirim</p>
-                                </div>
-                            </label>
-
-                            {{-- Radio: Selesai --}}
-                            <label class="relative cursor-pointer">
-                                <input type="radio" name="status" value="Selesai" x-model="newStatus" class="peer sr-only">
-                                <div class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 peer-checked:border-green-600 peer-checked:bg-green-50 transition-colors text-center">
-                                    <p class="font-headline font-bold text-xs uppercase text-gray-500 peer-checked:text-green-700">Selesai</p>
-                                </div>
-                            </label>
-
+                    {{-- Status Control Panel --}}
+                    <div class="bg-white border-[4px] border-gray-900 shadow-[12px_12px_0_var(--color-primary-darkest)] overflow-hidden">
+                        <div class="bg-primary p-6 border-b-[4px] border-gray-900">
+                            <h3 class="font-headline font-black text-white text-xl uppercase tracking-tighter italic leading-none">Kontrol Progres</h3>
                         </div>
+                        
+                        <div class="p-8">
+                            {{-- Action State: Normal --}}
+                            <div x-show="!forceCompleteMode" class="space-y-8">
+                                <div class="space-y-4">
+                                    <label class="text-[10px] font-black text-gray-900 uppercase tracking-widest italic block mb-2">Update Tahapan Pengiriman:</label>
+                                    
+                                    {{-- Custom Radio Group for Status --}}
+                                    <div class="flex flex-col gap-3">
+                                        <template x-for="status in ['Menunggu', 'Dikemas', 'Dikirim']">
+                                            <button @click="newStatus = status"
+                                                    :disabled="selectedOrder?.status === 'Selesai'"
+                                                    :class="newStatus === status ? 'bg-primary text-white border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]' : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
+                                                    class="w-full px-5 py-4 border-[3px] font-headline font-black text-[11px] uppercase tracking-widest text-left transition-all flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <span x-text="status"></span>
+                                                <div :class="newStatus === status ? 'bg-white' : 'bg-gray-100'" class="w-4 h-4 rounded-full border-2 border-gray-900"></div>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
 
-                        {{-- Input Resi (hanya muncul jika dikirim/selesai) --}}
-                        <div x-show="newStatus === 'Dikirim' || newStatus === 'Selesai'" x-cloak x-transition class="mt-4 flex flex-col gap-1.5" style="display: none;">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="resi">Nomor Resi / Bukti Jalan</label>
-                            <input id="resi" name="tracking_number" type="text" placeholder="Masukkan nomor resi..."
-                                class="bg-neutral-light border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors">
-                        </div>
+                                {{-- Input Resi & Kurir (Hanya jika Dikirim) --}}
+                                <div x-show="newStatus === 'Dikirim'" x-transition class="space-y-4 p-5 bg-blue-50 border-2 border-blue-200 border-dashed">
+                                    <p class="text-[9px] font-black text-blue-700 uppercase tracking-widest mb-2 italic">Informasi Logistik:</p>
+                                    
+                                    <div class="space-y-3">
+                                        <div class="space-y-1">
+                                            <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Kurir Pengantar</label>
+                                            <input type="text" placeholder="Contoh: Kurir Pabrik / Nama Ekspedisi"
+                                                class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest focus:border-primary focus:outline-none transition-all placeholder:text-slate-300">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest">No. Resi / Surat Jalan</label>
+                                            <input type="text" placeholder="Masukkan Nomor Valid"
+                                                class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest font-mono focus:border-primary focus:outline-none transition-all placeholder:text-slate-300">
+                                        </div>
+                                    </div>
+                                </div>
 
-                        {{-- Alert Info --}}
-                        <div x-show="newStatus === 'Selesai'" x-cloak x-transition class="mt-2 bg-green-100 border-l-[4px] border-green-600 p-3" style="display: none;">
-                            <p class="text-[10px] font-bold text-green-800 uppercase tracking-widest">Peringatan: Jika diset Selesai, stok otomatis ditambahkan ke sistem Distributor tersebut.</p>
+                                <div class="pt-4 border-t-2 border-neutral-light">
+                                    <button :disabled="selectedOrder?.status === 'Selesai'"
+                                        class="w-full bg-primary text-white py-6 font-headline font-black text-lg uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
+                                        SIMPAN UPDATE
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    </button>
+
+                                    {{-- Aksi Cadangan: Selesaikan Manual --}}
+                                    <template x-if="selectedOrder?.status === 'Dikirim' && newStatus === 'Dikirim'">
+                                        <button @click="forceCompleteMode = true" class="w-full mt-6 bg-white text-secondary border-[3px] border-secondary py-3 font-headline font-black text-[10px] uppercase tracking-widest hover:bg-secondary/5 transition-all">Selesaikan Pesanan Secara Manual</button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            {{-- Action State: Force Complete --}}
+                            <div x-show="forceCompleteMode" style="display: none;" x-transition class="space-y-6">
+                                <div class="p-5 bg-secondary/10 border-2 border-secondary/30">
+                                    <h4 class="text-secondary font-headline font-black text-sm uppercase mb-2">Penyelesaian Manual</h4>
+                                    <p class="text-[10px] text-gray-600 font-bold uppercase leading-relaxed">Peringatan: Gunakan fitur ini hanya jika Distributor lupa mengonfirmasi barang yang sudah sampai. Stok Distributor akan bertambah secara otomatis.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase italic">Alasan Penyelesaian:</label>
+                                    <textarea rows="3" class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 font-bold text-gray-900 text-xs focus:outline-none focus:border-secondary transition-all resize-none" placeholder="Contoh: Barang sudah sampai di gudang menurut kurir internal..."></textarea>
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    <button class="w-full bg-secondary text-white py-4 font-headline font-black text-sm uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_rgba(0,0,0,0.2)] hover:bg-secondary-dark transition-all">KONFIRMASI SELESAI</button>
+                                    
+                                    {{-- WA Notification after Manual Complete --}}
+                                    <a :href="getWaLink('manual_complete')" target="_blank" @click="waSent = true"
+                                        class="w-full bg-[#25D366] text-white py-3 font-headline font-bold text-[10px] uppercase tracking-widest border-[3px] border-gray-900 flex items-center justify-center gap-2">
+                                        INFO DISTRIBUTOR VIA WA
+                                    </a>
+                                    
+                                    <button @click="forceCompleteMode = false" class="w-full text-[9px] font-black text-slate-400 uppercase hover:underline">Kembali</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {{-- Aksi --}}
-                    <div class="p-6 md:p-8 bg-neutral border-t-[4px] border-gray-900 flex flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <button type="button" @click="goBack()" class="w-full sm:w-1/3 bg-white text-gray-600 border-[3px] border-gray-400 px-6 py-4 font-headline font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors">
-                                BATAL
-                            </button>
-                            
-                            <button type="submit" class="w-full sm:col-span-2 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                SIMPAN PERUBAHAN
-                            </button>
-                        </div>
-
-                        <div class="flex flex-col gap-2 border-t-2 border-dashed border-gray-300 pt-4 mt-2">
-                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Aksi Tambahan:</p>
-                            <a :href="getWaLink()" target="_blank"
-                                class="w-full bg-[#25D366] text-white px-6 py-3 font-headline font-bold text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-[#1DA851] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                                KIRIM NOTIFIKASI WA KE DISTRIBUTOR
-                            </a>
-                        </div>
+                    {{-- Admin Guidelines --}}
+                    <div class="bg-gray-900 p-8 border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)]">
+                        <h4 class="font-headline font-black text-secondary text-lg uppercase tracking-tight mb-4 italic">SOP Pengiriman</h4>
+                        <ul class="space-y-4">
+                            <li class="flex gap-3 items-start">
+                                <span class="text-secondary font-black">1.</span>
+                                <p class="text-[10px] font-bold text-white/70 uppercase leading-relaxed tracking-widest">Verifikasi pembayaran sebelum mengubah status ke <span class="text-white">Dikemas</span>.</p>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <span class="text-secondary font-black">2.</span>
+                                <p class="text-[10px] font-bold text-white/70 uppercase leading-relaxed tracking-widest">Wajib sertakan No. Resi/Surat Jalan saat status <span class="text-white">Dikirim</span>.</p>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <span class="text-secondary font-black">3.</span>
+                                <p class="text-[10px] font-bold text-white/70 uppercase leading-relaxed tracking-widest">Pastikan Distributor melakukan verifikasi barang di panel mereka.</p>
+                            </li>
+                        </ul>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

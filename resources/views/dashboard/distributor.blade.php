@@ -9,29 +9,74 @@
         @include('dashboard.distributor._menu')
     </x-slot:menuSlot>
 
-    {{-- 
-        TODO BACKEND:
-        Gunakan Toast Component untuk notifikasi success/error (misal: setelah berhasil login atau simpan data).
-        Silakan panggil komponen ini jika terdapat flash session.
-        Contoh:
-        @if(session('success'))
-            <div class="fixed top-8 right-8 z-[100]">
-                <x-ui.toast type="success" :message="session('success')" />
-            </div>
-        @endif
-    --}}
+    {{-- ACTION CENTER (PRIORITY TASKS) --}}
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-10 h-1 bg-primary"></span>
+            <h2 class="font-headline font-black text-xl text-primary uppercase tracking-tight italic">Pusat Aksi (Urgensi)</h2>
+            <span class="flex-1 h-[2px] bg-neutral-border"></span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- Task: Pesanan Pending --}}
+            <a href="/dashboard/distributor/incoming-orders?status=Menunggu" 
+               class="bg-red-50 border-[4px] border-red-600 p-6 flex items-center justify-between group hover:bg-red-600 transition-all duration-300 shadow-[8px_8px_0_var(--color-gray-900)]">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-red-600 flex items-center justify-center text-white group-hover:bg-white group-hover:text-red-600 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-headline font-black text-red-600 group-hover:text-white text-xl uppercase leading-none tracking-tighter">3 Pesanan Masuk</h4>
+                        <p class="text-[10px] font-bold text-red-400 group-hover:text-red-100 uppercase tracking-widest mt-1">Belum diproses & dikemas</p>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <svg class="w-8 h-8 text-red-600 group-hover:text-white transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {{-- Task: Stok Menipis --}}
+            <a href="/dashboard/distributor/inventory" 
+               class="bg-yellow-50 border-[4px] border-yellow-500 p-6 flex items-center justify-between group hover:bg-yellow-500 transition-all duration-300 shadow-[8px_8px_0_var(--color-gray-900)]">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-yellow-500 flex items-center justify-center text-white group-hover:bg-white group-hover:text-yellow-500 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-headline font-black text-yellow-600 group-hover:text-white text-xl uppercase leading-none tracking-tighter">Stok Menengah</h4>
+                        <p class="text-[10px] font-bold text-yellow-600/60 group-hover:text-yellow-100 uppercase tracking-widest mt-1">Sisa 2.125 PCS (Tersedia)</p>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <svg class="w-8 h-8 text-yellow-600 group-hover:text-white transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+        </div>
+    </div>
 
     {{-- KPI Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {{-- Volume Bulanan --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {{-- Volume Bulanan (Terjual) --}}
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-darkest)] p-6">
-            <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Volume Bulanan</p>
-            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">1.245</h3>
+            <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Volume Terjual (MTD)</p>
+            {{-- BACKEND-TODO: Sum qty dari ResellerOrder yang status 'Paid' atau 'Selesai' bulan ini --}}
+            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter">1.245 <span class="text-xs font-body">PCS</span></h3>
             <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 +8.3% vs bulan lalu
             </p>
         </div>
+
+        {{-- Estimasi Profit --}}
+        <div class="bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)] p-6">
+            <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Estimasi Profit (MTD)</p>
+            {{-- BACKEND-TODO: (Total Volume Terjual x 2.000) --}}
+            <h3 class="font-headline font-black text-3xl text-white tracking-tighter italic">Rp 2,49 Juta</h3>
+            <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mt-2 italic leading-tight">
+                *Dihitung dari margin Rp 2.000 / PCS
+            </p>
+        </div>
+
         {{-- Reseller Aktif --}}
         <div class="bg-white border-[3px] border-secondary shadow-[6px_6px_0_var(--color-gray-900)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Reseller Aktif</p>
@@ -41,14 +86,18 @@
                 Target Minimum Tercapai
             </p>
         </div>
-        {{-- Pendapatan MTD --}}
+
+        {{-- Stok Tersedia --}}
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-hover)] p-6">
-            <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Pendapatan MTD</p>
-            <h3 class="font-headline font-black text-2xl sm:text-3xl md:text-4xl text-primary tracking-tighter italic">Rp 1,5M</h3>
-            <p class="text-xs text-slate-500 font-bold mt-2 uppercase tracking-widest flex items-center gap-1">
-                <svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                +5.2% MoM
-            </p>
+            <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Stok Siap Jual</p>
+            {{-- BACKEND-TODO: Ambil dari inventory (stok fisik - terpesan) --}}
+            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic">2.125</h3>
+            <div class="mt-2">
+                <div class="w-full bg-slate-100 h-1.5 border border-slate-200">
+                    <div class="bg-secondary h-full" style="width: 65%"></div>
+                </div>
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Level Stok: Aman (65%)</p>
+            </div>
         </div>
     </div>
 
@@ -97,6 +146,7 @@
                 <a href="/dashboard/distributor/order" class="text-[10px] font-bold text-secondary hover:text-white uppercase tracking-widest transition-colors">Lihat Semua →</a>
             </div>
             {{-- BACKEND-TODO: Loop dari Order::latest()->take(5)->get() --}}
+            {{-- BACKEND-TODO: Gunakan Enum Status yang Konsisten (Menunggu Proses, Dikemas, Dikirim, Selesai, Dibatalkan) --}}
             <div class="divide-y-2 divide-neutral-border">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
                     <div class="flex-1">
@@ -104,7 +154,7 @@
                         <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">50 pcs — CeeKlin 450ml</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="px-2 py-1 border-2 border-primary text-primary text-[10px] font-bold uppercase tracking-widest">Menunggu Diproses</span>
+                        <span class="px-2 py-1 border-2 border-primary text-primary text-[10px] font-bold uppercase tracking-widest">Menunggu Proses</span>
                         <button class="bg-primary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-primary-hover">Proses</button>
                     </div>
                 </div>
@@ -114,7 +164,7 @@
                         <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5 leading-tight">100 pcs — CeeKlin 450ml</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Diproses / Dikirim</span>
+                        <span class="px-2 py-1 border-2 border-secondary text-secondary text-[10px] font-bold uppercase tracking-widest">Dikirim</span>
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">

@@ -93,7 +93,7 @@
                             <input type="password" placeholder="Ulangi Sandi" class="bg-white border-[3px] border-gray-900 px-4 py-3 font-bold text-sm text-gray-900 focus:outline-none focus:border-secondary">
                         </div>
                     </div>
-                    <button @click="saveChanges()" class="w-full bg-gray-900 text-white py-4 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-primary)] hover:bg-primary transition-all">
+                    <button @click="saveChanges()" class="w-full bg-primary text-white py-4 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-1 active:shadow-none">
                         PERBARUI AKSES AKUN
                     </button>
                 </div>

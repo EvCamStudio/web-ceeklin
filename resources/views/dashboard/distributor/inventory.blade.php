@@ -5,187 +5,229 @@
     <x-slot:topbarTitle>INVENTORI GUDANG</x-slot:topbarTitle>
     <x-slot:menuSlot>@include('dashboard.distributor._menu')</x-slot:menuSlot>
 
-    <div class="max-w-[1400px] mx-auto w-full flex flex-col gap-6">
+    <div class="max-w-[1400px] mx-auto w-full flex flex-col gap-6" x-data="{ activeTab: 'summary' }">
 
-        {{-- ======================== --}}
-        {{-- SECTION 1: Level Stok    --}}
-        {{-- ======================== --}}
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        {{-- NAVIGATION TABS --}}
+        <div class="flex flex-wrap gap-2 md:gap-4 border-b-[4px] border-gray-900 pb-2">
+            <button @click="activeTab = 'summary'"
+                :class="activeTab === 'summary' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
+                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Ringkasan Stok
+            </button>
+            <button @click="activeTab = 'sync'"
+                :class="activeTab === 'sync' ? 'bg-secondary text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
+                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Ajukan Sinkronisasi
+            </button>
+            <button @click="activeTab = 'logs'"
+                :class="activeTab === 'logs' ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
+                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Riwayat Perubahan
+            </button>
+        </div>
 
-            {{-- Level Stok --}}
-            <div class="xl:col-span-2 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
-                <div class="bg-primary px-6 py-3 flex items-center justify-between">
-                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">Level Stok Saat Ini</span>
-                    {{-- BACKEND-TODO: tampilkan waktu terakhir update dari Inventory::updated_at --}}
-                    <span class="text-[9px] font-bold text-white/50 uppercase tracking-widest">Update: Hari ini 08:30</span>
-                </div>
-                <div class="p-6 flex flex-col gap-6">
-                    {{-- BACKEND-TODO: Loop dari Inventory::where('distributor_id', Auth::id())->get() --}}
-
-                    {{-- Produk: CeeKlin 450ml --}}
-                    <div>
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-2 gap-1">
-                            <div>
-                                <span class="font-headline font-bold text-sm text-gray-900 uppercase tracking-tight">CeeKlin 450ml</span>
-                                <span class="ml-2 px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-bold uppercase tracking-wider border border-yellow-300">Stok Menengah</span>
+        {{-- TAB CONTENT 1: SUMMARY --}}
+        <div x-show="activeTab === 'summary'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+                {{-- Level Stok --}}
+                <div class="xl:col-span-2 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
+                    <div class="bg-primary px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Status Inventori Gudang</span>
+                            <p class="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Pantau Pergerakan & Kapasitas Jual</p>
+                        </div>
+                        <span class="text-[9px] font-bold text-secondary uppercase tracking-widest bg-gray-900 px-3 py-1.5 border border-white/20">Update: Hari ini 08:30</span>
+                    </div>
+                    
+                    <div class="p-6 flex flex-col gap-8">
+                        <div class="flex flex-col gap-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tighter">CeeKlin 450ml</h3>
+                                <span class="px-2 py-1 bg-yellow-400 text-gray-900 text-[10px] font-black uppercase border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Stok Menengah</span>
                             </div>
-                            <span class="font-headline font-black text-primary text-base sm:text-lg italic">2.450 / 5.000 PCS</span>
-                        </div>
-                        <div class="w-full bg-neutral-border-light border-2 border-neutral-border h-4 relative overflow-hidden">
-                            <div class="bg-secondary h-full transition-all duration-500" style="width:49%"></div>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-[8px] font-black text-gray-900/60 uppercase tracking-widest">49%</span>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-neutral-light border-[3px] border-gray-900 p-4 flex flex-col">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Stok Fisik (Gudang)</span>
+                                    <p class="font-headline font-black text-3xl text-gray-900 tracking-tighter">2.450 <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
+                                </div>
+                                <div class="bg-white border-[3px] border-secondary p-4 flex flex-col">
+                                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest mb-1">Terpesan (Hold)</span>
+                                    <p class="font-headline font-black text-3xl text-primary tracking-tighter">325 <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
+                                </div>
+                                <div class="bg-primary border-[3px] border-gray-900 p-4 flex flex-col shadow-[4px_4px_0_var(--color-gray-900)]">
+                                    <span class="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1">Stok Siap Jual</span>
+                                    <p class="font-headline font-black text-3xl text-white tracking-tighter">2.125 <span class="text-xs font-body font-bold text-white/40">PCS</span></p>
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-neutral-border-light border-[3px] border-gray-900 h-6 relative overflow-hidden">
+                                <div class="bg-secondary h-full transition-all duration-500" style="width:49%"></div>
+                                <div class="absolute inset-0 flex items-center px-4">
+                                    <span class="text-[9px] font-black text-gray-900 uppercase">Kapasitas: 49% (Segera Restock)</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex justify-between mt-1">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase">Stok Aman: ≥ 1.000 PCS</p>
-                            <p class="text-[9px] text-yellow-600 font-bold uppercase">⚠ Segera restock</p>
-                        </div>
+                    </div>
+                    <div class="px-6 pb-6">
+                        <a href="/dashboard/distributor/order" class="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Restock ke Pabrik
+                        </a>
                     </div>
                 </div>
 
-                {{-- Footer Link ke Restock --}}
-                <div class="px-6 pb-5">
-                    <a href="/dashboard/distributor/order"
-                       class="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Restock ke Pabrik
-                    </a>
+                <div class="bg-gray-900 border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)] p-6 text-white">
+                    <h4 class="font-headline font-black text-lg uppercase tracking-tight mb-4 text-secondary">Panduan Inventori</h4>
+                    <ul class="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest leading-relaxed">
+                        <li class="flex gap-3">
+                            <span class="text-secondary">●</span>
+                            <p><span class="text-white">Stok Fisik</span> adalah jumlah asli botol yang ada di gudang Anda. *Bertambah otomatis saat pesanan restock ke pabrik dinyatakan SELESAI/TERKIRIM.*</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-secondary">●</span>
+                            <p><span class="text-white">Terpesan (Hold)</span> adalah barang yang sudah dibayar reseller. *Stok distributor langsung berkurang dari sistem saat pembayaran reseller berhasil.*</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-secondary">●</span>
+                            <p><span class="text-white">Siap Jual</span> adalah sisa stok aman yang tersedia untuk dipesan oleh reseller lain.</p>
+                        </li>
+                    </ul>
+                    {{-- BACKEND-TODO: 
+                        1. Logika Penambahan Stok: Trigger saat DistributorOrder status 'Selesai'.
+                        2. Logika Pengurangan Stok: Trigger saat ResellerOrder status 'Paid' (Payment Gateway Callback).
+                        3. Pastikan ada pengecekan stok mencukupi sebelum Reseller diarahkan ke Payment Gateway.
+                    --}}
                 </div>
             </div>
+        </div>
 
-            {{-- Form Sinkronisasi Stok --}}
-            <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)]"
-                 x-data="{ stokNyata: '', alasan: '', submitted: false }">
-                <div class="bg-secondary px-6 py-3">
-                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">Ajukan Sinkronisasi Stok</span>
+        {{-- TAB CONTENT 2: SYNC --}}
+        <div x-show="activeTab === 'sync'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] max-w-2xl mx-auto" x-data="{ stokNyata: '', alasan: '', submitted: false }">
+                <div class="bg-secondary px-6 py-4 text-center">
+                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Ajukan Sinkronisasi Stok</span>
                 </div>
-                <div class="p-6">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-5">
-                        Jika ada selisih antara stok di sistem dan stok fisik di gudang (mis: rusak, hilang, tumpah), ajukan koreksi stok ke Admin.
-                    </p>
-
-                    {{-- BACKEND-TODO: action ke InventoryController@requestSync + @csrf --}}
-                    <form action="/dashboard/distributor/inventory/sync" method="POST"
-                          class="flex flex-col gap-4"
-                          @submit.prevent="if(stokNyata !== '' && alasan.trim() !== '') submitted = true">
+                <div class="p-8">
+                    <form action="/dashboard/distributor/inventory/sync" method="POST" class="flex flex-col gap-6" @submit.prevent="submitted = true">
                         @csrf
-
-                        {{-- Stok Sistem (readonly info) --}}
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[10px] font-bold text-primary uppercase tracking-widest">Stok di Sistem (Saat Ini)</label>
-                            <div class="bg-neutral-light border-[3px] border-neutral-border px-4 py-2.5 font-headline font-black text-lg text-slate-400 tracking-tighter">
-                                2.450 <span class="text-xs font-body font-normal text-slate-400">PCS</span>
-                            </div>
+                            <div class="bg-neutral-light border-[3px] border-neutral-border px-4 py-3 font-headline font-black text-xl text-slate-400 tracking-tighter">2.450 PCS</div>
                         </div>
-
-                        {{-- Stok Nyata --}}
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-secondary uppercase tracking-widest" for="stok-nyata">
-                                Stok Fisik Aktual <span class="text-red-500">*</span>
-                            </label>
-                            <input id="stok-nyata" name="actual_stock" type="number" min="0"
-                                   placeholder="Masukkan jumlah nyata..." x-model="stokNyata" required
-                                   class="bg-neutral-light border-[3px] border-secondary px-4 py-2.5 font-headline font-black text-lg text-primary focus:outline-none focus:border-primary transition-colors placeholder:text-slate-300 placeholder:font-body placeholder:font-normal placeholder:text-sm tracking-tighter">
-                            {{-- Preview selisih --}}
-                            <p class="text-[9px] font-bold uppercase tracking-widest"
+                            <label class="text-[10px] font-bold text-secondary uppercase tracking-widest">Stok Fisik Aktual</label>
+                            <input type="number" x-model="stokNyata" required class="bg-neutral-light border-[3px] border-secondary px-4 py-3 font-headline font-black text-xl text-primary focus:outline-none focus:border-primary transition-colors tracking-tighter" placeholder="0">
+                            
+                            {{-- Preview selisih (RESTORED) --}}
+                            <p class="text-[9px] font-bold uppercase tracking-widest mt-1"
                                x-show="stokNyata !== ''"
                                :class="parseInt(stokNyata) < 2450 ? 'text-red-600' : 'text-green-600'"
                                x-text="parseInt(stokNyata) < 2450 ? `Selisih: -${2450 - parseInt(stokNyata)} PCS (kurang)` : `Selisih: +${parseInt(stokNyata) - 2450} PCS (lebih)`">
                             </p>
                         </div>
-
-                        {{-- Alasan --}}
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alasan-sync">
-                                Alasan / Keterangan <span class="text-red-500">*</span>
-                            </label>
-                            <textarea id="alasan-sync" name="reason" rows="3" required x-model="alasan"
-                                placeholder="Contoh: 200 pcs rusak karena kebocoran gudang saat hujan deras tanggal 15 April..."
-                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary resize-none transition-colors placeholder:text-slate-400 placeholder:font-normal"></textarea>
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest">Alasan / Keterangan</label>
+                            <textarea rows="3" required x-model="alasan" class="bg-neutral-light border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary resize-none transition-colors" placeholder="Contoh: Barang rusak karena bocor..."></textarea>
                         </div>
 
-                        {{-- Alert info admin approval --}}
+                        {{-- Alert info admin approval (RESTORED) --}}
                         <div class="bg-yellow-50 border-l-[4px] border-yellow-500 p-3">
-                            <p class="text-[9px] font-bold text-yellow-800 uppercase tracking-widest leading-relaxed">
-                                ⚠️ Pengajuan ini perlu disetujui Admin sebelum stok di sistem diperbarui.
+                            <p class="text-[9px] font-bold text-yellow-800 uppercase tracking-widest leading-relaxed italic">
+                                ⚠️ Pengajuan ini perlu disetujui Admin sebelum stok diperbarui.
                             </p>
                         </div>
-
-                        {{-- Tombol Submit --}}
                         <div x-show="!submitted">
-                            <button type="submit"
-                                :disabled="stokNyata === '' || alasan.trim() === ''"
-                                class="w-full bg-secondary text-white py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1">
-                                Kirim Pengajuan Sinkronisasi
-                            </button>
+                            <button type="submit" class="w-full bg-secondary text-white py-4 font-headline font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-1 active:shadow-none transition-all">Kirim Pengajuan</button>
                         </div>
-
-                        {{-- Sukses Feedback --}}
-                        <div x-show="submitted" x-transition style="display:none;"
-                             class="bg-green-50 border-[3px] border-green-600 p-5 text-center shadow-[4px_4px_0_var(--color-green-600)]">
-                            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </div>
-                            <p class="font-headline font-black text-sm text-green-800 uppercase tracking-tighter">Pengajuan Terkirim!</p>
-                            <p class="text-[9px] text-green-600 mt-1 font-bold uppercase leading-relaxed">Admin akan memverifikasi selisih stok Anda dalam waktu maksimal 1x24 jam.</p>
-                            <button type="button" @click="submitted = false; stokNyata = ''; alasan = ''"
-                                class="mt-4 text-[9px] font-black text-green-700 underline uppercase tracking-widest hover:text-green-900">
-                                Buat Pengajuan Baru
-                            </button>
+                        <div x-show="submitted" class="p-6 bg-green-50 border-[3px] border-green-600 text-center">
+                            <p class="font-headline font-black text-green-800 uppercase tracking-tighter">Pengajuan Berhasil Dikirim!</p>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        {{-- ======================== --}}
-        {{-- SECTION 2: Riwayat Stok  --}}
-        {{-- ======================== --}}
-        <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)]">
-            <div class="bg-gray-900 px-6 py-3 flex items-center justify-between">
-                <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Riwayat Perubahan Stok</span>
-                <span class="text-[9px] font-bold text-white/50 uppercase tracking-widest">30 hari terakhir</span>
-            </div>
-            <div class="divide-y-2 divide-neutral-border">
-                {{-- BACKEND-TODO: Loop dari StockLog::where('distributor_id', Auth::id())->latest()->take(10)->get() --}}
-                @php
-                $logs = [
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1088',           'qty' => '+2.000', 'date' => '5 Apr 2026',  'color' => 'text-green-600', 'status' => 'Selesai'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Ahmad Fauzi (ORD-201)',  'qty' => '-100',   'date' => 'Hari Ini',    'color' => 'text-red-600', 'status' => 'Selesai'],
-                    ['type' => 'adj', 'desc' => 'Koreksi Stok (Manual Sync) — Hilang',       'qty' => '-15',    'date' => 'Kemarin',     'color' => 'text-orange-600', 'status' => 'Menunggu'],
-                    ['type' => 'out', 'desc' => 'Pesanan Reseller — Budi Santoso (ORD-195)', 'qty' => '-50',    'date' => 'Kemarin',     'color' => 'text-red-600', 'status' => 'Selesai'],
-                    ['type' => 'adj', 'desc' => 'Koreksi Stok — disetujui Admin',            'qty' => '-200',   'date' => '20 Mar 2026', 'color' => 'text-orange-600', 'status' => 'Disetujui'],
-                    ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1081',            'qty' => '+3.000', 'date' => '22 Mar 2026', 'color' => 'text-green-600', 'status' => 'Selesai'],
-                ];
-                @endphp
-                @foreach($logs as $log)
-                <div class="flex items-center justify-between px-6 py-4 hover:bg-neutral-light transition-colors gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 flex items-center justify-center flex-shrink-0 bg-neutral border-2 border-neutral-border">
-                            @if($log['type'] === 'in')
-                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                            @elseif($log['type'] === 'out')
-                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
-                            @else
-                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                            @endif
+        {{-- TAB CONTENT 3: LOGS --}}
+        <div x-show="activeTab === 'logs'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)]">
+                <div class="bg-gray-900 px-6 py-4 flex items-center justify-between">
+                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Riwayat Perubahan Stok</span>
+                </div>
+                <div class="divide-y-2 divide-neutral-border">
+                    {{-- BACKEND-TODO: Loop dari StockLog::where('user_id', Auth::id())->latest()->get() --}}
+                    {{-- BACKEND-TODO: Sertakan field 'admin_note' untuk menampilkan alasan penolakan/catatan sinkronisasi --}}
+                    @php
+                    $logs = [
+                        ['type' => 'in',  'desc' => 'Restock dari Pabrik — ORD-1088', 'qty' => '+2.000', 'date' => '5 Apr 2026', 'color' => 'text-green-600', 'status' => 'Selesai', 'note' => ''],
+                        ['type' => 'out', 'desc' => 'Pesanan Reseller — Ahmad Fauzi', 'qty' => '-100', 'date' => 'Hari Ini', 'color' => 'text-red-600', 'status' => 'Selesai', 'note' => ''],
+                        ['type' => 'adj', 'desc' => 'Koreksi Stok — Hilang (Sync)', 'qty' => '-15', 'date' => 'Kemarin', 'color' => 'text-orange-600', 'status' => 'Menunggu', 'note' => ''],
+                        ['type' => 'adj', 'desc' => 'Koreksi Stok — Produk Rusak', 'qty' => '-50', 'date' => '22 Mar 2026', 'color' => 'text-slate-400', 'status' => 'Ditolak', 'note' => 'Bukti foto tidak jelas, silakan ajukan ulang.'],
+                        ['type' => 'adj', 'desc' => 'Koreksi Stok — Disetujui Admin', 'qty' => '-200', 'date' => '20 Mar 2026', 'color' => 'text-orange-600', 'status' => 'Disetujui', 'note' => 'Sinkronisasi gudang rutin.'],
+                    ];
+                    @endphp
+                    @foreach($logs as $log)
+                    <div class="flex flex-col px-6 py-5 hover:bg-neutral-light transition-colors group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 flex items-center justify-center bg-neutral border-2 border-neutral-border">
+                                    @if($log['type'] === 'in') <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                    @elseif($log['type'] === 'out') <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
+                                    @else <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight">{{ $log['desc'] }}</p>
+                                        @if($log['status'] !== 'Selesai')
+                                            @php
+                                                $statusClasses = [
+                                                    'Menunggu' => 'bg-yellow-100 text-yellow-700 border-yellow-300',
+                                                    'Disetujui' => 'bg-green-100 text-green-700 border-green-300',
+                                                    'Ditolak' => 'bg-red-100 text-red-700 border-red-300',
+                                                ];
+                                            @endphp
+                                            <span class="text-[8px] font-black px-1.5 py-0.5 border {{ $statusClasses[$log['status']] ?? 'bg-gray-100' }} uppercase">{{ $log['status'] }}</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">{{ $log['date'] }}</p>
+                                </div>
+                            </div>
+                            <span class="font-headline font-black text-2xl {{ $log['color'] }} tracking-tighter">{{ $log['qty'] }} PCS</span>
                         </div>
-                        <div>
-                            <p class="font-headline font-bold text-xs text-gray-900 uppercase leading-tight tracking-tight">{{ $log['desc'] }}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $log['date'] }}</p>
-                                @if($log['status'] !== 'Selesai')
-                                    <span class="text-[8px] font-black px-1.5 py-0.5 border {{ $log['status'] === 'Menunggu' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : 'bg-green-100 text-green-700 border-green-300' }} uppercase">{{ $log['status'] }}</span>
-                                @endif
+                        
+                        {{-- Admin Note Display --}}
+                        @if($log['note'])
+                        <div class="mt-4 ml-14 relative">
+                            <div class="absolute -left-10 top-0 w-8 h-[2px] bg-neutral-border"></div>
+                            <div class="p-4 border-[2px] {{ $log['status'] === 'Ditolak' ? 'border-red-500 bg-red-50/50' : 'border-gray-900 bg-neutral-light' }} shadow-[4px_4px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-0.5">
+                                        @if($log['status'] === 'Ditolak')
+                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        @else
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <p class="text-[9px] font-black {{ $log['status'] === 'Ditolak' ? 'text-red-600' : 'text-primary' }} uppercase tracking-[0.2em] mb-1">
+                                            {{ $log['status'] === 'Ditolak' ? 'Feedback Admin (Ditolak):' : 'Catatan Admin:' }}
+                                        </p>
+                                        <p class="text-xs font-bold text-gray-800 leading-relaxed italic">"{{ $log['note'] }}"</p>
+                                        @if($log['status'] === 'Ditolak')
+                                            <p class="text-[8px] font-black text-red-500 uppercase mt-2">→ Mohon periksa kembali data & ajukan ulang sinkronisasi.</p>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        @endif
                     </div>
-                    <span class="font-headline font-black text-lg {{ $log['color'] }} flex-shrink-0 tracking-tighter">{{ $log['qty'] }} PCS</span>
+                    @endforeach
                 </div>
-                @endforeach
             </div>
         </div>
 

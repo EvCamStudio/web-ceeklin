@@ -87,7 +87,7 @@
             </div>
 
             <div class="flex justify-center mt-12">
-                <button @click="saveChanges()" class="w-full lg:max-w-md bg-gray-900 text-white py-5 font-headline font-black text-sm uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary)] hover:bg-primary transition-all active:translate-y-1 active:shadow-none">
+                <button @click="saveChanges()" class="w-full lg:max-w-md bg-primary text-white py-5 font-headline font-black text-sm uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-1 active:shadow-none">
                     SIMPAN HARGA NASIONAL
                 </button>
             </div>

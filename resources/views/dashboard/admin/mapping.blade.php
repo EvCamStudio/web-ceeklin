@@ -163,7 +163,7 @@
                         <div class="flex items-center gap-4 w-full md:w-auto">
                             <span class="hidden lg:block bg-green-100 text-green-700 px-2 py-1 text-[9px] font-black uppercase">Distributor Lokal Tersedia ✓</span>
                             <button @click.prevent="openMigration({{ json_encode($reseller) }}, '{{ $reseller['old_dist'] }}')"
-                                class="w-full md:w-auto bg-gray-900 text-white px-6 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-amber-500)] hover:bg-amber-500 transition-all active:translate-y-1 active:shadow-none">
+                                class="w-full md:w-auto bg-primary text-white px-6 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-1 active:shadow-none">
                                 PULANGKAN KE LOKAL
                             </button>
                         </div>
@@ -210,7 +210,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <button @click.prevent="openMigration({{ json_encode($reseller) }}, '{{ $reseller['old_dist'] }}')"
-                                        class="bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-secondary hover:text-white transition-all">
+                                        class="bg-primary text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all">
                                         PINDAHKAN
                                     </button>
                                 </td>
