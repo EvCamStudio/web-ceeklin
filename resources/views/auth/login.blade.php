@@ -40,8 +40,21 @@
                         <x-ui.toast type="warning" message="Akun Anda sedang dalam proses peninjauan oleh Admin." />
                     </div>
                 @elseif(session('status') === 'rejected')
-                    <div class="fixed top-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">
-                        <x-ui.toast type="error" :message="'Akun Ditolak: ' . session('reason')" />
+                    <div class="mb-8 bg-red-50 border-[4px] border-red-600 p-6 shadow-[8px_8px_0_var(--color-red-600)] text-left animate-in">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 bg-red-600 flex items-center justify-center border-2 border-gray-900">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </div>
+                            <h4 class="font-headline font-black text-red-600 text-sm uppercase tracking-tight">Pendaftaran Ditolak</h4>
+                        </div>
+                        <p class="text-[10px] font-black text-red-700 uppercase mb-1">Alasan Penolakan:</p>
+                        <p class="text-xs font-bold text-gray-900 mb-6 italic leading-relaxed">"{{ session('reason') ?? 'Data tidak lengkap atau tidak valid.' }}"</p>
+                        
+                        <a href="https://wa.me/62xxxxxxxxxx?text=Halo%20Admin%2C%20pendaftaran%20reseller%20saya%20ditolak.%20Bisa%20bantu%20jelaskan%3F" target="_blank"
+                           class="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 font-headline font-bold text-[9px] uppercase tracking-widest hover:bg-red-600 transition-colors">
+                            HUBUNGI ADMIN VIA WA
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
                     </div>
                 @elseif($errors->any())
                     <div class="fixed top-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4">

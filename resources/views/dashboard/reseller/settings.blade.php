@@ -25,9 +25,36 @@
                         <x-ui.input id="username-reseller" label="Username" value="{{ auth()->user()->username }}" disabled />
 
                         <div class="flex flex-col gap-1.5 md:col-span-2">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-reseller">Alamat</label>
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-reseller">Alamat Lengkap</label>
                             <textarea id="alamat-reseller" name="address" rows="2" required
                                 class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none">{{ auth()->user()->address }}</textarea>
+                        </div>
+
+                        {{-- BACKEND-TODO: Map Koordinat UI --}}
+                        <div class="flex flex-col gap-3 md:col-span-2 mt-2 p-4 bg-gray-50 border-[3px] border-gray-900 border-dashed">
+                            <div class="flex justify-between items-center mb-1">
+                                <div>
+                                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest block">Titik Koordinat Lokasi (Maps)</label>
+                                    <span class="text-[9px] text-slate-500 uppercase tracking-widest">Paskan pin di peta untuk mempermudah navigasi pengiriman</span>
+                                </div>
+                            </div>
+                            
+                            {{-- Placeholder Peta --}}
+                            <div class="w-full h-[180px] bg-gray-200 border-2 border-gray-900 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer hover:border-secondary transition-colors">
+                                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                                <svg class="w-8 h-8 text-secondary mb-2 relative z-10 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-gray-900 relative z-10 bg-white/90 px-3 py-1.5 border-[2px] border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Klik untuk Menyesuaikan Pin Peta</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mt-2">
+                                <x-ui.input id="lat-reseller" label="Latitude" value="-6.8732" placeholder="Cth: -6.123456" />
+                                <x-ui.input id="lng-reseller" label="Longitude" value="107.5421" placeholder="Cth: 106.123456" />
+                            </div>
+                            
+                            <button type="button" class="w-full bg-white text-secondary border-[2px] border-secondary py-2.5 font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors mt-1 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Ambil Titik Lokasi GPS Saat Ini
+                            </button>
                         </div>
                     </div>
                     

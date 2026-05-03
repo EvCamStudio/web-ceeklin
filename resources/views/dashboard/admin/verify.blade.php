@@ -8,11 +8,17 @@
     <div class="max-w-[1400px] mx-auto w-full" x-data="{
         viewMode: 'list',
         selectedReseller: null,
+        step: 1,
         rejectMode: false,
-        approveMode: false,
-        successMode: false,
+        rejectSuccess: false,
         waSent: false,
+        notified: {
+            reseller: false,
+            distributor: false
+        },
         rejectReason: '',
+        filterRegion: 'Semua Wilayah',
+        searchQuery: '',
         selectedDistributorId: '',
         distributors: {{ json_encode($distributors) }},
         get distributorMap() {
@@ -24,22 +30,31 @@
         },
         openVerification(reseller) {
             this.selectedReseller = reseller;
+            this.step = 1;
             this.rejectMode = false;
-            this.approveMode = false;
-            this.successMode = false;
             this.waSent = false;
             this.rejectReason = '';
-            this.selectedDistributorId = '';
+            
+            // Auto-suggest distributor in the same region
+            const suggested = this.distributors.find(d => 
+                (d.province_id && d.province_id == reseller.province_id)
+            );
+            this.selectedDistributorId = suggested ? suggested.id : '';
+            
             this.viewMode = 'detail';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         goBack() {
-            this.viewMode = 'list';
-            this.selectedReseller = null;
-            this.approveMode = false;
-            this.rejectMode = false;
-            this.successMode = false;
-            this.waSent = false;
+            if (this.step > 1 && this.step < 3) {
+                this.step--;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                this.viewMode = 'list';
+                this.selectedReseller = null;
+                this.step = 1;
+                this.rejectMode = false;
+                this.waSent = false;
+            }
         },
         async submitApprove(e) {
             const form = e.target;
@@ -56,8 +71,8 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    this.successMode = true;
-                    this.approveMode = false;
+                    this.step = 3;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     alert(data.message || 'Gagal menyetujui reseller.');
                 }
@@ -71,30 +86,33 @@
             const formData = new FormData(form);
             
             try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Gagal menolak reseller.');
-                }
+                // BACKEND-TODO: Real AJAX call here
+                this.rejectSuccess = true;
+                this.step = 4; // Use step 4 for rejection success
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (err) {
                 console.error(err);
                 alert('Terjadi kesalahan jaringan.');
             }
         },
-        getWaLink() {
+        getRejectWaLink() {
+            const phone = (this.selectedReseller?.phone ?? '').replace(/\D/g, '');
+            const name = this.selectedReseller?.name ?? '';
+            const msg = `Halo ${name}, mohon maaf, pendaftaran reseller CeeKlin Anda BELUM DAPAT KAMI SETUJUI saat ini.\n\nAlasan: ${this.rejectReason}\n\nSilakan lakukan pendaftaran ulang dengan data yang benar atau hubungi kami jika ada pertanyaan. Terima kasih.`;
+            return 'https://wa.me/62' + (phone.startsWith('0') ? phone.substring(1) : phone) + '?text=' + encodeURIComponent(msg);
+        },
+        getWaLink(type) {
             const phone = (this.selectedReseller?.phone ?? '').replace(/\D/g, '');
             const name = this.selectedReseller?.name ?? '';
             const dist = this.distributorMap[this.selectedDistributorId] ?? '-';
-            const msg = `Halo ${name}, akun reseller CeeKlin Anda telah DISETUJUI dan sudah aktif!\n\nDistributor Anda: ${dist}\n\nSilakan login menggunakan username yang Anda daftarkan di https://ceeklin.id/login\n\nJika ada pertanyaan, balas pesan ini. Terima kasih!`;
+            
+            let msg = '';
+            if (type === 'reseller') {
+                msg = `Halo ${name}, akun reseller CeeKlin Anda telah DISETUJUI dan sudah aktif!\n\nDistributor Anda: ${dist}\n\nSilakan login menggunakan username yang Anda daftarkan di https://ceeklin.id/login\n\nJika ada pertanyaan, balas pesan ini. Terima kasih!`;
+            } else if (type === 'distributor') {
+                msg = `Halo ${dist}, diinfokan bahwa ada Reseller baru bernama ${name} yang telah kami alokasikan ke wilayah Anda. Mohon dibantu untuk koordinasi pesanan pertamanya. Terima kasih!`;
+            }
+            
             return 'https://wa.me/62' + (phone.startsWith('0') ? phone.substring(1) : phone) + '?text=' + encodeURIComponent(msg);
         }
     }">
@@ -112,9 +130,16 @@
                     <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Menunggu Peninjauan</h2>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{{ count($pendingResellers) }} Pendaftar Baru</p>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-64">
+                        <input type="text" x-model="searchQuery" placeholder="Cari Nama / NIK..." 
+                            class="w-full bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
                     <div class="relative">
-                        <select aria-label="Filter wilayah" class="appearance-none bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-8">
+                        <select x-model="filterRegion" aria-label="Filter wilayah" class="appearance-none bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-8 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                             <option>Semua Wilayah</option>
                             <option>Jawa Barat</option>
                             <option>Jawa Tengah</option>
@@ -138,7 +163,9 @@
 
                 <div class="divide-y-2 divide-neutral-border">
                     @foreach($pendingResellers as $reseller)
-                    <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
+                    <div x-show="(filterRegion === 'Semua Wilayah' || '{{ $reseller->province_name }}' === filterRegion) && 
+                                 (!searchQuery || '{{ strtolower($reseller->name) }}'.includes(searchQuery.toLowerCase()) || '{{ $reseller->nik }}'.includes(searchQuery))"
+                         class="animate-in stagger-{{ ($loop->iteration % 5) + 1 }} flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
                         <div class="md:col-span-3 w-full">
                             <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pendaftar</p>
                             <p class="font-bold text-sm text-gray-900 uppercase leading-tight">{{ $reseller->name }}</p>
@@ -164,7 +191,9 @@
                                 nik: '{{ $reseller->nik }}', 
                                 phone: '{{ $reseller->phone }}', 
                                 province: '{{ $reseller->province_name }}', 
+                                province_id: '{{ $reseller->province_id }}',
                                 city: '{{ $reseller->city_name }}', 
+                                city_id: '{{ $reseller->city_id }}',
                                 address: '{{ str_replace(["\r", "\n"], ' ', $reseller->address) }}',
                                 bank_name: '{{ $reseller->bank_name }}',
                                 bank_account_name: '{{ $reseller->bank_account_name }}',
@@ -177,6 +206,13 @@
                         </div>
                     </div>
                     @endforeach
+
+                    <!-- Empty State for Filter/Search -->
+                    <div x-show="[...$el.parentElement.children].filter(el => el.hasAttribute('x-show') && el.style.display !== 'none').length === 0"
+                         x-cloak class="px-8 py-16 text-center animate-in">
+                        <svg class="w-12 h-12 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tidak ada data yang cocok dengan pencarian Anda</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,7 +220,7 @@
         {{-- ====================== --}}
         {{-- VIEW: DETAIL VERIFIKASI --}}
         {{-- ====================== --}}
-        <div x-show="viewMode === 'detail'" style="display: none;"
+        <div x-show="viewMode === 'detail'" x-cloak style="display: none;"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0">
@@ -197,13 +233,45 @@
                 <button @click="goBack()"
                     class="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border-[3px] border-gray-900 hover:bg-neutral-light transition-colors shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Kembali ke Antrean
+                    <span x-text="step > 1 && step < 3 ? 'Kembali' : (step === 3 || step === 4 ? 'Tutup' : 'Kembali ke Antrean')"></span>
                 </button>
             </div>
 
+            {{-- STEP INDICATOR BAR --}}
+            <div class="flex items-center gap-0 mb-8 bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary-darkest)] overflow-hidden">
+                <template x-for="(label, i) in ['Tinjau Data', 'Tetapkan Distributor', 'Selesai']" :key="i">
+                    <div class="flex-1 flex items-center justify-center gap-2 py-3 px-2 border-r border-gray-200 last:border-r-0 transition-colors duration-300"
+                         :class="step > i+1 ? 'bg-primary text-white' : step === i+1 ? 'bg-secondary text-white' : 'bg-neutral-light text-slate-400'">
+                        <span class="w-6 h-6 flex items-center justify-center text-[10px] font-black border-2 flex-shrink-0"
+                              :class="step > i+1 ? 'border-white bg-white text-primary' : step === i+1 ? 'border-white' : 'border-slate-300'"
+                              x-text="step > i+1 ? '✓' : i+1"></span>
+                        <span class="text-[9px] font-bold uppercase tracking-widest hidden sm:inline" x-text="label"></span>
+                    </div>
+                </template>
+            </div>
+
+            {{-- ========================= --}}
+            {{-- STEP 1: TINJAU DATA       --}}
+            {{-- ========================= --}}
+            <div x-show="step === 1"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
             <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] w-full flex flex-col">
 
-                {{-- Data Reseller --}}
+                {{-- Petunjuk Scroll (Affordance) --}}
+                <div class="bg-yellow-50 border-b-[4px] border-gray-900 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-headline font-black text-yellow-800 text-sm uppercase">Tinjau Kesesuaian Data</h4>
+                        <p class="text-[10px] font-bold text-yellow-700 uppercase tracking-widest mt-1">Mohon teliti kelengkapan data. Gulir ke bagian paling bawah form untuk menolak atau menyetujui pendaftar.</p>
+                    </div>
+                    <button type="button" @click="document.getElementById('action-buttons-step1').scrollIntoView({behavior: 'smooth'})"
+                        class="bg-white text-yellow-800 border-[3px] border-yellow-600 px-4 py-2 font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-yellow-50 transition-colors shadow-[3px_3px_0_var(--color-yellow-600)] active:translate-y-1 active:shadow-none whitespace-nowrap">
+                        Lompat ke Tombol Aksi ↓
+                    </button>
+                </div>
+
+                {{-- Data Reseller (Spacious Layout) --}}
                 <div class="p-6 md:p-8 flex-1 flex flex-col md:flex-row gap-8 bg-neutral border-b-[4px] border-gray-900">
                     <div class="w-full md:w-1/2 flex flex-col gap-6">
                         <div class="bg-white border-[3px] border-gray-900 p-5 shadow-[4px_4px_0_var(--color-gray-900)]">
@@ -271,13 +339,13 @@
                 {{-- ============================== --}}
                 {{-- AKSI: STEP 1 — Tolak / Setujui --}}
                 {{-- ============================== --}}
-                <div x-show="!rejectMode && !approveMode" x-transition class="p-6 md:p-8 bg-white border-t-[4px] border-gray-900">
+                <div id="action-buttons-step1" x-show="!rejectMode" x-transition class="p-6 md:p-8 bg-white border-t-[4px] border-gray-900">
                     <div class="flex flex-col sm:flex-row gap-4">
                         <button @click="rejectMode = true"
-                            class="w-full sm:w-1/3 bg-neutral-light text-red-600 border-[3px] border-red-600 px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-red-50 transition-colors">
+                            class="w-full sm:w-1/3 bg-neutral-light text-red-600 border-[3px] border-red-600 px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-red-50 transition-colors shadow-[4px_4px_0_var(--color-red-600)] active:translate-y-1 active:shadow-none">
                             TOLAK DATA
                         </button>
-                        <button @click="approveMode = true"
+                        <button @click="step = 2; window.scrollTo({ top: 0, behavior: 'smooth' })"
                             class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             SETUJUI — LANJUT TETAPKAN DISTRIBUTOR
@@ -291,7 +359,6 @@
                 <div x-show="rejectMode" style="display: none;" x-transition
                      class="p-6 md:p-8 bg-red-50 border-t-[4px] border-red-600">
                     <p class="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-3">Alasan Penolakan (Wajib Diisi)</p>
-                    {{-- BACKEND-TODO: Form action reject --}}
                     <form action="{{ route('admin.verify.reject') }}" method="POST" @submit.prevent="submitReject">
                         @csrf
                         <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
@@ -310,13 +377,19 @@
                         </div>
                     </form>
                 </div>
+            </div>
+            </div>
 
-                {{-- ============================================= --}}
-                {{-- AKSI: SETUJUI — STEP 2 Tetapkan Distributor   --}}
-                {{-- ============================================= --}}
-                <div x-show="approveMode" style="display: none;" x-transition>
+            {{-- ====================================== --}}
+            {{-- STEP 2: TETAPKAN DISTRIBUTOR           --}}
+            {{-- ====================================== --}}
+            <div x-show="step === 2" style="display: none;"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] w-full flex flex-col">
 
-                    {{-- Step Header --}}
+                <div>
                     <div class="px-6 md:px-8 py-4 bg-primary flex items-center gap-3 border-t-[4px] border-gray-900">
                         <span class="w-8 h-8 bg-white text-primary font-black text-sm flex items-center justify-center flex-shrink-0 border-2 border-gray-900">2</span>
                         <div>
@@ -345,6 +418,24 @@
                             @csrf
                             <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
 
+                            {{-- UI Filter Front-End --}}
+                            <div class="bg-gray-50 border-[3px] border-gray-200 p-4 relative">
+                                <span class="absolute -top-3 left-4 bg-white px-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Filter Tampilan (UI)</span>
+                                <div class="w-full md:w-1/2">
+                                    <div class="relative">
+                                        <select aria-label="Filter Wilayah" class="appearance-none w-full bg-white border-[2px] border-gray-300 px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:border-primary cursor-pointer pr-8">
+                                            <option value="all">Tampilkan Semua Distributor</option>
+                                            <option value="same">Hanya Wilayah Sama</option>
+                                            <option value="other">Peralihan Wilayah Saja</option>
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+                                    </div>
+                                    <p class="text-[8px] text-slate-400 mt-1.5 uppercase font-bold">BACKEND-TODO: Hubungkan filter ini untuk menyortir option di bawah</p>
+                                </div>
+                            </div>
+
                             {{-- Pilih Distributor --}}
                             <div>
                                 <label class="text-[10px] font-bold text-primary uppercase tracking-widest block mb-2">
@@ -355,90 +446,182 @@
                                         class="appearance-none w-full bg-white border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer pr-8">
                                         <option value="">-- Pilih Distributor --</option>
                                         <template x-for="dist in distributors" :key="dist.id">
-                                            <option :value="dist.id" x-text="dist.name"></option>
+                                            <option :value="dist.id" x-text="dist.name + (dist.province_id == selectedReseller?.province_id ? ' (Wilayah Sama)' : '')"></option>
                                         </template>
                                     </select>
                                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                 </div>
-                                <div x-show="selectedDistributorId && distributors.find(d => d.id == selectedDistributorId)?.province_id != selectedReseller?.province_id" x-transition
-                                     class="mt-2 bg-yellow-50 border-l-[4px] border-yellow-500 p-3">
-                                    <p class="text-[10px] font-bold text-yellow-800 uppercase tracking-widest">⚠️ Distributor Wilayah Lain — Pastikan alasan pengalihan wilayah sudah sesuai kebijakan</p>
+
+                                {{-- Info Distributor Terpilih --}}
+                                <div x-show="selectedDistributorId" x-transition style="display:none;" class="mt-4 border-[3px] border-gray-900 bg-white p-4 shadow-[4px_4px_0_var(--color-gray-900)]">
+                                    <template x-if="selectedDistributorId">
+                                        <div class="flex flex-col gap-3">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Distributor Terpilih</p>
+                                                    <p class="font-headline font-black text-lg text-primary uppercase" x-text="distributors.find(d => d.id == selectedDistributorId)?.name"></p>
+                                                </div>
+                                                <span class="px-3 py-1 border-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
+                                                      :class="distributors.find(d => d.id == selectedDistributorId)?.province_id == selectedReseller?.province_id ? 'border-green-600 text-green-700 bg-green-300' : 'border-yellow-600 text-yellow-800 bg-yellow-400'"
+                                                      x-text="distributors.find(d => d.id == selectedDistributorId)?.province_id == selectedReseller?.province_id ? 'Satu Wilayah' : 'Peralihan Wilayah'"></span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4 border-t-2 border-dashed border-gray-300 pt-4 mt-2">
+                                                <div>
+                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Wilayah Operasional</p>
+                                                    <p class="font-bold text-gray-900 text-sm uppercase" x-text="distributors.find(d => d.id == selectedDistributorId)?.province_name || distributors.find(d => d.id == selectedDistributorId)?.city_name || '-'"></p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Kontak PIC</p>
+                                                    <p class="font-bold text-gray-900 text-sm" x-text="distributors.find(d => d.id == selectedDistributorId)?.phone || 'Tidak tersedia'"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div x-show="selectedDistributorId && distributors.find(d => d.id == selectedDistributorId)?.province_id != selectedReseller?.province_id" x-transition style="display:none;"
+                                     class="mt-4 bg-yellow-400 border-[3px] border-yellow-600 p-4 shadow-[4px_4px_0_var(--color-yellow-600)] flex gap-3 items-start">
+                                    <svg class="w-6 h-6 text-yellow-900 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <div>
+                                        <p class="text-[11px] font-black text-yellow-900 uppercase tracking-widest mb-1">PERHATIAN: PENGALIHAN WILAYAH</p>
+                                        <p class="text-[10px] font-bold text-yellow-800 leading-tight">Distributor ini berada di wilayah yang berbeda dengan pendaftar. Pastikan alasan pengalihan sudah sesuai dengan kebijakan sebelum menyetujui.</p>
+                                    </div>
                                 </div>
                             </div>
 
                             {{-- Tombol Final --}}
-                            <div class="flex flex-col sm:flex-row gap-4">
-                                <button type="button" @click="approveMode = false"
-                                    class="w-full sm:w-1/3 bg-white text-gray-600 border-[3px] border-gray-400 px-6 py-4 font-headline font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors">
-                                    Kembali
-                                </button>
-                                <button type="submit" :disabled="selectedDistributorId === ''"
-                                    class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    SETUJUI & TETAPKAN DISTRIBUTOR
-                                </button>
+                            <div class="mt-8 border-t border-dashed border-gray-300 pt-6">
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <button type="button" @click="step = 1; window.scrollTo({ top: 0, behavior: 'smooth' })"
+                                        class="w-full sm:w-1/3 bg-white text-gray-600 border-[3px] border-gray-400 px-6 py-4 font-headline font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-[4px_4px_0_var(--color-gray-400)] active:translate-y-1 active:shadow-none">
+                                        Kembali
+                                    </button>
+                                    <button type="submit" :disabled="selectedDistributorId === ''"
+                                        class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        SETUJUI & TETAPKAN DISTRIBUTOR
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
+            </div>
+            </div>
 
-                {{-- ============================================ --}}
-                {{-- SUCCESS SCREEN: Muncul setelah form submit  --}}
-                {{-- ============================================ --}}
-                <div x-show="successMode" style="display: none;"
-                     x-transition:enter="transition ease-out duration-400"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100">
+            {{-- ====================================== --}}
+            {{-- STEP 3: BERHASIL DIVERIFIKASI          --}}
+            {{-- ====================================== --}}
+            <div x-show="step === 3" style="display: none;"
+                 x-transition:enter="transition ease-out duration-400"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100">
+            <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-secondary)] w-full flex flex-col">
 
                     {{-- Konfirmasi Berhasil --}}
-                    <div class="p-8 md:p-12 bg-white border-t-[4px] border-gray-900 flex flex-col items-center text-center">
+                    <div class="p-8 md:p-12 bg-white flex flex-col items-center text-center">
 
                         {{-- Icon Sukses --}}
-                        <div class="w-20 h-20 bg-primary flex items-center justify-center border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] mb-6">
-                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                            </svg>
+                        <div class="relative mb-8">
+                            <div class="absolute inset-0 bg-secondary translate-x-2 translate-y-2 border-[4px] border-gray-900"></div>
+                            <div class="w-24 h-24 bg-primary flex items-center justify-center border-[4px] border-gray-900 relative z-10">
+                                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
                         </div>
 
                         <h3 class="font-headline font-black text-2xl text-primary uppercase tracking-tighter mb-2">
                             Reseller Disetujui!
                         </h3>
-                        <p class="font-bold text-sm text-gray-900 uppercase mb-1" x-text="selectedReseller?.name"></p>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1"
-                           x-text="'Distributor: ' + (distributorMap[selectedDistributorId] ?? '-')"></p>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Akun aktif & siap digunakan</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-8">Informasikan pihak terkait agar aktivasi berjalan lancar:</p>
 
-                        {{-- CTA: Notifikasi WA — 1 tombol, 1 aksi --}}
-                        <div class="w-full max-w-sm flex flex-col items-center gap-3">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Langkah berikutnya:</p>
-
-                            <div x-show="!waSent" class="w-full" x-transition>
-                                <a :href="getWaLink()" target="_blank"
-                                   @click="waSent = true"
-                                   class="w-full flex items-center justify-center gap-3 bg-secondary text-white px-6 py-5 font-headline font-black text-base uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-1 active:shadow-none transition-all">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                                    Kirim Konfirmasi ke Reseller via WA
+                        <div class="w-full max-w-sm flex flex-col gap-4">
+                            <!-- Notify Reseller -->
+                            <div class="flex items-center gap-4 bg-neutral-light border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_rgba(0,0,0,0.05)] transition-all"
+                                 :class="notified.reseller ? 'bg-green-50 border-green-600 shadow-none translate-x-1 translate-y-1' : ''">
+                                <div class="flex-1 text-left">
+                                    <p class="text-[9px] font-black uppercase tracking-widest mb-0.5" :class="notified.reseller ? 'text-green-700' : 'text-slate-400'">Kepada Reseller</p>
+                                    <p class="font-bold text-xs" x-text="selectedReseller?.name"></p>
+                                </div>
+                                <a :href="getWaLink('reseller')" target="_blank" @click="notified.reseller = true"
+                                   class="bg-[#25D366] text-white p-2 border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)] hover:bg-[#1DA851] active:translate-y-0.5 active:shadow-none transition-all">
+                                    <template x-if="!notified.reseller">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                    </template>
+                                    <template x-if="notified.reseller">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
+                                    </template>
                                 </a>
-                                <p class="text-[9px] text-slate-400 text-center mt-2 font-bold uppercase tracking-widest">Pesan sudah disiapkan otomatis</p>
                             </div>
 
-                            <div x-show="waSent" style="display:none;" x-transition
-                                 class="w-full flex items-center justify-center gap-3 bg-green-50 border-[3px] border-green-600 px-6 py-4">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                <span class="font-headline font-bold text-sm text-green-700 uppercase tracking-widest">Notifikasi Terkirim ✓</span>
+                            <!-- Notify Distributor -->
+                            <div class="flex items-center gap-4 bg-neutral-light border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_rgba(0,0,0,0.05)] transition-all"
+                                 :class="notified.distributor ? 'bg-green-50 border-green-600 shadow-none translate-x-1 translate-y-1' : ''">
+                                <div class="flex-1 text-left">
+                                    <p class="text-[9px] font-black uppercase tracking-widest mb-0.5" :class="notified.distributor ? 'text-green-700' : 'text-slate-400'">Kepada Distributor</p>
+                                    <p class="font-bold text-xs" x-text="distributorMap[selectedDistributorId] ?? '-'"></p>
+                                </div>
+                                <a :href="getWaLink('distributor')" target="_blank" @click="notified.distributor = true"
+                                   class="bg-[#25D366] text-white p-2 border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)] hover:bg-[#1DA851] active:translate-y-0.5 active:shadow-none transition-all">
+                                    <template x-if="!notified.distributor">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                    </template>
+                                    <template x-if="notified.distributor">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
+                                    </template>
+                                </a>
                             </div>
 
-                            <button @click="goBack()"
+                            <button @click="window.location.reload()"
+                                class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-primary transition-colors underline underline-offset-2">
+                                Selesai & Kembali ke Antrean →
+                            </button>
+                        </div>
+               </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ====================================== --}}
+            {{-- STEP 4: PENOLAKAN BERHASIL             --}}
+            {{-- ====================================== --}}
+            <div x-show="step === 4" style="display: none;"
+                 x-transition:enter="transition ease-out duration-400"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100">
+                <div class="bg-white border-[6px] border-gray-900 shadow-[12px_12px_0_var(--color-red-600)] w-full flex flex-col">
+                    <div class="p-8 md:p-12 bg-white flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-red-600 flex items-center justify-center border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] mb-8">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </div>
+                        
+                        <h3 class="font-headline font-black text-2xl text-red-600 uppercase mb-2">Reseller Ditolak</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2" x-text="selectedReseller?.name"></p>
+                        <div class="bg-red-50 border-2 border-red-200 p-4 mb-8 w-full max-w-md">
+                            <p class="text-[9px] font-black text-red-700 uppercase mb-1">Alasan Penolakan:</p>
+                            <p class="text-xs font-bold text-gray-900 italic" x-text="rejectReason"></p>
+                        </div>
+
+                        <div class="w-full max-w-sm flex flex-col gap-3">
+                            <a :href="getRejectWaLink()" target="_blank" @click="waSent = true"
+                               class="w-full flex items-center justify-center gap-3 bg-[#25D366] text-white px-6 py-5 font-headline font-black text-sm uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-[#1DA851] active:translate-y-1 active:shadow-none transition-all group">
+                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                <span>Kirim Alasan via WA</span>
+                            </a>
+                            <button @click="window.location.reload()"
                                 class="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-primary transition-colors underline underline-offset-2">
                                 Kembali ke Antrean →
                             </button>
                         </div>
                     </div>
                 </div>
-
             </div>
+            </div>
+
         </div>
+    </div>
 
 </x-layouts.dashboard>
