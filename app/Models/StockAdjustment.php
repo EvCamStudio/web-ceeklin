@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BonusAllocation extends Model
+class StockAdjustment extends Model
 {
-    protected $fillable = ['user_id', 'amount', 'status', 'quarter'];
+    protected $fillable = ['user_id', 'system_stock', 'physical_stock', 'reason', 'status', 'admin_note'];
 
     public function user()
     {

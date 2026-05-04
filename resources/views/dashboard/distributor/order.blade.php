@@ -11,18 +11,18 @@
         price: {{ $productPrice ?? 13000 }},
         paymentMethod: 'qris',
         selectedSubMethod: '',
-        address: '{{ Auth::user()->address ?? 'Jl. Industri No. 45, Kawasan Industri Jababeka, Cikarang Selatan, Bekasi, Jawa Barat 17530' }}',
-        pic: '{{ Auth::user()->name }}',
+        address: '{{ addslashes(Auth::user()->address ?? 'Alamat belum diatur') }}',
+        pic: '{{ addslashes(Auth::user()->name) }} ({{ Auth::user()->phone ?? 'No. Telp belum diatur' }})',
         note: '',
         paymentError: false,
         isProcessing: false,
         orderSuccess: false,
-        
+
+        formatRupiah(number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number); },
+
         get total() { return (this.qtyInvalid ? 0 : this.qty) * this.price; },
         get qtyInvalid() { return !this.qty || this.qty < 1000; },
-        
-        formatRupiah(number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number); },
-        
+
         get displayPayment() {
             if (this.paymentMethod === 'qris') return 'QRIS (Otomatis)';
             if (this.selectedSubMethod) return this.selectedSubMethod.replace('va_', 'VA ').replace('wallet_', '').toUpperCase();
@@ -30,7 +30,7 @@
         },
 
         getWaAdminLink() {
-            const adminPhone = '6281234567890';
+            const adminPhone = '6281234567890'; // TODO: BACKEND - Ambil nomor WA Admin dari config/db
             const msg = `Halo Admin CeeKlin, saya Distributor baru saja melakukan pemesanan restock produk sebanyak *${this.qty} PCS*. 
 
 Metode Pembayaran: *${this.displayPayment}*
@@ -65,20 +65,24 @@ Mohon segera divalidasi dan diproses pengirimannya. Terima kasih!`;
 
         submitOrder() {
             if (this.qtyInvalid) return;
+            if (this.paymentMethod === 'va' || this.paymentMethod === 'wallet') {
+                if (!this.selectedSubMethod) {
+                    this.paymentError = true;
+                    document.getElementById('payment-section').scrollIntoView({ behavior: 'smooth' });
+                    return;
+                }
+            }
             this.isProcessing = true;
             this.$refs.orderForm.submit();
         }
     }">
-        
-        {{-- Hidden Form for Backend Submission --}}
-        <form x-ref="orderForm" action="{{ route('distributor.order.store') }}" method="POST" class="hidden">
+        <form x-ref="orderForm" action="{{ route('distributor.order.store') }}" method="POST" style="display: none;">
             @csrf
             <input type="hidden" name="qty" :value="qty">
-            <input type="hidden" name="payment_method" :value="displayPayment">
+            <input type="hidden" name="payment_method" :value="paymentMethod">
             <input type="hidden" name="note" :value="note">
-            <input type="hidden" name="address" :value="address">
         </form>
-
+        
         {{-- VIEW: SUCCESS PAGE --}}
         <div x-show="orderSuccess" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" class="flex flex-col items-center justify-center py-20 text-center" x-cloak>
             <div class="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center border-[6px] border-gray-900 shadow-[10px_10px_0_var(--color-gray-900)] mb-10 animate-bounce">
@@ -92,7 +96,7 @@ Mohon segera divalidasi dan diproses pengirimannya. Terima kasih!`;
                     <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     INFOKAN ADMIN KE WA
                 </a>
-                <a href="{{ route('distributor.history') }}" class="bg-gray-900 text-white py-5 px-8 font-headline font-black text-lg uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary)] hover:bg-gray-800 transition-all text-center">LIHAT RIWAYAT</a>
+                <a href="/dashboard/distributor/history" class="bg-gray-900 text-white py-5 px-8 font-headline font-black text-lg uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary)] hover:bg-gray-800 transition-all text-center">LIHAT RIWAYAT</a>
                 <button @click="window.location.reload()" class="bg-white text-gray-900 py-5 px-8 font-headline font-black text-lg uppercase tracking-widest border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)] hover:bg-neutral-light transition-all">BELANJA LAGI</button>
             </div>
         </div>
@@ -134,8 +138,9 @@ Mohon segera divalidasi dan diproses pengirimannya. Terima kasih!`;
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
                                         <h4 class="font-black text-primary uppercase text-base tracking-tight">{{ Auth::user()->name }}</h4>
-                                        <span class="px-2 py-0.5 bg-secondary text-white text-[9px] font-black uppercase tracking-widest shadow-[2px_2px_0_var(--color-gray-900)]">Distributor</span>
+                                        <span class="px-2 py-0.5 bg-secondary text-white text-[9px] font-black uppercase tracking-widest shadow-[2px_2px_0_var(--color-gray-900)]">DISTRIBUTOR</span>
                                     </div>
+                                    <p class="font-bold text-gray-900 text-sm italic">Gudang Utama - Distribusi {{ Auth::user()->city_name }}</p>
                                     <p class="text-sm text-slate-500 mt-2 leading-relaxed" x-text="address"></p>
                                     <p class="text-xs font-bold text-gray-900 mt-3 font-mono" x-text="'PIC: ' + pic"></p>
                                     
@@ -171,6 +176,7 @@ Mohon segera divalidasi dan diproses pengirimannya. Terima kasih!`;
                                     
                                     <div class="flex flex-col items-center md:items-end gap-3">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Jumlah (PCS)</span>
+                                        {{-- BACKEND-TODO: Validasi minimal 1.000 PCS di Controller --}}
                                         <div :class="qtyInvalid ? 'border-secondary bg-red-50' : 'border-gray-900 bg-neutral-light'"
                                              class="flex items-center gap-3 p-1.5 border-[3px] transition-colors">
                                             <button type="button" @click="if(qty > 1000) qty--" class="w-10 h-10 bg-white border-2 border-gray-900 flex items-center justify-center font-black hover:bg-primary hover:text-white transition-all text-xl shadow-[3px_3px_0_var(--color-gray-900)] active:shadow-none active:translate-y-1">−</button>

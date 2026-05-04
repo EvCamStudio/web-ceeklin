@@ -62,9 +62,12 @@ class ResellerDashboardController extends Controller
         }
 
         $upline = $user->upline;
-        $resellerPrice = Pricing::where('tier', 'reseller')->latest()->first()->price ?? 1450000;
+        
+        // Define price per PCS (CeeKlin 450ml)
+        // Check if there is a global price settings, or use default 20.000
+        $price = \App\Models\Pricing::where('tier', 'reseller')->first()->price ?? 15000; 
 
-        return view('dashboard.reseller.order', compact('user', 'upline', 'resellerPrice'));
+        return view('dashboard.reseller.order', compact('user', 'upline', 'price'));
     }
 
     public function storeOrder(Request $request)
@@ -85,7 +88,7 @@ class ResellerDashboardController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $resellerPrice = Pricing::where('tier', 'reseller')->latest()->first()->price ?? 1450000;
+        $resellerPrice = Pricing::where('tier', 'reseller')->first()->price ?? 15000;
         $totalPrice = $request->quantity * $resellerPrice;
 
         ResellerOrder::create([
@@ -104,7 +107,8 @@ class ResellerDashboardController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $orders = ResellerOrder::where('reseller_id', $user->id)
+        $orders = ResellerOrder::with('distributor')
+            ->where('reseller_id', $user->id)
             ->latest()
             ->get()
             ->map(function($order) {
@@ -116,6 +120,10 @@ class ResellerDashboardController extends Controller
                     'Ditolak'             => 'border-gray-500 text-gray-700 bg-gray-50',
                 ];
                 $order->statusClass = $colors[$order->status] ?? 'border-gray-300 text-gray-500 bg-gray-50';
+                $order->formatted_date = $order->created_at->translatedFormat('d M Y');
+                if($order->created_at->isToday()) $order->formatted_date = 'Hari Ini';
+                elseif($order->created_at->isYesterday()) $order->formatted_date = 'Kemarin';
+                
                 return $order;
             });
 
@@ -125,9 +133,26 @@ class ResellerDashboardController extends Controller
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('total_price');
-        $pendingBonus = 0; // Separate module
+        
+        // Real bonus calculation
+        $pendingBonus = $user->bonus_balance ?? 0;
 
-        return view('dashboard.reseller.history', compact('orders', 'totalTransaction', 'monthlyTransaction', 'pendingBonus'));
+        // Bonus logs (simplified)
+        $bonusLogs = \App\Models\BonusAllocation::where('user_id', $user->id)
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function($log) {
+                return [
+                    'nama' => $log->description,
+                    'ket' => 'Alokasi bonus sistem',
+                    'nominal' => '+Rp ' . number_format($log->amount, 0, ',', '.'),
+                    'tgl' => $log->created_at->translatedFormat('d M Y'),
+                    'type' => $log->type // target or referral
+                ];
+            });
+
+        return view('dashboard.reseller.history', compact('orders', 'totalTransaction', 'monthlyTransaction', 'pendingBonus', 'bonusLogs'));
     }
 
     public function confirmReceived(Request $request)
@@ -154,10 +179,55 @@ class ResellerDashboardController extends Controller
         $referrals = User::where('upline_id', $user->id)->where('role', 'reseller')->get();
         
         $totalReferrals = $referrals->count();
-        $activeReferrals = $referrals->where('status', 'active')->count();
-        $totalCommission = 0; // Separate module
+        
+        // Real referrals from DB
+        $referrals = User::where('upline_id', $user->id)
+            ->where('role', 'reseller')
+            ->get()
+            ->map(function($ref) {
+                return [
+                    'nama' => $ref->name,
+                    'bergabung' => $ref->created_at->translatedFormat('M Y'),
+                    'status' => $ref->status === 'verified' ? 'Aktif' : 'Menunggu',
+                    'aktif' => $ref->status === 'verified'
+                ];
+            });
 
-        return view('dashboard.reseller.referrals', compact('user', 'referrals', 'totalReferrals', 'activeReferrals', 'totalCommission'));
+        // Personal sales volume (MTD)
+        $personalSales = ResellerOrder::where('reseller_id', $user->id)
+            ->where('status', 'Selesai')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('quantity');
+
+        // Referral sales volume (MTD) - recursive logic or direct child
+        $referralIds = User::where('upline_id', $user->id)->pluck('id');
+        $referralSales = ResellerOrder::whereIn('reseller_id', $referralIds)
+            ->where('status', 'Selesai')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('quantity');
+
+        // Bonus calculations (example logic)
+        $personalBonus = $personalSales * 1000; // Rp 1.000 per PCS
+        $referralBonus = $referralSales * 500;  // Rp 500 per PCS override
+        $totalToWithdraw = $personalBonus + $referralBonus;
+
+        $stats = [
+            'total_referral' => $referrals->count(),
+            'aktif_referral' => $referrals->where('aktif', true)->count(),
+            'total_komisi' => 'Rp ' . number_format($totalToWithdraw / 1000, 1) . 'jt', // Simplified for UI
+        ];
+
+        return view('dashboard.reseller.referrals', compact(
+            'referrals', 
+            'personalSales', 
+            'referralSales', 
+            'personalBonus', 
+            'referralBonus', 
+            'totalToWithdraw',
+            'stats'
+        ));
     }
 
     public function settings()

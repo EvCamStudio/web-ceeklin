@@ -10,6 +10,7 @@
         selectedOrder: null,
         showAll: false,
         confirmMode: false,
+        history: {{ $history->toJson() }},
         checklist: { qty: false, quality: false, original: false },
         openDetail(order) {
             this.selectedOrder = order;
@@ -19,14 +20,18 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         confirmReceived() {
-            // BACKEND-TODO: Kirim request API di sini untuk update status ke Selesai dan update stok gudang
-            this.selectedOrder.status = 'Selesai';
-            this.confirmMode = false;
+            if(this.canConfirm()) {
+                this.$refs.confirmForm.submit();
+            }
         },
         canConfirm() {
             return this.checklist.qty && this.checklist.quality && this.checklist.original;
         }
     }">
+        <form x-ref="confirmForm" action="{{ route('distributor.history.confirm') }}" method="POST" style="display: none;">
+            @csrf
+            <input type="hidden" name="order_id" :value="selectedOrder?.id">
+        </form>
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4" x-show="viewMode === 'list'">
             <div>
@@ -35,6 +40,20 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
                     Lacak Pengiriman & Konfirmasi Barang Diterima
                 </p>
+            </div>
+            <div class="flex gap-2">
+                <div class="relative">
+                    <select aria-label="Filter status pesanan" class="appearance-none bg-white border-[3px] border-gray-900 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_var(--color-gray-900)]">
+                        <option>Semua Status</option>
+                        <option>Menunggu</option>
+                        <option>Dikemas</option>
+                        <option>Dikirim</option>
+                        <option>Selesai</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -49,45 +68,53 @@
                 <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Aksi</div>
             </div>
 
+            {{-- Data Loop --}}
             <div class="divide-y-2 divide-neutral-border">
-                @forelse($history as $item)
-                <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center border-l-[5px] {{ $item->leftBorder }} hover:bg-neutral-light/50 transition-colors duration-150 group">
-                    {{-- No. Order --}}
-                    <div class="md:col-span-2 w-full">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Order</p>
-                        <p class="font-headline font-black text-sm text-gray-900 tracking-tight">{{ $item->id }}</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $item->date->format('d M Y') }}</p>
-                    </div>
-                    {{-- Volume --}}
-                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Volume</p>
-                        <p class="font-headline font-black text-xl text-primary tracking-tighter italic">{{ number_format($item->qty, 0, ',', '.') }} <span class="text-[10px] font-body font-bold text-slate-400">PCS</span></p>
-                    </div>
-                    {{-- Total --}}
-                    <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
-                        <p class="font-bold text-sm text-gray-900 italic">Rp {{ number_format($item->total, 0, ',', '.') }}</p>
-                    </div>
-                    {{-- Status --}}
-                    <div class="md:col-span-3 w-full flex justify-between md:block md:text-center">
-                        <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
-                        <div class="flex flex-col md:items-center">
-                            <span class="px-2 py-1 border-2 {{ $item->color }} text-[9px] font-black uppercase tracking-widest block w-max shadow-[2px_2px_0_rgba(0,0,0,0.05)]">{{ $item->status }}</span>
+                <template x-for="order in (showAll ? history : history.slice(0, 5))" :key="order.db_id + '-' + order.type">
+                    <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center border-l-[5px] hover:bg-neutral-light/50 transition-colors duration-150 group"
+                         :class="order.leftBorder">
+                        {{-- No. Order --}}
+                        <div class="md:col-span-2 w-full">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Order</p>
+                            <p class="font-headline font-black text-sm text-gray-900 tracking-tight" x-text="order.id"></p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" x-text="order.date"></p>
+                        </div>
+                        {{-- Volume --}}
+                        <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Volume</p>
+                            <p class="font-headline font-black text-xl text-primary tracking-tighter italic">
+                                <span x-text="new Intl.NumberFormat('id-ID').format(order.qty)"></span> 
+                                <span class="text-[10px] font-body font-bold text-slate-400">PCS</span>
+                            </p>
+                        </div>
+                        {{-- Total --}}
+                        <div class="md:col-span-2 w-full flex justify-between md:block md:text-right">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
+                            <p class="font-bold text-sm text-gray-900 italic" x-text="order.total"></p>
+                        </div>
+                        {{-- Status --}}
+                        <div class="md:col-span-3 w-full flex justify-between md:block md:text-center">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest">Status</p>
+                            <div class="flex flex-col md:items-center">
+                                <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block w-max shadow-[2px_2px_0_rgba(0,0,0,0.05)]"
+                                      :class="order.statusClass" x-text="order.status"></span>
+                            </div>
+                        </div>
+                        {{-- Aksi --}}
+                        <div class="md:col-span-3 w-full flex justify-start md:justify-end">
+                            <button @click="openDetail(order)"
+                                class="bg-primary text-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
+                                Lihat Detail
+                            </button>
                         </div>
                     </div>
-                    {{-- Aksi --}}
-                    <div class="md:col-span-3 w-full flex justify-start md:justify-end">
-                        <button @click="openDetail({ id: '{{ $item->id }}', qty: {{ $item->qty }}, total: 'Rp {{ number_format($item->total, 0, ',', '.') }}', status: '{{ $item->status }}', date: '{{ $item->date->format('d M Y') }}', tracking: '{{ $item->tracking_number ?? '' }}', courier: '{{ $item->courier ?? '' }}', notes: '{{ $item->admin_note ?? '' }}' })"
-                            class="bg-primary text-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
-                            Lihat Detail
-                        </button>
+                </template>
+
+                <template x-if="history.length === 0">
+                    <div class="p-20 text-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Belum ada riwayat transaksi</p>
                     </div>
-                </div>
-                @empty
-                <div class="py-20 text-center">
-                    <p class="font-headline font-bold text-sm text-slate-500 uppercase tracking-widest">Belum Ada Riwayat Pesanan</p>
-                </div>
-                @endforelse
+                </template>
             </div>
         </div>
 
@@ -103,6 +130,7 @@
                     </div>
                 </div>
                 
+                {{-- Success Alert (Inline) --}}
                 <template x-if="selectedOrder?.status === 'Selesai'">
                     <div class="w-full lg:max-w-md bg-green-50 border-[3px] border-green-600 p-4 shadow-[4px_4px_0_var(--color-green-600)] flex items-center gap-4">
                         <div class="w-10 h-10 bg-green-600 text-white flex items-center justify-center font-bold text-xl">✓</div>
@@ -147,6 +175,7 @@
                         </div>
                     </div>
 
+                    {{-- Admin Note --}}
                     <div class="bg-neutral-light border-[4px] border-gray-900 p-8 shadow-[8px_8px_0_var(--color-primary-darkest)]">
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-3 italic">Catatan Pabrik / Admin:</span>
                         <div class="bg-white p-4 border-2 border-gray-200">
@@ -155,6 +184,7 @@
                     </div>
                 </div>
 
+                {{-- Ringkasan Item --}}
                 <div class="bg-white border-[4px] border-gray-900 p-8 shadow-[10px_10px_0_var(--color-secondary)]">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-6 italic">Rincian Stok Dipesan</span>
                     <div class="flex items-center gap-8 mb-8 pb-8 border-b-2 border-dashed border-gray-200">
@@ -163,6 +193,7 @@
                         </div>
                         <div class="flex-1">
                             <h4 class="font-headline font-black text-primary uppercase text-xl italic leading-none">CeeKlin 450ml</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">SKU: CK-450-DIST</p>
                             <div class="mt-4 flex items-end justify-between">
                                 <p class="text-3xl font-headline font-black text-gray-900 italic tracking-tighter" x-text="new Intl.NumberFormat('id-ID').format(selectedOrder?.qty) + ' PCS'"></p>
                                 <div class="text-right">
@@ -183,6 +214,7 @@
             {{-- Konfirmasi Barang Diterima (Checklist) --}}
             <template x-if="selectedOrder?.status === 'Dikirim'">
                 <div class="bg-white border-[4px] border-gray-900 shadow-[12px_12px_0_var(--color-primary)] overflow-hidden">
+                    {{-- Initial State --}}
                     <div x-show="!confirmMode" class="p-10 flex flex-col md:flex-row items-center justify-between gap-8">
                         <div class="flex items-center gap-8">
                             <div class="w-20 h-20 bg-primary/10 border-[4px] border-primary flex items-center justify-center text-4xl shadow-[6px_6px_0_var(--color-gray-900)]">
@@ -199,6 +231,7 @@
                         </button>
                     </div>
 
+                    {{-- Checklist State --}}
                     <div x-show="confirmMode" x-collapse class="bg-neutral-light p-10 border-t-[4px] border-gray-900">
                         <div class="flex justify-between items-center mb-8">
                             <h4 class="font-headline font-black text-xl text-primary uppercase italic">Checklist Verifikasi Fisik Barang</h4>
@@ -229,20 +262,25 @@
                             </label>
                         </div>
 
-                        <form x-ref="confirmForm" action="{{ route('distributor.history.confirm') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="order_id" :value="selectedOrder?.id">
-                            <button @click.prevent="confirmReceived(); $refs.confirmForm.submit()"
-                                :disabled="!canConfirm()"
-                                :class="canConfirm() ? 'bg-primary shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none' : 'bg-slate-300 shadow-none opacity-50 cursor-not-allowed'"
-                                class="w-full bg-gray-900 text-white py-6 font-headline font-black text-base uppercase tracking-widest transition-all flex items-center justify-center gap-3">
-                                <span x-text="canConfirm() ? 'Kirim Konfirmasi Selesai' : 'Harap Centang Semua Checklist Di Atas'"></span>
-                                <svg x-show="canConfirm()" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
-                            </button>
-                        </form>
+                        <button @click="confirmReceived()"
+                            :disabled="!canConfirm()"
+                            :class="canConfirm() ? 'bg-primary shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none' : 'bg-slate-300 shadow-none opacity-50 cursor-not-allowed'"
+                            class="w-full bg-gray-900 text-white py-6 font-headline font-black text-base uppercase tracking-widest transition-all flex items-center justify-center gap-3">
+                            <span x-text="canConfirm() ? 'Kirim Konfirmasi Selesai' : 'Harap Centang Semua Checklist Di Atas'"></span>
+                            <svg x-show="canConfirm()" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
+                        </button>
                     </div>
                 </div>
             </template>
+        </div>
+
+        {{-- Footer Summary --}}
+        <div class="px-6 py-4 border-t-[4px] border-gray-900 bg-neutral-light flex flex-col sm:flex-row items-center justify-between gap-3 mt-8" x-show="viewMode === 'list'">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 italic" x-text="showAll ? 'Menampilkan semua transaksi histori' : 'Menampilkan transaksi terbaru'"></span>
+            <button @click="showAll = !showAll" class="text-[10px] font-black uppercase tracking-widest text-primary hover:text-secondary transition-colors flex items-center gap-2 group">
+                <span x-text="showAll ? 'Sembunyikan' : 'Muat Semua Riwayat'"></span>
+                <svg class="w-4 h-4 transition-transform duration-300" :class="showAll ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+            </button>
         </div>
 
         {{-- Info Stok Update --}}

@@ -14,6 +14,8 @@ class DistributorOrder extends Model
         'total_price',
         'status',
         'tracking_number',
+        'courier_name',
+        'notes',
     ];
 
     public function user()

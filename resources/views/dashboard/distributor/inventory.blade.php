@@ -36,51 +36,46 @@
                 <div class="xl:col-span-2 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
                     <div class="bg-primary px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <div>
-                            <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Status Inventori Gudang</span>
-                            <p class="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Pantau Pergerakan & Kapasitas Jual</p>
+                            <span class="font-headline font-black text-white text-lg uppercase tracking-tight italic">Status Inventori Gudang</span>
+                            <p class="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5 italic">Pantau Pergerakan & Kapasitas Jual</p>
                         </div>
-                        <span class="text-[9px] font-bold text-secondary uppercase tracking-widest bg-gray-900 px-3 py-1.5 border border-white/20">Update: {{ now()->format('d M H:i') }}</span>
+                        <span class="text-[9px] font-bold text-secondary uppercase tracking-widest bg-gray-900 px-3 py-1.5 border border-white/20 italic">Update: {{ now()->translatedFormat('d M Y H:i') }}</span>
                     </div>
                     
                     <div class="p-6 flex flex-col gap-8">
                         <div class="flex flex-col gap-4">
                             <div class="flex justify-between items-center">
-                                <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tighter">CeeKlin 450ml</h3>
-                                @if($user->stock < 1000)
-                                    <span class="px-2 py-1 bg-red-500 text-white text-[10px] font-black uppercase border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Stok Rendah</span>
-                                @elseif($user->stock < 2500)
-                                    <span class="px-2 py-1 bg-yellow-400 text-gray-900 text-[10px] font-black uppercase border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Stok Menengah</span>
-                                @else
-                                    <span class="px-2 py-1 bg-green-500 text-white text-[10px] font-black uppercase border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Stok Aman</span>
-                                @endif
+                                <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tighter italic">CeeKlin 450ml</h3>
+                                <span class="px-2 py-1 {{ $stockPercentage < 30 ? 'bg-red-500' : 'bg-yellow-400' }} text-gray-900 text-[10px] font-black uppercase border-2 border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)] italic">
+                                    {{ $stockPercentage < 30 ? 'Stok Rendah' : 'Stok Menengah' }}
+                                </span>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="bg-neutral-light border-[3px] border-gray-900 p-4 flex flex-col">
-                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Stok Fisik (Gudang)</span>
-                                    <p class="font-headline font-black text-3xl text-gray-900 tracking-tighter">{{ number_format($user->stock, 0, ',', '.') }} <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Stok Fisik (Gudang)</span>
+                                    <p class="font-headline font-black text-3xl text-gray-900 tracking-tighter italic">{{ number_format($physicalStock) }} <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
                                 </div>
                                 <div class="bg-white border-[3px] border-secondary p-4 flex flex-col">
-                                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest mb-1">Terpesan (Hold)</span>
-                                    {{-- Placeholder: logic belum ada di controller --}}
-                                    <p class="font-headline font-black text-3xl text-primary tracking-tighter">0 <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
+                                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest mb-1 italic">Terpesan (Hold)</span>
+                                    <p class="font-headline font-black text-3xl text-primary tracking-tighter italic">{{ number_format($holdStock) }} <span class="text-xs font-body font-bold text-slate-400">PCS</span></p>
                                 </div>
                                 <div class="bg-primary border-[3px] border-gray-900 p-4 flex flex-col shadow-[4px_4px_0_var(--color-gray-900)]">
-                                    <span class="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1">Stok Siap Jual</span>
-                                    <p class="font-headline font-black text-3xl text-white tracking-tighter">{{ number_format($user->stock, 0, ',', '.') }} <span class="text-xs font-body font-bold text-white/40">PCS</span></p>
+                                    <span class="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1 italic">Stok Siap Jual</span>
+                                    <p class="font-headline font-black text-3xl text-white tracking-tighter italic">{{ number_format($readyStock) }} <span class="text-xs font-body font-bold text-white/40">PCS</span></p>
                                 </div>
                             </div>
 
                             <div class="w-full bg-neutral-border-light border-[3px] border-gray-900 h-6 relative overflow-hidden">
-                                <div class="bg-secondary h-full transition-all duration-500" style="width:{{ $stockPercentage }}%"></div>
+                                <div class="bg-secondary h-full transition-all duration-500" style="width: {{ $stockPercentage }}%"></div>
                                 <div class="absolute inset-0 flex items-center px-4">
-                                    <span class="text-[9px] font-black text-gray-900 uppercase">Kapasitas: {{ round($stockPercentage) }}% @if($user->stock < 1000) (Segera Restock) @endif</span>
+                                    <span class="text-[9px] font-black text-gray-900 uppercase italic">Kapasitas: {{ number_format($stockPercentage, 1) }}% {{ $stockPercentage < 30 ? '(Segera Restock)' : '' }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="px-6 pb-6">
-                        <a href="{{ route('distributor.order') }}" class="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
+                        <a href="{{ route('distributor.order') }}" class="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 font-headline font-bold text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all italic">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Restock ke Pabrik
                         </a>
@@ -88,15 +83,15 @@
                 </div>
 
                 <div class="bg-gray-900 border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)] p-6 text-white">
-                    <h4 class="font-headline font-black text-lg uppercase tracking-tight mb-4 text-secondary">Panduan Inventori</h4>
-                    <ul class="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest leading-relaxed">
+                    <h4 class="font-headline font-black text-lg uppercase tracking-tight mb-4 text-secondary italic">Panduan Inventori</h4>
+                    <ul class="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest leading-relaxed italic">
                         <li class="flex gap-3">
                             <span class="text-secondary">●</span>
-                            <p><span class="text-white">Stok Fisik</span> adalah jumlah asli botol yang ada di gudang Anda. *Bertambah otomatis saat pesanan restock ke pabrik dinyatakan SELESAI/TERKIRIM.*</p>
+                            <p><span class="text-white">Stok Fisik</span> adalah jumlah asli botol yang ada di gudang Anda. Bertambah otomatis saat pesanan restock ke pabrik dinyatakan SELESAI.</p>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-secondary">●</span>
-                            <p><span class="text-white">Terpesan (Hold)</span> adalah barang yang sudah dibayar reseller. *Stok distributor langsung berkurang dari sistem saat pembayaran reseller berhasil.*</p>
+                            <p><span class="text-white">Terpesan (Hold)</span> adalah barang yang sudah dipesan reseller namun belum dikirim. Stok distributor langsung dikunci saat reseller membuat pesanan.</p>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-secondary">●</span>
@@ -109,30 +104,49 @@
 
         {{-- TAB CONTENT 2: SYNC --}}
         <div x-show="activeTab === 'sync'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] max-w-2xl mx-auto" x-data="{ stokNyata: '', alasan: '', submitted: false }">
+            <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] max-w-2xl mx-auto" 
+                 x-data="{ 
+                    stokNyata: '', 
+                    alasan: '', 
+                    submitted: false,
+                    errors: {},
+                    validate(e) {
+                        this.errors = {};
+                        if (!this.stokNyata) this.errors.stok_fisik = 'Stok fisik wajib diisi';
+                        if (!this.alasan) this.errors.alasan = 'Alasan wajib diisi';
+                        
+                        if (Object.keys(this.errors).length > 0) {
+                            e.preventDefault();
+                            return false;
+                        }
+                        this.submitted = true;
+                    }
+                 }">
                 <div class="bg-secondary px-6 py-4 text-center">
-                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Ajukan Sinkronisasi Stok</span>
+                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight italic">Ajukan Sinkronisasi Stok</span>
                 </div>
                 <div class="p-8">
-                    <form action="{{ route('distributor.inventory') }}" method="POST" class="flex flex-col gap-6" @submit.prevent="submitted = true">
+                    <form action="{{ route('distributor.inventory.sync') }}" method="POST" class="flex flex-col gap-6" @submit="validate" novalidate>
                         @csrf
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest">Stok di Sistem (Saat Ini)</label>
-                            <div class="bg-neutral-light border-[3px] border-neutral-border px-4 py-3 font-headline font-black text-xl text-slate-400 tracking-tighter">{{ number_format($user->stock, 0, ',', '.') }} PCS</div>
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest italic">Stok di Sistem (Saat Ini)</label>
+                            <div class="bg-neutral-light border-[3px] border-neutral-border px-4 py-3 font-headline font-black text-xl text-slate-400 tracking-tighter italic">{{ number_format($physicalStock) }} PCS</div>
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-secondary uppercase tracking-widest">Stok Fisik Aktual</label>
-                            <input type="number" name="actual_stock" x-model="stokNyata" required class="bg-neutral-light border-[3px] border-secondary px-4 py-3 font-headline font-black text-xl text-primary focus:outline-none focus:border-primary transition-colors tracking-tighter" placeholder="0">
+                        <div class="flex flex-col gap-1.5 relative">
+                            <label class="text-[10px] font-bold text-secondary uppercase tracking-widest italic">Stok Fisik Aktual</label>
+                            <input type="number" x-model="stokNyata" name="stok_fisik" required class="bg-neutral-light border-[3px] border-secondary px-4 py-3 font-headline font-black text-xl text-primary focus:outline-none focus:border-primary transition-colors tracking-tighter italic" placeholder="0">
+                            <x-ui.error name="stok_fisik" />
                             
-                            <p class="text-[9px] font-bold uppercase tracking-widest mt-1"
+                            <p class="text-[9px] font-bold uppercase tracking-widest mt-1 italic"
                                x-show="stokNyata !== ''"
-                               :class="parseInt(stokNyata) < {{ $user->stock }} ? 'text-red-600' : 'text-green-600'"
-                               x-text="parseInt(stokNyata) < {{ $user->stock }} ? `Selisih: -${ {{ $user->stock }} - parseInt(stokNyata)} PCS (kurang)` : `Selisih: +${parseInt(stokNyata) - {{ $user->stock }} } PCS (lebih)`">
+                               :class="parseInt(stokNyata) < {{ $physicalStock }} ? 'text-red-600' : 'text-green-600'"
+                               x-text="parseInt(stokNyata) < {{ $physicalStock }} ? `Selisih: -${ {{ $physicalStock }} - parseInt(stokNyata)} PCS (kurang)` : `Selisih: +${parseInt(stokNyata) - {{ $physicalStock }} } PCS (lebih)`">
                             </p>
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest">Alasan / Keterangan</label>
-                            <textarea name="reason" rows="3" required x-model="alasan" class="bg-neutral-light border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary resize-none transition-colors" placeholder="Contoh: Barang rusak karena bocor..."></textarea>
+                        <div class="flex flex-col gap-1.5 relative">
+                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest italic">Alasan / Keterangan</label>
+                            <textarea rows="3" name="alasan" required x-model="alasan" class="bg-neutral-light border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary resize-none transition-colors italic" placeholder="Contoh: Barang rusak karena bocor..."></textarea>
+                            <x-ui.error name="alasan" />
                         </div>
 
                         <div class="bg-yellow-50 border-l-[4px] border-yellow-500 p-3">
@@ -141,10 +155,10 @@
                             </p>
                         </div>
                         <div x-show="!submitted">
-                            <button type="submit" class="w-full bg-secondary text-white py-4 font-headline font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-1 active:shadow-none transition-all">Kirim Pengajuan</button>
+                            <button type="submit" class="w-full bg-secondary text-white py-4 font-headline font-black text-sm uppercase tracking-widest border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] hover:bg-secondary-dark active:translate-y-1 active:shadow-none transition-all italic">Kirim Pengajuan</button>
                         </div>
-                        <div x-show="submitted" class="p-6 bg-green-50 border-[3px] border-green-600 text-center">
-                            <p class="font-headline font-black text-green-800 uppercase tracking-tighter">Pengajuan Berhasil Dikirim!</p>
+                        <div x-show="submitted" class="p-6 bg-green-50 border-[3px] border-green-600 text-center italic">
+                            <p class="font-headline font-black text-green-800 uppercase tracking-tighter italic">Pengajuan Berhasil Dikirim!</p>
                         </div>
                     </form>
                 </div>
@@ -155,7 +169,7 @@
         <div x-show="activeTab === 'logs'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
             <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)]">
                 <div class="bg-gray-900 px-6 py-4 flex items-center justify-between">
-                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight">Riwayat Perubahan Stok</span>
+                    <span class="font-headline font-black text-white text-lg uppercase tracking-tight italic">Riwayat Perubahan Stok</span>
                 </div>
                 <div class="divide-y-2 divide-neutral-border">
                     @forelse($logs as $log)
@@ -170,17 +184,30 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <p class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight">{{ $log['desc'] }}</p>
+                                        <p class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight italic">{{ $log['desc'] }}</p>
+                                        @if($log['status'] !== 'Selesai')
+                                            <span class="text-[8px] font-black px-1.5 py-0.5 border bg-yellow-100 text-yellow-700 border-yellow-300 uppercase italic">{{ $log['status'] }}</span>
+                                        @endif
                                     </div>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">{{ $log['date'] }}</p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 italic">{{ $log['date'] }}</p>
                                 </div>
                             </div>
-                            <span class="font-headline font-black text-2xl {{ $log['color'] }} tracking-tighter">{{ $log['qty'] }} PCS</span>
+                            <span class="font-headline font-black text-2xl {{ $log['color'] }} tracking-tighter italic">{{ $log['qty'] }} PCS</span>
                         </div>
+                        
+                        @if($log['note'])
+                        <div class="mt-4 ml-14 relative">
+                            <div class="absolute -left-10 top-0 w-8 h-[2px] bg-neutral-border"></div>
+                            <div class="p-4 border-[2px] border-gray-900 bg-neutral-light shadow-[4px_4px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+                                <p class="text-[9px] font-black text-primary uppercase tracking-[0.2em] mb-1 italic">Catatan:</p>
+                                <p class="text-xs font-bold text-gray-800 leading-relaxed italic">"{{ $log['note'] }}"</p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                     @empty
-                    <div class="px-6 py-10 text-center">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada riwayat stok</p>
+                    <div class="py-20 text-center">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Belum ada riwayat pergerakan stok</p>
                     </div>
                     @endforelse
                 </div>

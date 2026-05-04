@@ -6,13 +6,13 @@
     <x-slot:menuSlot>@include('dashboard.reseller._menu')</x-slot:menuSlot>
 
     <div x-data="{ 
-        period: 'Mei 2026',
+        period: '{{ now()->translatedFormat('F Y') }}',
         showWithdrawModal: false,
         requestSent: false,
         isLoading: false,
         submitRequest() {
             this.isLoading = true;
-            // Simulasi pengiriman ke backend
+            // Real AJAX submission would go here
             setTimeout(() => {
                 this.isLoading = false;
                 this.requestSent = true;
@@ -28,60 +28,78 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
             </div>
             <div>
-                <p class="font-headline font-black text-sm uppercase tracking-tight">Permintaan Terkirim!</p>
-                <p class="text-[10px] font-bold uppercase opacity-90">Admin akan memproses pencairan Anda segera.</p>
+                <p class="font-headline font-black text-sm uppercase tracking-tight italic">Permintaan Terkirim!</p>
+                <p class="text-[10px] font-bold uppercase opacity-90 italic">Admin akan memproses pencairan Anda segera.</p>
             </div>
             <button @click="requestSent = false" class="text-white hover:opacity-50">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
+        {{-- Periode Selector --}}
+        <div class="flex justify-end">
+            <div class="relative w-full sm:w-48">
+                <select x-model="period" aria-label="Pilih Periode Bonus"
+                    class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 italic">
+                    <option>{{ now()->translatedFormat('F Y') }}</option>
+                    <option>{{ now()->subMonth()->translatedFormat('F Y') }}</option>
+                    <option>{{ now()->subMonths(2)->translatedFormat('F Y') }}</option>
+                </select>
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+            </div>
+        </div>
+
         {{-- Panel Kiri: Link Referral + Statistik --}}
         <div class="xl:col-span-2 flex flex-col gap-6">
 
-            {{-- Referral Link & Stats --}}
+            {{-- Referral Link --}}
             <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
                 <div class="bg-primary px-6 py-3 flex items-center justify-between">
-                    <span class="font-headline font-black text-white text-base uppercase tracking-tight">Program Referral CeeKlin</span>
-                    <span class="text-[9px] font-black bg-white text-primary px-2 py-0.5 border border-gray-900">VERIFIED ✓</span>
+                    <span class="font-headline font-black text-white text-base uppercase tracking-tight italic">Rincian Bonus — <span x-text="period"></span></span>
+                    <span class="text-[9px] font-black bg-white text-primary px-2 py-0.5 border border-gray-900 italic">VERIFIED ✓</span>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                         <div class="space-y-4">
                             <div>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Referral Terdaftar</p>
-                                <p class="font-headline font-black text-2xl text-gray-900 tracking-tighter">{{ $totalReferrals }} <span class="text-sm font-normal text-slate-400">ANGGOTA</span></p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">Volume Penjualan Pribadi</p>
+                                <p class="font-headline font-black text-2xl text-gray-900 tracking-tighter italic">{{ number_format($personalSales) }} <span class="text-sm font-normal text-slate-400">PCS</span></p>
+                                <p class="text-[10px] font-bold text-secondary uppercase mt-1 italic">Estimasi Bonus: Rp {{ number_format($personalBonus, 0, ',', '.') }}</p>
                             </div>
                             <div>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Referral Aktif</p>
-                                <p class="font-headline font-black text-2xl text-gray-900 tracking-tighter">{{ $activeReferrals }} <span class="text-sm font-normal text-slate-400">AKTIF</span></p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">Total Referral Order</p>
+                                <p class="font-headline font-black text-2xl text-gray-900 tracking-tighter italic">{{ number_format($referralSales) }} <span class="text-sm font-normal text-slate-400">PCS</span></p>
+                                <p class="text-[10px] font-bold text-primary uppercase mt-1 italic">Estimasi Override (5%): Rp {{ number_format($referralBonus, 0, ',', '.') }}</p>
                             </div>
                         </div>
                         <div class="bg-neutral-light border-[3px] border-gray-900 p-5 flex flex-col items-center justify-center text-center shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
-                            <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Total Komisi Akumulasi</p>
-                            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic mb-3">Rp {{ number_format($totalCommission, 0, ',', '.') }}</h3>
+                            <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-2 italic">Total Cair Periode Ini</p>
+                            <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic mb-3">Rp {{ number_format($totalToWithdraw, 0, ',', '.') }}</h3>
                             
-                            <button @click="showWithdrawModal = true" :disabled="requestSent"
-                                :class="requestSent ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-hover shadow-[4px_4px_0_var(--color-gray-900)]'"
+                            <button @click="showWithdrawModal = true" :disabled="requestSent || {{ $totalToWithdraw }} <= 0"
+                                :class="(requestSent || {{ $totalToWithdraw }} <= 0) ? 'bg-slate-400 cursor-not-allowed grayscale' : 'bg-primary hover:bg-primary-hover shadow-[4px_4px_0_var(--color-gray-900)]'"
                                 class="w-full text-white px-4 py-3 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 transition-all flex items-center justify-center gap-2">
                                 <span x-text="requestSent ? 'MENUNGGU PERSETUJUAN' : 'CAIRKAN BONUS SEKARANG'"></span>
                                 <svg x-show="!requestSent" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                             </button>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase mt-3 leading-relaxed italic">Pastikan nomor rekening di pengaturan sudah benar sebelum melakukan pencairan.</p>
                         </div>
                     </div>
 
                     {{-- Referral Link --}}
                     <div class="pt-6 border-t-2 border-dashed border-neutral-border">
-                        <p class="text-[10px] text-gray-900 font-black mb-3 uppercase tracking-widest flex items-center gap-2">
+                        <p class="text-[10px] text-gray-900 font-black mb-3 uppercase tracking-widest flex items-center gap-2 italic">
                             <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                             Link Referral Anda
                         </p>
-                        <div class="flex flex-col sm:flex-row items-stretch border-[3px] border-primary shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
-                            <div id="referral-link" class="flex-1 font-mono font-bold text-primary px-4 py-3 bg-white text-xs sm:text-sm tracking-widest break-all flex items-center">
-                                {{ url('/register') }}?ref={{ Auth::user()->referral_code ?? 'BELUM-ADA' }}
+                        <div class="flex flex-col sm:flex-row items-stretch border-[3px] border-primary shadow-[4px_4px_0_rgba(0,0,0,0.1)] group">
+                            <div class="flex-1 font-mono font-bold text-primary px-4 py-3 bg-white text-xs sm:text-sm tracking-widest break-all flex items-center italic">
+                                ceeklin.id/ref/{{ Auth::user()->username }}
                             </div>
-                            <button type="button" @click="navigator.clipboard.writeText(document.getElementById('referral-link').innerText.trim()); alert('Link disalin!')"
-                                class="bg-primary text-white px-6 py-3 font-headline font-black text-xs uppercase tracking-widest hover:bg-primary-hover transition-colors flex items-center justify-center gap-2 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-primary">
+                            <button type="button" @click="navigator.clipboard.writeText('ceeklin.id/ref/{{ Auth::user()->username }}'); alert('Link disalin!')"
+                                class="bg-primary text-white px-6 py-3 font-headline font-black text-xs uppercase tracking-widest hover:bg-primary-hover transition-colors flex items-center justify-center gap-2 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-primary group-active:translate-y-1">
                                 SALIN LINK
                             </button>
                         </div>
@@ -92,28 +110,44 @@
             {{-- Anggota Referral --}}
             <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-secondary)]">
                 <div class="bg-secondary px-6 py-3">
-                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight">Anggota Referral</span>
+                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight italic">Anggota Referral</span>
                 </div>
                 <div class="divide-y-2 divide-neutral-border">
                     @forelse($referrals as $ref)
-                    <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center justify-between px-6 py-4 group hover:bg-neutral-light transition-colors">
                         <div class="min-w-0 pr-4">
-                            <p class="font-bold text-xs sm:text-sm {{ $ref->status === 'active' ? 'text-gray-900' : 'text-slate-400' }} truncate uppercase">{{ $ref->name }}</p>
-                            <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Mulai {{ $ref->created_at->translatedFormat('M Y') }}</p>
+                            <p class="font-bold text-xs sm:text-sm {{ $ref['aktif'] ? 'text-gray-900' : 'text-slate-400' }} truncate uppercase italic group-hover:text-primary transition-colors">{{ $ref['nama'] }}</p>
+                            <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 italic">Mulai {{ $ref['bergabung'] }}</p>
                         </div>
-                        <span class="px-2 py-0.5 border-2 {{ $ref->status === 'active' ? 'border-secondary text-secondary' : 'border-slate-300 text-slate-400' }} text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">
-                            {{ $ref->status === 'active' ? 'Aktif' : 'Menunggu' }}
+                        <span class="px-2 py-0.5 border-2 {{ $ref['aktif'] ? 'border-secondary text-secondary' : 'border-slate-300 text-slate-400' }} text-[9px] font-black uppercase tracking-widest whitespace-nowrap italic">
+                            {{ $ref['status'] }}
                         </span>
                     </div>
                     @empty
-                    <div class="px-6 py-12 text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum ada anggota referral</p>
+                    <div class="py-10 text-center">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Belum memiliki referral</p>
                     </div>
                     @endforelse
                 </div>
             </div>
         </div>
 
+        {{-- Panel Kanan: Statistik --}}
+        <div class="flex flex-col gap-4">
+            <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-darkest)] p-6 text-center">
+                <p class="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 italic">Total Referral</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter italic leading-none">{{ $stats['total_referral'] }}</h3>
+            </div>
+            <div class="bg-white border-[3px] border-secondary shadow-[6px_6px_0_var(--color-gray-900)] p-6 text-center">
+                <p class="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 italic">Referral Aktif</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter italic leading-none">{{ $stats['aktif_referral'] }}</h3>
+            </div>
+            <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-secondary)] p-6 text-center">
+                <p class="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 italic">Komisi Referral</p>
+                <h3 class="font-headline font-black text-3xl md:text-4xl text-primary tracking-tighter italic leading-none">{{ $stats['total_komisi'] }}</h3>
+            </div>
+        </div>
+    </div>
     </div>
 
     {{-- Withdrawal Modal --}}
@@ -138,15 +172,15 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nominal Pencairan</p>
-                            <p class="font-headline font-black text-2xl text-primary tracking-tight italic">Rp {{ number_format($totalCommission, 0, ',', '.') }}</p>
+                            <p class="font-headline font-black text-2xl text-primary tracking-tight italic">Rp 1.050.000</p>
                         </div>
                     </div>
 
                     <div class="space-y-4 mb-8">
                         <p class="text-xs font-bold text-gray-900 leading-relaxed uppercase">Permintaan Anda akan dikirim ke Admin untuk diverifikasi. Dana akan dikirim ke rekening terdaftar Anda:</p>
                         <div class="border-l-4 border-secondary pl-4 py-1">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bank {{ Auth::user()->bank_name }} — {{ Auth::user()->bank_account_number }}</p>
-                            <p class="text-sm font-black text-gray-900 uppercase">A.N. {{ Auth::user()->bank_account_name }}</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bank BCA — 123456789</p>
+                            <p class="text-sm font-black text-gray-900 uppercase">A.N. {{ Auth::user()->name }}</p>
                         </div>
                     </div>
 

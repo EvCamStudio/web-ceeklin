@@ -30,31 +30,45 @@
             {{-- BACKEND-TODO: Integrasikan dengan Google Maps / Leaflet.js menggunakan koordinat reseller --}}
             <div class="h-[360px] bg-neutral-light relative flex items-center justify-center border-b-2 border-neutral-border">
                 <div class="absolute inset-0 opacity-10 bg-[linear-gradient(var(--color-neutral-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-neutral-border)_1px,transparent_1px)] [background-size:32px_32px]"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 absolute bottom-4">Peta Interaktif — Data Real Terkoneksi</p>
+                {{-- Pin Bandung --}}
+                <div class="absolute top-[30%] left-[35%] flex flex-col items-center">
+                    <div class="w-4 h-4 bg-primary border-[3px] border-white shadow-[2px_2px_0_var(--color-primary-darkest)]"></div>
+                    <span class="text-[9px] font-black bg-white border-2 border-primary text-primary px-1.5 py-0.5 mt-1 tracking-widest uppercase">BGD Hub</span>
+                </div>
+                {{-- Pin Bekasi --}}
+                <div class="absolute top-[50%] left-[65%] flex flex-col items-center">
+                    <div class="w-4 h-4 bg-secondary border-[3px] border-white shadow-[2px_2px_0_var(--color-gray-900)]"></div>
+                    <span class="text-[9px] font-black bg-white border-2 border-secondary text-secondary px-1.5 py-0.5 mt-1 tracking-widest uppercase">BKS Point</span>
+                </div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 absolute bottom-4">Peta Interaktif — Integrasi Backend Diperlukan</p>
             </div>
         </div>
 
         {{-- Statistik Lokasi --}}
         <div class="flex flex-col gap-4">
-            @forelse($cityStats as $stat)
-            <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary-darkest)]">
-                <div class="bg-primary px-5 py-3">
-                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight">{{ $stat->city_name }}</span>
+            @forelse($cityStats as $city)
+            <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-{{ $loop->first ? 'primary' : 'secondary' }})]">
+                <div class="bg-{{ $loop->first ? 'primary' : 'secondary' }} px-5 py-3 border-b-[3px] border-gray-900">
+                    <span class="font-headline font-black text-white text-sm uppercase tracking-tight italic">{{ $city->city_name }}</span>
                 </div>
-                <div class="p-5 flex flex-col gap-3">
-                    <div class="flex justify-between items-center border-b border-neutral-border pb-2 last:border-0 last:pb-0">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Reseller Aktif</span>
-                        <span class="font-headline font-black text-primary text-base">{{ $stat->count }}</span>
+                <div class="p-5 flex flex-col gap-3 italic">
+                    <div class="flex justify-between items-center border-b border-neutral-border pb-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Reseller Aktif</span>
+                        <span class="font-headline font-black text-primary text-base italic">{{ number_format($city->count) }}</span>
                     </div>
-                    <div class="flex justify-between items-center border-b border-neutral-border pb-2 last:border-0 last:pb-0">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cakupan</span>
-                        <span class="font-headline font-black text-primary text-base">Aktif</span>
+                    <div class="flex justify-between items-center border-b border-neutral-border pb-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Volume Total</span>
+                        <span class="font-headline font-black text-primary text-base italic">{{ number_format($city->total_volume ?? 0) }} Unit</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Hub Status</span>
+                        <span class="px-1.5 py-0.5 bg-green-50 text-green-700 border border-green-200 text-[8px] font-black uppercase italic">Aktif</span>
                     </div>
                 </div>
             </div>
             @empty
-            <div class="bg-white border-[4px] border-gray-900 p-10 text-center shadow-[6px_6px_0_var(--color-neutral-border)]">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Belum ada data reseller per wilayah</p>
+            <div class="bg-white border-[4px] border-gray-900 shadow-[6px_6px_0_var(--color-primary-darkest)] p-8 text-center italic">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Belum ada data wilayah distribusi</p>
             </div>
             @endforelse
         </div>

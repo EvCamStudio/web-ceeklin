@@ -15,6 +15,10 @@ class ResellerOrder extends Model
         'status',
         'payment_status',
         'payment_proof',
+        'courier_name',
+        'tracking_number',
+        'reject_reason',
+        'note',
     ];
 
     public function reseller()

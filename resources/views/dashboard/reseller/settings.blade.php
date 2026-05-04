@@ -8,101 +8,68 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl">
 
         {{-- Profil Reseller --}}
-        <div class="lg:col-span-2">
+        <x-ui.card shadow="primary" headerColor="primary" class="lg:col-span-2">
+            <x-slot:titleSlot><span class="italic">Profil Reseller</span></x-slot:titleSlot>
+            
             <form action="{{ route('reseller.settings.profile') }}" method="POST">
                 @csrf
-                <x-ui.card shadow="primary" headerColor="primary">
-                    <x-slot:titleSlot>Profil Reseller</x-slot:titleSlot>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 italic">
+                    <x-ui.input id="name" name="name" label="Nama Lengkap" value="{{ old('name', $user->name) }}" />
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <x-ui.input id="nama-lengkap" name="name" label="Nama Lengkap" value="{{ auth()->user()->name }}" required />
-                        
-                        {{-- NIK tidak bisa diubah, hanya Admin --}}
-                        <x-ui.input id="nik-reseller" label="No. NIK" value="{{ auth()->user()->nik }}" disabled />
-                        
-                        <x-ui.input id="hp-reseller" name="phone" type="tel" label="No. HP (WhatsApp)" value="{{ auth()->user()->phone }}" required />
-                        
-                        <x-ui.input id="username-reseller" label="Username" value="{{ auth()->user()->username }}" disabled />
+                    {{-- NIK tidak bisa diubah, hanya Admin --}}
+                    <x-ui.input id="nik" label="No. NIK (Locked)" value="{{ $user->nik ?? 'N/A' }}" disabled />
+                    
+                    <x-ui.input id="phone" name="phone" type="tel" label="No. HP (WhatsApp)" value="{{ old('phone', $user->phone) }}" />
+                    
+                    <x-ui.input id="ahli_waris" name="ahli_waris" label="Ahli Waris" value="{{ old('ahli_waris', $user->ahli_waris ?? 'N/A') }}" />
 
-                        <div class="flex flex-col gap-1.5 md:col-span-2">
-                            <label class="text-[10px] font-bold text-primary uppercase tracking-widest" for="alamat-reseller">Alamat Lengkap</label>
-                            <textarea id="alamat-reseller" name="address" rows="2" required
-                                class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none">{{ auth()->user()->address }}</textarea>
-                        </div>
-
-                        {{-- BACKEND-TODO: Map Koordinat UI --}}
-                        <div class="flex flex-col gap-3 md:col-span-2 mt-2 p-4 bg-gray-50 border-[3px] border-gray-900 border-dashed">
-                            <div class="flex justify-between items-center mb-1">
-                                <div>
-                                    <label class="text-[10px] font-bold text-primary uppercase tracking-widest block">Titik Koordinat Lokasi (Maps)</label>
-                                    <span class="text-[9px] text-slate-500 uppercase tracking-widest">Paskan pin di peta untuk mempermudah navigasi pengiriman</span>
-                                </div>
-                            </div>
-                            
-                            {{-- Placeholder Peta --}}
-                            <div class="w-full h-[180px] bg-gray-200 border-2 border-gray-900 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer hover:border-secondary transition-colors">
-                                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                                <svg class="w-8 h-8 text-secondary mb-2 relative z-10 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-gray-900 relative z-10 bg-white/90 px-3 py-1.5 border-[2px] border-gray-900 shadow-[2px_2px_0_var(--color-gray-900)]">Klik untuk Menyesuaikan Pin Peta</span>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mt-2">
-                                <x-ui.input id="lat-reseller" label="Latitude" value="-6.8732" placeholder="Cth: -6.123456" />
-                                <x-ui.input id="lng-reseller" label="Longitude" value="107.5421" placeholder="Cth: 106.123456" />
-                            </div>
-                            
-                            <button type="button" class="w-full bg-white text-secondary border-[2px] border-secondary py-2.5 font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors mt-1 flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Ambil Titik Lokasi GPS Saat Ini
-                            </button>
-                        </div>
+                    <div class="flex flex-col gap-1.5 md:col-span-2">
+                        <label class="text-[10px] font-bold text-primary uppercase tracking-widest italic" for="address">Alamat Lengkap</label>
+                        <textarea id="address" name="address" rows="3"
+                            class="bg-neutral-light border-[3px] border-primary px-4 py-2.5 font-body text-sm text-primary focus:outline-none focus:border-secondary transition-colors resize-none italic">{{ old('address', $user->address) }}</textarea>
                     </div>
-                    
-                    <x-ui.button type="submit" class="mt-6">
-                        Simpan Perubahan
-                    </x-ui.button>
-                </x-ui.card>
+                </div>
+                
+                <x-ui.button class="mt-8 italic" type="submit">
+                    Simpan Perubahan
+                </x-ui.button>
             </form>
-        </div>
+        </x-ui.card>
 
         {{-- Panel Kanan --}}
         <div class="flex flex-col gap-6">
 
             {{-- Ganti Kata Sandi --}}
-            <form action="{{ route('reseller.settings.password') }}" method="POST">
-                @csrf
-                <x-ui.card shadow="gray" headerColor="gray">
-                    <x-slot:titleSlot>Kata Sandi</x-slot:titleSlot>
+            <x-ui.card shadow="gray" headerColor="gray">
+                <x-slot:titleSlot><span class="italic">Kata Sandi</span></x-slot:titleSlot>
+                
+                <form action="{{ route('reseller.settings.password') }}" method="POST" class="flex flex-col gap-4 italic">
+                    @csrf
+                    <x-ui.input id="current_password" name="current_password" type="password" label="Sandi Lama" placeholder="••••••••" class="!border-gray-900" />
+                    <x-ui.input id="new_password" name="new_password" type="password" label="Sandi Baru" placeholder="Min. 8 karakter" class="!border-gray-900" />
                     
-                    <div class="flex flex-col gap-4">
-                        <x-ui.input id="sandi-lama-res" name="current_password" type="password" label="Sandi Lama" placeholder="••••••••" class="!border-gray-900" required />
-                        <x-ui.input id="sandi-baru-res" name="new_password" type="password" label="Sandi Baru" placeholder="Min. 8 karakter" class="!border-gray-900" required />
-                        <x-ui.input id="konfirmasi-sandi-res" name="new_password_confirmation" type="password" label="Konfirmasi" placeholder="Ketik ulang" class="!border-gray-900" required />
-                        
-                        <x-ui.button type="submit" variant="neutral" fullWidth="true" class="mt-1 shadow-[3px_3px_0_var(--color-primary-darkest)]">
-                            Perbarui Sandi
-                        </x-ui.button>
-                    </div>
-                </x-ui.card>
-            </form>
+                    <x-ui.button variant="neutral" fullWidth="true" class="mt-1 shadow-[3px_3px_0_var(--color-primary-darkest)] italic" type="submit">
+                        Perbarui Sandi
+                    </x-ui.button>
+                </form>
+            </x-ui.card>
 
             {{-- Info Rekening --}}
-            <form action="{{ route('reseller.settings.bank') }}" method="POST">
-                @csrf
-                <x-ui.card shadow="secondary" headerColor="secondary">
-                    <x-slot:titleSlot>Info Rekening</x-slot:titleSlot>
+            <x-ui.card shadow="secondary" headerColor="secondary">
+                <x-slot:titleSlot><span class="italic">Info Rekening</span></x-slot:titleSlot>
+                
+                <form action="{{ route('reseller.settings.bank') }}" method="POST" class="flex flex-col gap-4 italic">
+                    @csrf
+                    <x-ui.input id="bank_name" name="bank_name" label="Nama Bank" value="{{ old('bank_name', $user->bank_name) }}" class="!border-secondary" />
+                    <x-ui.input id="bank_account_number" name="bank_account_number" label="Nomor Rekening" value="{{ old('bank_account_number', $user->bank_account_number) }}" class="!border-secondary" />
+                    <x-ui.input id="bank_account_name" name="bank_account_name" label="Atas Nama" value="{{ old('bank_account_name', $user->bank_account_name) }}" class="!border-secondary" />
                     
-                    <div class="flex flex-col gap-4">
-                        <x-ui.input id="bank-reseller" name="bank_name" label="Nama Bank" value="{{ auth()->user()->bank_name }}" class="!border-secondary" required />
-                        <x-ui.input id="norek-reseller" name="bank_account_number" label="Nomor Rekening" value="{{ auth()->user()->bank_account_number }}" class="!border-secondary" required />
-                        <x-ui.input id="atasnama-reseller" name="bank_account_name" label="Atas Nama" value="{{ auth()->user()->bank_account_name }}" class="!border-secondary" required />
-                        
-                        <x-ui.button type="submit" variant="secondary" fullWidth="true" class="mt-1 shadow-[3px_3px_0_var(--color-gray-900)]">
-                            Perbarui Rekening
-                        </x-ui.button>
-                    </div>
-                </x-ui.card>
-            </form>
+                    <x-ui.button variant="secondary" fullWidth="true" class="mt-1 shadow-[3px_3px_0_var(--color-gray-900)] italic" type="submit">
+                        Perbarui Rekening
+                    </x-ui.button>
+                </form>
+            </x-ui.card>
         </div>
+    </div>
     </div>
 </x-layouts.dashboard>

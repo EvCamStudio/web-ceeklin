@@ -48,7 +48,7 @@ class AdminPanelSeeder extends Seeder
                 'bank_name' => 'BCA',
                 'bank_account_name' => 'PT DISTRIBUTOR SUKSES',
                 'bank_account_number' => '888000111',
-                'stock' => 1000
+                'stock' => 0
             ]
         );
 
@@ -81,5 +81,45 @@ class AdminPanelSeeder extends Seeder
         Setting::updateOrCreate(['key' => 'monthly_target_qty'], ['value' => '1000']);
         Setting::updateOrCreate(['key' => 'monthly_target_reward'], ['value' => '2500000']);
 
+        /*
+        // Seed Distributor Orders (Commented out for flow testing)
+        $distributor = User::where('username', 'distributor')->first();
+        if ($distributor) {
+            DistributorOrder::updateOrCreate(
+                ['order_number' => 'ORD-20240501-001'],
+                [
+                    'user_id' => $distributor->id,
+                    'quantity' => 100,
+                    'price' => 13000,
+                    'total_price' => 1300000,
+                    'status' => 'Menunggu Proses',
+                ]
+            );
+
+            DistributorOrder::updateOrCreate(
+                ['order_number' => 'ORD-20240502-002'],
+                [
+                    'user_id' => $distributor->id,
+                    'quantity' => 250,
+                    'price' => 13000,
+                    'total_price' => 3250000,
+                    'status' => 'Diproses',
+                ]
+            );
+
+            DistributorOrder::updateOrCreate(
+                ['order_number' => 'ORD-20240503-003'],
+                [
+                    'user_id' => $distributor->id,
+                    'quantity' => 500,
+                    'price' => 13000,
+                    'total_price' => 6500000,
+                    'status' => 'Dikirim',
+                    'tracking_number' => 'JKT12345678',
+                    'courier_name' => 'Kurir Pabrik'
+                ]
+            );
+        }
+        */
     }
 }

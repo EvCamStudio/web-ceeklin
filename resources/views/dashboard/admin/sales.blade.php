@@ -18,7 +18,7 @@
                 <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1 italic">Total Omzet (MTD)</p>
                 <h3 class="font-headline font-black text-3xl text-white tracking-tighter italic">Rp {{ number_format($totalOmzet ?? 0, 0, ',', '.') }}</h3>
                 <div class="flex items-center gap-2 mt-4 italic">
-                    <span class="bg-secondary text-gray-900 text-[9px] font-black px-1.5 py-0.5 italic">+{{ $growth ?? 0 }}%</span>
+                    <span class="bg-secondary text-gray-900 text-[9px] font-black px-1.5 py-0.5 italic">{{ $growth >= 0 ? '+' : '' }}{{ number_format($growth, 1) }}%</span>
                     <span class="text-[9px] font-bold text-white/50 uppercase italic">vs Bulan Lalu</span>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="bg-white p-6 border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] italic">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 italic">Aktivitas Terbaru</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 italic">Total Transaksi</p>
                 <h3 class="font-headline font-black text-3xl text-gray-900 tracking-tighter italic">{{ $totalTransactions ?? 0 }} <span class="text-sm italic">INV</span></h3>
                 <div class="w-full bg-neutral-border-light h-1.5 mt-5 border border-gray-900 italic">
                     <div class="bg-secondary h-full italic" style="width: 75%"></div>
@@ -40,10 +40,38 @@
             </div>
         </div>
 
+        {{-- Toolbar: Filter & Export --}}
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 italic">
+            <div class="flex flex-wrap gap-3 italic">
+                <div class="relative min-w-[200px] italic">
+                    <select x-model="reportPeriod" class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)] italic">
+                        <option>Hari Ini</option>
+                        <option>Minggu Ini</option>
+                        <option>Bulan Ini</option>
+                        <option>Kuartal Ini</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary italic">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 italic">
+                <button class="bg-primary text-white px-6 py-3 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center gap-3 italic">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    TARIK KE EXCEL
+                </button>
+            </div>
+        </div>
+
         {{-- Main Table: Transaction Detail --}}
         <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)] overflow-hidden mb-12 italic">
             <div class="bg-gray-900 px-8 py-4 flex justify-between items-center border-b-2 border-gray-900 italic">
                 <h4 class="font-headline font-black text-white text-sm uppercase tracking-widest italic">Rincian Transaksi Masuk</h4>
+                <div class="flex items-center gap-2 italic">
+                    <span class="w-2 h-2 bg-secondary rounded-full animate-pulse italic"></span>
+                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest italic">Live Updates</span>
+                </div>
             </div>
             
             <div class="overflow-x-auto italic">
@@ -59,33 +87,40 @@
                     </thead>
                     <tbody class="divide-y-2 divide-neutral-border italic">
                         @forelse($recentTransactions ?? [] as $txn)
-                        <tr class="hover:bg-neutral-light transition-colors group italic">
-                            <td class="px-8 py-5 italic">
-                                <p class="font-headline font-black text-sm text-gray-900 leading-none italic">{{ $txn->invoice_number }}</p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 italic">{{ $txn->created_at->translatedFormat('d M Y') }}</p>
-                            </td>
-                            <td class="px-6 py-5 italic">
-                                <p class="text-[11px] font-black text-gray-900 uppercase leading-none italic">{{ $txn->user->name }}</p>
-                                <p class="text-[9px] font-bold text-slate-500 uppercase mt-1 italic">{{ $txn->user->city_name }}</p>
-                            </td>
-                            <td class="px-6 py-5 text-center italic">
-                                <p class="font-headline font-black text-base text-primary tracking-tighter italic">{{ number_format($txn->quantity) }} PCS</p>
-                            </td>
-                            <td class="px-6 py-5 text-right italic">
-                                <p class="font-headline font-black text-lg text-gray-900 tracking-tighter italic">Rp {{ number_format($txn->total_price) }}</p>
-                            </td>
-                            <td class="px-6 py-5 text-center italic">
-                                <span class="px-3 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic border-secondary text-secondary bg-secondary/5">
-                                    {{ $txn->status }}
-                                </span>
-                            </td>
-                        </tr>
+                            <tr class="hover:bg-neutral-light transition-colors group italic">
+                                <td class="px-8 py-5 italic">
+                                    <p class="font-headline font-black text-sm text-gray-900 leading-none italic">{{ $txn->invoice_number }}</p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 italic">{{ $txn->created_at->translatedFormat('d M Y') }}</p>
+                                </td>
+                                <td class="px-6 py-5 italic">
+                                    <div class="flex items-center gap-3 italic">
+                                        <div class="w-8 h-8 flex items-center justify-center border-2 border-gray-900 font-headline font-black text-[10px] bg-primary text-white italic">
+                                            <span>{{ substr($txn->user->role ?? 'U', 0, 1) }}</span>
+                                        </div>
+                                        <div class="italic">
+                                            <p class="text-[11px] font-black text-gray-900 uppercase leading-none italic">{{ $txn->user->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase mt-1 italic">{{ $txn->user->city_name }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center italic">
+                                    <p class="font-headline font-black text-base text-primary tracking-tighter italic">{{ number_format($txn->quantity) }} PCS</p>
+                                </td>
+                                <td class="px-6 py-5 text-right italic">
+                                    <p class="font-headline font-black text-lg text-gray-900 tracking-tighter italic">Rp {{ number_format($txn->total_price) }}</p>
+                                </td>
+                                <td class="px-6 py-5 text-center italic">
+                                    <span class="px-3 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic {{ $txn->status === 'Selesai' ? 'border-secondary text-secondary bg-secondary/5' : 'border-orange-400 text-orange-500 bg-orange-50' }}">
+                                        {{ $txn->status }}
+                                    </span>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" class="py-10 text-center italic">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada transaksi</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="5" class="py-10 text-center italic">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada transaksi</p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -124,6 +159,9 @@
                 <p class="text-sm font-bold text-slate-700 leading-relaxed mb-4 italic">
                     Data diperbarui secara real-time berdasarkan invoice yang statusnya telah terverifikasi.
                 </p>
+                <div class="p-4 bg-white border-2 border-gray-900 italic text-[10px] font-bold text-slate-500 italic">
+                    *Data diperbarui secara real-time berdasarkan transaksi yang masuk ke sistem.
+                </div>
             </div>
         </div>
     </div>

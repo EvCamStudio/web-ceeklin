@@ -14,6 +14,8 @@ class AdminDashboardController extends Controller
         $distributorsCount = User::where('role', 'distributor')->count();
         $resellersCount = User::where('role', 'reseller')->where('status', 'active')->count();
         $pendingVerificationsCount = User::where('role', 'reseller')->where('status', 'pending')->count();
+        $pendingDistributorOrdersCount = \App\Models\DistributorOrder::where('status', 'Menunggu Proses')->count();
+        $pendingBonusRequestsCount = \App\Models\BonusAllocation::where('status', 'pending')->count();
         
         // Provinces with active distributors
         $provincesCount = User::where('role', 'distributor')
@@ -26,8 +28,8 @@ class AdminDashboardController extends Controller
             ->get()
             ->map(function ($user) {
                 return [
-                    'title' => $user->role === 'distributor' ? "{$user->name} mendaftar" : "Pendaftaran Reseller: {$user->name}",
-                    'subtitle' => $user->role === 'distributor' ? "Distributor Baru — " . ($user->province_name ?? 'N/A') : "Reseller Baru — " . ($user->city_name ?? 'N/A'),
+                    'icon' => $user->role === 'distributor' ? '📦' : '🛡️',
+                    'msg' => $user->role === 'distributor' ? "Distributor baru: {$user->name} mendaftar" : "Reseller baru: {$user->name} menunggu verifikasi",
                     'time' => $user->created_at->diffForHumans(),
                 ];
             });
@@ -59,25 +61,74 @@ class AdminDashboardController extends Controller
 
         $recentTransactions = $distributorOrders->concat($resellerOrders)->sortByDesc('created_at')->take(5);
 
+        // Top Performers (based on volume)
+        $topPerformers = \App\Models\DistributorOrder::where('status', 'Selesai')
+            ->with('user')
+            ->select('user_id', DB::raw('SUM(quantity) as total_volume'))
+            ->groupBy('user_id')
+            ->orderBy('total_volume', 'desc')
+            ->take(3)
+            ->get();
+
+        $totalCentralStock = User::where('role', 'distributor')->sum('stock');
+
         return view('dashboard.admin', compact(
             'distributorsCount',
             'resellersCount',
             'pendingVerificationsCount',
+            'pendingDistributorOrdersCount',
+            'pendingBonusRequestsCount',
             'provincesCount',
             'recentActivity',
-            'recentTransactions'
+            'recentTransactions',
+            'topPerformers',
+            'totalCentralStock'
         ));
     }
 
     public function mapping()
     {
-        $distributors = User::where('role', 'distributor')
-            ->with(['resellers' => function($query) {
-                $query->orderBy('name');
-            }])
-            ->get();
+        $allResellers = User::where('role', 'reseller')
+            ->with(['upline', 'city'])
+            ->get()
+            ->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'city' => $user->city_name ?? 'N/A',
+                    'city_id' => $user->city_id,
+                    'old_dist' => $user->upline->name ?? 'Pusat',
+                    'dist_city' => $user->upline->city_name ?? 'N/A',
+                    'stock' => $user->upline->stock ?? 0,
+                ];
+            });
 
-        return view('dashboard.admin.mapping', compact('distributors'));
+        $priorityResellers = $allResellers->filter(fn($r) => $r['stock'] <= 0 && $r['old_dist'] !== 'Pusat');
+        
+        $optimizeResellers = $allResellers->filter(function($r) {
+            // Logic: Current distributor is NOT in the same city as reseller, 
+            // BUT there is another distributor in the same city as reseller.
+            $hasLocalDistributor = User::where('role', 'distributor')
+                ->where('city_id', $r['city_id'])
+                ->exists();
+            
+            return $r['city'] !== $r['dist_city'] && $hasLocalDistributor;
+        });
+
+        $distributors = User::where('role', 'distributor')
+            ->with('city')
+            ->get()
+            ->map(function($d) {
+                return [
+                    'id' => $d->id,
+                    'name' => $d->name,
+                    'city' => $d->city_name ?? 'N/A',
+                    'city_id' => $d->city_id,
+                    'stock' => number_format($d->stock)
+                ];
+            });
+
+        return view('dashboard.admin.mapping', compact('allResellers', 'priorityResellers', 'optimizeResellers', 'distributors'));
     }
 
     public function pricing()
@@ -93,29 +144,55 @@ class AdminDashboardController extends Controller
         $targetQty = \App\Models\Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
         $targetReward = \App\Models\Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
         
-        $bonusAllocations = \App\Models\BonusAllocation::with('user')->latest()->get();
+        $bonusRequests = \App\Models\BonusAllocation::where('status', 'pending')
+            ->with(['user', 'user.upline'])
+            ->latest()
+            ->get();
 
-        return view('dashboard.admin.bonus', compact('targetQty', 'targetReward', 'bonusAllocations'));
+        // Reseller Leaderboard
+        $leaderboard = \App\Models\ResellerOrder::where('status', 'Selesai')
+            ->with(['reseller', 'reseller.upline'])
+            ->select('reseller_id', DB::raw('SUM(quantity) as total_sales'))
+            ->groupBy('reseller_id')
+            ->orderBy('total_sales', 'desc')
+            ->get()
+            ->map(function($item) use ($targetQty, $targetReward) {
+                $item->progress = min(100, round(($item->total_sales / $targetQty) * 100));
+                $item->potential = 'Rp ' . number_format($item->total_sales * 15, 0, ',', '.'); // Example potential
+                return $item;
+            });
+
+        return view('dashboard.admin.bonus', compact('targetQty', 'targetReward', 'bonusRequests', 'leaderboard'));
     }
 
     public function distributorOrders()
     {
-        $orders = \App\Models\DistributorOrder::with('user')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function($order) {
-                // Mapping status to colors for the view
-                $colors = [
-                    'Menunggu Proses' => 'bg-red-100 text-red-800 border-red-300',
-                    'Diproses'        => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                    'Dikirim'         => 'bg-blue-100 text-blue-800 border-blue-300',
-                    'Selesai'         => 'bg-green-100 text-green-800 border-green-300',
-                ];
-                $order->statusColor = $colors[$order->status] ?? 'bg-gray-100 text-gray-800 border-gray-300';
-                return $order;
-            });
+        $orders = \App\Models\DistributorOrder::with('user')->latest()->get()->map(function($order) {
+            return [
+                'id' => $order->order_number ?? ('ORD-' . $order->id),
+                'db_id' => $order->id,
+                'name' => $order->user->name,
+                'phone' => $order->user->phone,
+                'city' => ($order->user->city_name ?? 'N/A') . ', ' . ($order->user->province_name ?? ''),
+                'qty' => $order->quantity,
+                'status' => $order->status,
+                'date' => $order->created_at->translatedFormat('d M Y, H:i'),
+                'items' => 'CeeKlin 450ml (x' . number_format($order->quantity) . ')',
+                'total' => 'Rp ' . number_format($order->quantity * 13000, 0, ',', '.'),
+                'method' => $order->payment_method ?? 'Manual Transfer',
+                'note' => $order->notes ?? '',
+                'courier_name' => $order->courier_name ?? '',
+                'tracking_number' => $order->tracking_number ?? ''
+            ];
+        });
 
-        return view('dashboard.admin.distributor-orders', compact('orders'));
+        $stats = [
+            'Menunggu' => $orders->where('status', 'Menunggu Proses')->count(),
+            'Dikemas' => $orders->where('status', 'Diproses')->count(),
+            'Dikirim' => $orders->where('status', 'Dikirim')->count(),
+        ];
+
+        return view('dashboard.admin.distributor-orders', compact('orders', 'stats'));
     }
 
     public function sales()
@@ -189,7 +266,9 @@ class AdminDashboardController extends Controller
         $request->validate([
             'order_id' => 'required|exists:distributor_orders,id',
             'status' => 'required',
-            'tracking_number' => 'nullable|string'
+            'tracking_number' => 'required_if:status,Dikirim',
+            'courier_name' => 'required_if:status,Dikirim',
+            'note' => 'nullable|string'
         ]);
 
         $order = \App\Models\DistributorOrder::findOrFail($request->order_id);
@@ -202,7 +281,9 @@ class AdminDashboardController extends Controller
 
         $order->update([
             'status' => $request->status,
-            'tracking_number' => $request->tracking_number
+            'tracking_number' => $request->tracking_number,
+            'courier_name' => $request->courier_name,
+            'notes' => $request->note
         ]);
 
         return back()->with('success', 'Status pesanan distributor berhasil diperbarui.');
@@ -247,8 +328,73 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.mapping')->with('success', 'Reseller berhasil dimigrasikan.');
     }
 
+    public function approveBonus(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:bonus_allocations,id'
+        ]);
+
+        $bonus = \App\Models\BonusAllocation::findOrFail($request->request_id);
+        $bonus->update(['status' => 'paid']);
+
+        return back()->with('success', 'Pencairan bonus berhasil disetujui.');
+    }
+
+    public function rejectBonus(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:bonus_allocations,id'
+        ]);
+
+        $bonus = \App\Models\BonusAllocation::findOrFail($request->request_id);
+        $bonus->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Pengajuan bonus telah ditangguhkan.');
+    }
+
     public function requests()
     {
-        return view('dashboard.admin.requests');
+        $adjustments = \App\Models\StockAdjustment::with(['user', 'user.city'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        return view('dashboard.admin.requests', compact('adjustments'));
+    }
+
+    public function approveAdjustment(Request $request)
+    {
+        $request->validate(['request_id' => 'required|exists:stock_adjustments,id']);
+        
+        $adjustment = \App\Models\StockAdjustment::findOrFail($request->request_id);
+        
+        if ($adjustment->status !== 'pending') {
+            return back()->with('error', 'Pengajuan ini sudah diproses.');
+        }
+
+        // Update Stock
+        $user = $adjustment->user;
+        $user->stock = $adjustment->physical_stock;
+        $user->save();
+
+        $adjustment->update(['status' => 'approved']);
+
+        return back()->with('success', 'Sinkronisasi stok berhasil disetujui dan diperbarui.');
+    }
+
+    public function rejectAdjustment(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:stock_adjustments,id',
+            'note' => 'nullable|string'
+        ]);
+
+        $adjustment = \App\Models\StockAdjustment::findOrFail($request->request_id);
+        $adjustment->update([
+            'status' => 'rejected',
+            'admin_note' => $request->note
+        ]);
+
+        return back()->with('success', 'Pengajuan sinkronisasi telah ditolak.');
     }
 }

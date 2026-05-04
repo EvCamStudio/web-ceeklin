@@ -17,8 +17,23 @@
         showSuccess: false,
         successMsg: '',
         syncRequests: [
-            { id: 'SYNC-102', requester: 'PT Tirta Makmur', type: 'Distributor', city: 'Bandung', province: 'Jawa Barat', phone: '08123456789', current: 2450, actual: 2500, diff: '+50', reason: 'Kelebihan kirim dari pabrik setelah audit internal. Data pengiriman fisik menunjukkan 2500 botol namun di sistem hanya tercatat 2450 botol.', status: 'Menunggu', date: 'Hari ini, 09:15' },
-            { id: 'SYNC-101', requester: 'CV Bintang Selatan', type: 'Distributor', city: 'Surabaya', province: 'Jawa Timur', phone: '08987654321', current: 1500, actual: 1300, diff: '-200', reason: 'Kebocoran atap gudang mengakibatkan stok rusak sebanyak 200 botol. Foto bukti sudah dilampirkan ke admin via WA.', status: 'Menunggu', date: 'Kemarin, 16:45' }
+            @foreach($adjustments as $adj)
+            { 
+                db_id: {{ $adj->id }},
+                id: 'SYNC-{{ 1000 + $adj->id }}', 
+                requester: '{{ addslashes($adj->user->name) }}', 
+                type: 'Distributor', 
+                city: '{{ $adj->user->city_name ?? "N/A" }}', 
+                province: '{{ $adj->user->province_name ?? "N/A" }}', 
+                phone: '{{ $adj->user->phone }}', 
+                current: {{ $adj->system_stock }}, 
+                actual: {{ $adj->physical_stock }}, 
+                diff: '{{ ($adj->physical_stock - $adj->system_stock) > 0 ? "+" . ($adj->physical_stock - $adj->system_stock) : ($adj->physical_stock - $adj->system_stock) }}', 
+                reason: '{{ addslashes($adj->reason) }}', 
+                status: 'Menunggu', 
+                date: '{{ $adj->created_at->diffForHumans() }}' 
+            },
+            @endforeach
         ],
         openDetail(req) {
             this.selectedRequest = req;
@@ -30,22 +45,10 @@
             this.selectedRequest = null;
         },
         handleConfirm() {
-            // BACKEND-TODO: Kirim request AJAX ke controller untuk update stok
-            this.viewMode = 'list';
-            this.syncRequests = this.syncRequests.filter(r => r.id !== this.selectedRequest.id);
-            this.successMsg = 'Sinkronisasi Stok Berhasil Disetujui!';
-            this.showSuccess = true;
-            this.selectedRequest = null;
-            setTimeout(() => { this.showSuccess = false; }, 3000);
+            this.$refs.approveForm.submit();
         },
         handleReject() {
-            // BACKEND-TODO: Kirim request AJAX ke controller untuk tolak pengajuan
-            this.viewMode = 'list';
-            this.syncRequests = this.syncRequests.filter(r => r.id !== this.selectedRequest.id);
-            this.successMsg = 'Pengajuan Sinkronisasi Telah Ditolak.';
-            this.showSuccess = true;
-            this.selectedRequest = null;
-            setTimeout(() => { this.showSuccess = false; }, 3000);
+            this.$refs.rejectForm.submit();
         },
         getWaLink(req) {
             const phone = (req.phone ?? '').replace(/\D/g, '');
@@ -64,6 +67,13 @@
                 );
             }
             return res;
+        },
+        init() {
+            @if(session('success'))
+                this.successMsg = '{{ session('success') }}';
+                this.showSuccess = true;
+                setTimeout(() => { this.showSuccess = false; }, 4000);
+            @endif
         }
     }">
         <div x-show="viewMode === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
@@ -97,7 +107,6 @@
             </div>
         </div>
 
-        {{-- Success Alert (Center Position) --}}
         <div class="fixed top-8 left-0 right-0 z-[10002] flex justify-center pointer-events-none px-4">
             <div x-show="showSuccess" 
                  x-transition:enter="transition ease-out duration-500" 
@@ -114,6 +123,16 @@
                 <span class="font-headline font-black text-[11px] uppercase tracking-widest leading-tight" x-text="successMsg"></span>
             </div>
         </div>
+
+        <form x-ref="approveForm" action="{{ route('admin.requests.approve') }}" method="POST" style="display: none;">
+            @csrf
+            <input type="hidden" name="request_id" :value="selectedRequest?.db_id">
+        </form>
+
+        <form x-ref="rejectForm" action="{{ route('admin.requests.reject') }}" method="POST" style="display: none;">
+            @csrf
+            <input type="hidden" name="request_id" :value="selectedRequest?.db_id">
+        </form>
 
         {{-- CONTENT: TAB SINKRONISASI STOK --}}
         <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">

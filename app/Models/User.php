@@ -61,6 +61,16 @@ class User extends Authenticatable
         return \Laravolt\Indonesia\Models\City::where('code', $this->city_id)->value('name') ?? $this->city_id;
     }
 
+    public function province()
+    {
+        return $this->belongsTo(\Laravolt\Indonesia\Models\Province::class, 'province_id', 'code');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(\Laravolt\Indonesia\Models\City::class, 'city_id', 'code');
+    }
+
     public function resellers()
     {
         return $this->hasMany(User::class, 'upline_id');
@@ -69,6 +79,11 @@ class User extends Authenticatable
     public function upline()
     {
         return $this->belongsTo(User::class, 'upline_id');
+    }
+
+    public function resellerOrders()
+    {
+        return $this->hasMany(ResellerOrder::class, 'reseller_id');
     }
 
     protected static function booted()

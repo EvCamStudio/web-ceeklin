@@ -50,14 +50,20 @@ Route::prefix('dashboard/admin')->middleware(['auth'])->group(function () {
     Route::get('/mapping', [App\Http\Controllers\Admin\AdminDashboardController::class, 'mapping'])->name('admin.mapping');
     Route::post('/mapping/migrate', [App\Http\Controllers\Admin\AdminDashboardController::class, 'migrateReseller'])->name('admin.mapping.migrate');
     Route::get('/pricing', [App\Http\Controllers\Admin\AdminDashboardController::class, 'pricing'])->name('admin.pricing');
+    Route::get('/pricing/update', function() { return redirect()->route('admin.pricing'); });
     Route::post('/pricing/update', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updatePricing'])->name('admin.pricing.update');
     Route::get('/bonus', [App\Http\Controllers\Admin\AdminDashboardController::class, 'bonus'])->name('admin.bonus');
+    Route::get('/bonus/update', function() { return redirect()->route('admin.bonus'); });
     Route::post('/bonus/update', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateBonusSettings'])->name('admin.bonus.update');
+    Route::post('/bonus/approve', [App\Http\Controllers\Admin\AdminDashboardController::class, 'approveBonus'])->name('admin.bonus.approve');
+    Route::post('/bonus/reject', [App\Http\Controllers\Admin\AdminDashboardController::class, 'rejectBonus'])->name('admin.bonus.reject');
     Route::get('/distributor-orders', [App\Http\Controllers\Admin\AdminDashboardController::class, 'distributorOrders'])->name('admin.distributor-orders');
     Route::post('/distributor-orders/update-status', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateDistributorOrderStatus'])->name('admin.distributor-orders.update-status');
     Route::get('/sales', [App\Http\Controllers\Admin\AdminDashboardController::class, 'sales'])->name('admin.sales');
     Route::get('/settings', [App\Http\Controllers\Admin\AdminDashboardController::class, 'settings'])->name('admin.settings');
     Route::get('/requests', [App\Http\Controllers\Admin\AdminDashboardController::class, 'requests'])->name('admin.requests');
+    Route::post('/requests/approve', [App\Http\Controllers\Admin\AdminDashboardController::class, 'approveAdjustment'])->name('admin.requests.approve');
+    Route::post('/requests/reject', [App\Http\Controllers\Admin\AdminDashboardController::class, 'rejectAdjustment'])->name('admin.requests.reject');
     
     Route::prefix('distributors')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\DistributorController::class, 'index'])->name('admin.distributors.index');
@@ -75,6 +81,7 @@ Route::prefix('dashboard/admin')->middleware(['auth'])->group(function () {
 Route::prefix('dashboard/distributor')->middleware(['auth'])->group(function () {
     Route::get('/', [DistributorDashboardController::class, 'overview'])->name('distributor.overview');
     Route::get('/inventory', [DistributorDashboardController::class, 'inventory'])->name('distributor.inventory');
+    Route::post('/inventory', [DistributorDashboardController::class, 'syncInventory'])->name('distributor.inventory.sync');
     Route::get('/incoming-orders', [DistributorDashboardController::class, 'incomingOrders'])->name('distributor.incoming-orders');
     Route::post('/incoming-orders/update-status', [DistributorDashboardController::class, 'updateOrderStatus'])->name('distributor.incoming-orders.update');
     Route::post('/incoming-orders/cancel', [DistributorDashboardController::class, 'cancelOrder'])->name('distributor.incoming-orders.cancel');
