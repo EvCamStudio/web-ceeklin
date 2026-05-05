@@ -85,8 +85,14 @@ class ResellerDashboardController extends Controller
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:50', // Updated min to 50
         ]);
+
+        // BACKEND-TODO: Handle these new fields from the multi-step checkout
+        // $paymentMethod = $request->input('payment_method');
+        // $paymentSubMethod = $request->input('payment_sub_method');
+        // $shippingAddress = $request->input('shipping_address');
+        // $shippingNote = $request->input('shipping_note');
 
         $resellerPrice = Pricing::where('tier', 'reseller')->first()->price ?? 15000;
         $totalPrice = $request->quantity * $resellerPrice;
@@ -99,9 +105,11 @@ class ResellerDashboardController extends Controller
             'total_price' => $totalPrice,
             'status' => 'Menunggu Konfirmasi',
             'payment_status' => 'Belum Dibayar',
+            'note' => $request->input('shipping_note'), // Map note to model
         ]);
 
-        return redirect()->route('reseller.history')->with('success', 'Pesanan berhasil dibuat. Silakan hubungi distributor Anda untuk pembayaran.');
+        // Redirect back with order_success to show the success view in the frontend
+        return redirect()->route('reseller.order')->with('order_success', true);
     }
 
     public function history()

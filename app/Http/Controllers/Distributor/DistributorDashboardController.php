@@ -412,7 +412,7 @@ class DistributorDashboardController extends Controller
             'status' => 'Menunggu Proses'
         ]);
 
-        return back()->with('success', 'Pesanan restock berhasil dikirim ke pabrik.');
+        return back()->with('order_success', true);
     }
 
     public function updateProfile(Request $request)

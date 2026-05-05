@@ -19,6 +19,8 @@
         rejectReason: '',
         filterRegion: 'Semua Wilayah',
         searchQuery: '',
+        distFilter: 'same',
+        distSearch: '',
         selectedDistributorId: '',
         distributors: {{ json_encode($distributors) }},
         get distributorMap() {
@@ -27,6 +29,10 @@
                 map[d.id] = d.name;
             });
             return map;
+        },
+        get sameRegionCount() {
+            if (!this.selectedReseller) return 0;
+            return this.distributors.filter(d => d.province_id == this.selectedReseller.province_id).length;
         },
         openVerification(reseller) {
             this.selectedReseller = reseller;
@@ -418,75 +424,123 @@
                             @csrf
                             <input type="hidden" name="reseller_id" :value="selectedReseller?.id">
 
-                            {{-- UI Filter Front-End --}}
-                            <div class="bg-gray-50 border-[3px] border-gray-200 p-4 relative">
-                                <span class="absolute -top-3 left-4 bg-white px-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Filter Tampilan (UI)</span>
-                                <div class="w-full md:w-1/2">
-                                    <div class="relative">
-                                        <select aria-label="Filter Wilayah" class="appearance-none w-full bg-white border-[2px] border-gray-300 px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:border-primary cursor-pointer pr-8">
-                                            <option value="all">Tampilkan Semua Distributor</option>
-                                            <option value="same">Hanya Wilayah Sama</option>
-                                            <option value="other">Peralihan Wilayah Saja</option>
-                                        </select>
-                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            {{-- Filter Distributor yang Lebih User Friendly --}}
+                            <div class="flex flex-col gap-4 mb-6">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div class="flex p-1 bg-neutral-light border-2 border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)]">
+                                        <button type="button" @click="distFilter = 'same'"
+                                            :class="distFilter === 'same' ? 'bg-primary text-white shadow-[2px_2px_0_rgba(0,0,0,0.2)]' : 'text-slate-400 hover:text-primary'"
+                                            class="px-4 py-2 font-headline font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2">
+                                            <span>Wilayah Sama</span>
+                                            <span class="px-1.5 py-0.5 bg-black/10 text-[9px] rounded-sm" x-text="sameRegionCount"></span>
+                                        </button>
+                                        <button type="button" @click="distFilter = 'all'"
+                                            :class="distFilter === 'all' ? 'bg-primary text-white shadow-[2px_2px_0_rgba(0,0,0,0.2)]' : 'text-slate-400 hover:text-primary'"
+                                            class="px-4 py-2 font-headline font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2">
+                                            <span>Semua Wilayah</span>
+                                            <span class="px-1.5 py-0.5 bg-black/10 text-[9px] rounded-sm" x-text="distributors.length"></span>
+                                        </button>
+                                    </div>
+
+                                    <div class="relative flex-grow max-w-md">
+                                        <input type="text" x-model="distSearch" placeholder="Cari nama distributor..."
+                                            class="w-full bg-white border-[3px] border-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.03)]">
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-primary opacity-50">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                         </div>
                                     </div>
-                                    <p class="text-[8px] text-slate-400 mt-1.5 uppercase font-bold">BACKEND-TODO: Hubungkan filter ini untuk menyortir option di bawah</p>
                                 </div>
-                            </div>
-
-                            {{-- Pilih Distributor --}}
-                            <div>
-                                <label class="text-[10px] font-bold text-primary uppercase tracking-widest block mb-2">
-                                    Pilih Distributor <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <select name="distributor_id" x-model="selectedDistributorId" required
-                                        class="appearance-none w-full bg-white border-[3px] border-primary px-4 py-3 font-body text-sm font-bold text-primary focus:outline-none focus:border-secondary transition-colors cursor-pointer pr-8">
-                                        <option value="">-- Pilih Distributor --</option>
-                                        <template x-for="dist in distributors" :key="dist.id">
-                                            <option :value="dist.id" x-text="dist.name + (dist.province_id == selectedReseller?.province_id ? ' (Wilayah Sama)' : '')"></option>
-                                        </template>
-                                    </select>
-                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                
+                                {{-- Instruksi Cerdas Jika Kosong --}}
+                                <div x-show="distFilter === 'same' && sameRegionCount === 0" x-transition
+                                     class="bg-yellow-50 border-l-[6px] border-yellow-400 p-5 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-10 h-10 bg-yellow-400 flex items-center justify-center flex-shrink-0 border-2 border-yellow-600">
+                                            <svg class="w-6 h-6 text-yellow-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-headline font-black text-yellow-900 text-xs uppercase tracking-widest mb-1">Wilayah Ini Belum Tercover!</p>
+                                            <p class="text-[11px] font-bold text-yellow-800 leading-tight mb-3">
+                                                Belum ada distributor yang terdaftar di <span class="underline" x-text="selectedReseller?.province"></span>. 
+                                                Silakan gunakan tombol di bawah untuk mencari distributor di provinsi lain.
+                                            </p>
+                                            <button type="button" @click="distFilter = 'all'"
+                                                class="bg-yellow-400 text-yellow-900 px-4 py-2 text-[9px] font-black uppercase tracking-widest border-2 border-yellow-600 hover:bg-yellow-500 transition-all shadow-[2px_2px_0_var(--color-yellow-600)] active:translate-y-0.5 active:shadow-none">
+                                                Pindah ke Semua Wilayah &rarr;
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {{-- Info Distributor Terpilih --}}
-                                <div x-show="selectedDistributorId" x-transition style="display:none;" class="mt-4 border-[3px] border-gray-900 bg-white p-4 shadow-[4px_4px_0_var(--color-gray-900)]">
-                                    <template x-if="selectedDistributorId">
-                                        <div class="flex flex-col gap-3">
-                                            <div class="flex justify-between items-start">
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Distributor Terpilih</p>
-                                                    <p class="font-headline font-black text-lg text-primary uppercase" x-text="distributors.find(d => d.id == selectedDistributorId)?.name"></p>
-                                                </div>
-                                                <span class="px-3 py-1 border-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-[2px_2px_0_rgba(0,0,0,0.2)]"
-                                                      :class="distributors.find(d => d.id == selectedDistributorId)?.province_id == selectedReseller?.province_id ? 'border-green-600 text-green-700 bg-green-300' : 'border-yellow-600 text-yellow-800 bg-yellow-400'"
-                                                      x-text="distributors.find(d => d.id == selectedDistributorId)?.province_id == selectedReseller?.province_id ? 'Satu Wilayah' : 'Peralihan Wilayah'"></span>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic" x-show="distFilter === 'same' && sameRegionCount > 0">
+                                    * Menampilkan <span class="text-secondary" x-text="sameRegionCount"></span> distributor di <span class="text-secondary" x-text="selectedReseller?.province"></span>
+                                </p>
+                            </div>
+
+                            {{-- Pilih Distributor dalam Bentuk Grid Kartu --}}
+                            <div class="flex flex-col gap-3">
+                                <label class="text-[10px] font-bold text-primary uppercase tracking-widest block mb-1">
+                                    Pilih Distributor Yang Akan Menangani <span class="text-red-500">*</span>
+                                </label>
+                                
+                                {{-- Hidden Input untuk Form --}}
+                                <input type="hidden" name="distributor_id" :value="selectedDistributorId" required>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2 border-2 border-dashed border-gray-200 bg-neutral/30 scrollbar-thin scrollbar-thumb-primary">
+                                    <template x-for="dist in distributors.filter(d => 
+                                        (distFilter === 'all' || d.province_id == selectedReseller?.province_id) &&
+                                        (!distSearch || d.name.toLowerCase().includes(distSearch.toLowerCase()))
+                                    )" :key="dist.id">
+                                        <div @click="selectedDistributorId = dist.id"
+                                             :class="selectedDistributorId == dist.id ? 'border-primary bg-primary/5 shadow-[6px_6px_0_var(--color-primary)] -translate-x-1 -translate-y-1' : 'border-gray-300 bg-white hover:border-primary hover:shadow-[4px_4px_0_rgba(0,0,0,0.1)]'"
+                                             class="cursor-pointer border-[3px] p-4 transition-all duration-200 flex flex-col justify-between gap-4 relative overflow-hidden group">
+                                            
+                                            {{-- Selected Badge --}}
+                                            <div x-show="selectedDistributorId == dist.id" class="absolute top-0 right-0 bg-primary text-white p-1 shadow-[-2px_2px_0_var(--color-gray-900)] border-b-2 border-l-2 border-gray-900">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4 border-t-2 border-dashed border-gray-300 pt-4 mt-2">
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Wilayah Operasional</p>
-                                                    <p class="font-bold text-gray-900 text-sm uppercase" x-text="distributors.find(d => d.id == selectedDistributorId)?.province_name || distributors.find(d => d.id == selectedDistributorId)?.city_name || '-'"></p>
+
+                                            <div>
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <h5 class="font-headline font-black text-sm text-primary uppercase leading-tight pr-6" x-text="dist.name"></h5>
                                                 </div>
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Kontak PIC</p>
-                                                    <p class="font-bold text-gray-900 text-sm" x-text="distributors.find(d => d.id == selectedDistributorId)?.phone || 'Tidak tersedia'"></p>
+                                                <div class="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">
+                                                    <svg class="w-3 h-3 text-secondary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                                    <span x-text="dist.province_name || 'Nasional'"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center justify-between border-t border-dashed border-gray-200 pt-3">
+                                                <div class="flex flex-col">
+                                                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Stok Tersedia</span>
+                                                    <span :class="(dist.current_stock ?? 0) < 100 ? 'text-red-600' : 'text-green-600'" 
+                                                          class="font-headline font-black text-base" 
+                                                          x-text="(dist.current_stock ?? 0).toLocaleString('id-ID') + ' PCS'"></span>
+                                                </div>
+                                                <div :class="dist.province_id == selectedReseller?.province_id ? 'bg-green-100 text-green-700 border-green-600' : 'bg-yellow-100 text-yellow-800 border-yellow-600'"
+                                                     class="px-2 py-0.5 border text-[8px] font-black uppercase tracking-widest"
+                                                     x-text="dist.province_id == selectedReseller?.province_id ? 'Wilayah Sama' : 'Beda Wilayah'">
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
+
+                                    {{-- Empty Grid State --}}
+                                    <template x-if="distributors.filter(d => (distFilter === 'all' || d.province_id == selectedReseller?.province_id) && (!distSearch || d.name.toLowerCase().includes(distSearch.toLowerCase()))).length === 0">
+                                        <div class="col-span-full py-12 flex flex-col items-center justify-center opacity-50 italic">
+                                            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            <p class="text-[10px] font-bold uppercase tracking-widest">Tidak ada distributor yang ditemukan</p>
+                                        </div>
+                                    </template>
                                 </div>
 
+                                {{-- Warning Info jika Beda Wilayah --}}
                                 <div x-show="selectedDistributorId && distributors.find(d => d.id == selectedDistributorId)?.province_id != selectedReseller?.province_id" x-transition style="display:none;"
-                                     class="mt-4 bg-yellow-400 border-[3px] border-yellow-600 p-4 shadow-[4px_4px_0_var(--color-yellow-600)] flex gap-3 items-start">
+                                     class="mt-2 bg-yellow-400 border-[3px] border-yellow-600 p-4 shadow-[4px_4px_0_var(--color-yellow-600)] flex gap-3 items-start">
                                     <svg class="w-6 h-6 text-yellow-900 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <div>
-                                        <p class="text-[11px] font-black text-yellow-900 uppercase tracking-widest mb-1">PERHATIAN: PENGALIHAN WILAYAH</p>
-                                        <p class="text-[10px] font-bold text-yellow-800 leading-tight">Distributor ini berada di wilayah yang berbeda dengan pendaftar. Pastikan alasan pengalihan sudah sesuai dengan kebijakan sebelum menyetujui.</p>
+                                        <p class="text-[10px] font-black text-yellow-900 uppercase tracking-widest mb-1">PERHATIAN: PENGALIHAN WILAYAH</p>
+                                        <p class="text-[9px] font-bold text-yellow-800 leading-tight">Distributor terpilih berada di luar wilayah pendaftar. Pastikan ini adalah keputusan yang disengaja.</p>
                                     </div>
                                 </div>
                             </div>

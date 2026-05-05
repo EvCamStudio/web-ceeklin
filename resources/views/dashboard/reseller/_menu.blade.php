@@ -1,5 +1,6 @@
 @php
     $currentPage = request()->segment(3) ?? 'overview';
+    $type = request()->query('type');
 
     $menuGroups = [
         [
@@ -24,20 +25,26 @@
                 ],
                 [
                     'key'   => 'history',
-                    'name'  => 'Pesanan Saya',
+                    'name'  => 'Pelacakan Pesanan',
                     'route' => '/dashboard/reseller/history',
                     'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />',
                 ],
             ],
         ],
         [
-            'label' => 'Program',
+            'label' => 'Program & Keuangan',
             'items' => [
                 [
-                    'key'   => 'referrals',
-                    'name'  => 'Referral & Bonus',
-                    'route' => '/dashboard/reseller/referrals',
-                    'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />',
+                    'key'   => 'target',
+                    'name'  => 'Bonus Target',
+                    'route' => '/dashboard/reseller/referrals?type=target',
+                    'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />',
+                ],
+                [
+                    'key'   => 'referral',
+                    'name'  => 'Kode Referral',
+                    'route' => '/dashboard/reseller/referrals?type=referral',
+                    'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />',
                 ],
             ],
         ],
@@ -64,9 +71,17 @@
         {{-- Group Items --}}
         @foreach($group['items'] as $menu)
             @php
-                $isActive = ($menu['key'] === 'overview')
-                    ? ($currentPage === 'overview' || request()->is('dashboard/reseller'))
-                    : ($currentPage === $menu['key']);
+                // Logic to check active state based on route and query param
+                $isActive = false;
+                if ($menu['key'] === 'overview') {
+                    $isActive = ($currentPage === 'overview' || request()->is('dashboard/reseller'));
+                } elseif ($menu['key'] === 'target') {
+                    $isActive = ($currentPage === 'referrals' && request()->query('type') === 'target');
+                } elseif ($menu['key'] === 'referral') {
+                    $isActive = ($currentPage === 'referrals' && request()->query('type') === 'referral');
+                } else {
+                    $isActive = ($currentPage === $menu['key']);
+                }
 
                 $activeClass = $isActive
                     ? 'bg-white/10 text-secondary border-l-[5px] border-secondary'
