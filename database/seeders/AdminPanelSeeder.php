@@ -74,8 +74,8 @@ class AdminPanelSeeder extends Seeder
         );
 
         // Default Pricing
-        Pricing::updateOrCreate(['tier' => 'distributor'], ['price' => 1250000]);
-        Pricing::updateOrCreate(['tier' => 'reseller'], ['price' => 1450000]);
+        Pricing::updateOrCreate(['tier' => 'distributor'], ['price' => 13000]);
+        Pricing::updateOrCreate(['tier' => 'reseller'], ['price' => 15000]);
 
         // Default Settings
         Setting::updateOrCreate(['key' => 'monthly_target_qty'], ['value' => '1000']);

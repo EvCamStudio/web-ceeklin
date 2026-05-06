@@ -5,29 +5,39 @@
     <x-slot:topbarTitle>RIWAYAT PESANAN</x-slot:topbarTitle>
     <x-slot:menuSlot>@include('dashboard.distributor._menu')</x-slot:menuSlot>
 
-    <div class="max-w-[1400px] mx-auto w-full relative" x-data="{ 
-        viewMode: 'list', 
-        selectedOrder: null,
-        showAll: false,
-        confirmMode: false,
-        history: {{ $history->toJson() }},
-        checklist: { qty: false, quality: false, original: false },
-        openDetail(order) {
-            this.selectedOrder = order;
-            this.viewMode = 'detail';
-            this.confirmMode = false;
-            this.checklist = { qty: false, quality: false, original: false };
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        },
-        confirmReceived() {
-            if(this.canConfirm()) {
-                this.$refs.confirmForm.submit();
-            }
-        },
-        canConfirm() {
-            return this.checklist.qty && this.checklist.quality && this.checklist.original;
-        }
-    }">
+    <div class="max-w-[1400px] mx-auto w-full relative" x-data="distributorHistory">
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('distributorHistory', () => ({
+                    viewMode: 'list',
+                    selectedOrder: null,
+                    showAll: false,
+                    confirmMode: false,
+                    history: @json($history),
+                    statusFilter: 'all',
+                    get filteredHistory() {
+                        if (this.statusFilter === 'all') return this.history;
+                        return (this.history || []).filter(o => o.status === this.statusFilter);
+                    },
+                    checklist: { qty: false, quality: false, original: false },
+                    openDetail(order) {
+                        this.selectedOrder = order;
+                        this.viewMode = 'detail';
+                        this.confirmMode = false;
+                        this.checklist = { qty: false, quality: false, original: false };
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    },
+                    confirmReceived() {
+                        if(this.canConfirm()) {
+                            this.$refs.confirmForm.submit();
+                        }
+                    },
+                    canConfirm() {
+                        return this.checklist.qty && this.checklist.quality && this.checklist.original;
+                    }
+                }));
+            });
+        </script>
         <form x-ref="confirmForm" action="{{ route('distributor.history.confirm') }}" method="POST" style="display: none;">
             @csrf
             <input type="hidden" name="order_id" :value="selectedOrder?.id">
@@ -43,12 +53,13 @@
             </div>
             <div class="flex gap-2">
                 <div class="relative">
-                    <select aria-label="Filter status pesanan" class="appearance-none bg-white border-[3px] border-gray-900 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_var(--color-gray-900)]">
-                        <option>Semua Status</option>
-                        <option>Menunggu</option>
-                        <option>Dikemas</option>
-                        <option>Dikirim</option>
-                        <option>Selesai</option>
+                    <select x-model="statusFilter" aria-label="Filter status pesanan" class="appearance-none bg-white border-[3px] border-gray-900 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_var(--color-gray-900)]">
+                        <option value="all">Semua Status</option>
+                        <option value="Menunggu">Menunggu</option>
+                        <option value="Dikemas">Dikemas</option>
+                        <option value="Dikirim">Dikirim</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Dibatalkan">Dibatalkan</option>
                     </select>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
@@ -70,7 +81,7 @@
 
             {{-- Data Loop --}}
             <div class="divide-y-2 divide-neutral-border">
-                <template x-for="order in (showAll ? history : history.slice(0, 5))" :key="order.db_id + '-' + order.type">
+                <template x-for="order in (showAll ? (filteredHistory || []) : (filteredHistory || []).slice(0, 5))" :key="order.db_id + '-' + order.type">
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center border-l-[5px] hover:bg-neutral-light/50 transition-colors duration-150 group"
                          :class="order.leftBorder">
                         {{-- No. Order --}}
@@ -110,7 +121,7 @@
                     </div>
                 </template>
 
-                <template x-if="history.length === 0">
+                <template x-if="!history || history.length === 0">
                     <div class="p-20 text-center">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Belum ada riwayat transaksi</p>
                     </div>
@@ -195,7 +206,7 @@
                             <h4 class="font-headline font-black text-primary uppercase text-xl italic leading-none">CeeKlin 450ml</h4>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">SKU: CK-450-DIST</p>
                             <div class="mt-4 flex items-end justify-between">
-                                <p class="text-3xl font-headline font-black text-gray-900 italic tracking-tighter" x-text="new Intl.NumberFormat('id-ID').format(selectedOrder?.qty) + ' PCS'"></p>
+                                <p class="text-3xl font-headline font-black text-gray-900 italic tracking-tighter" x-text="new Intl.NumberFormat('id-ID').format(selectedOrder?.qty || 0) + ' PCS'"></p>
                                 <div class="text-right">
                                     <p class="text-[8px] font-black text-slate-400 uppercase">Subtotal</p>
                                     <p class="text-sm font-bold text-gray-900" x-text="selectedOrder?.total"></p>

@@ -106,9 +106,9 @@
         {{-- Group Items --}}
         @foreach($group['items'] as $menu)
             @php
-                $isActive = ($menu['key'] === 'overview')
-                    ? ($currentPage === 'overview' || request()->is('dashboard/admin'))
-                    : ($currentPage === $menu['key']);
+                // Cek apakah route saat ini cocok dengan route menu (menghapus domain)
+                $path = ltrim(parse_url($menu['route'], PHP_URL_PATH), '/');
+                $isActive = request()->is($path . '*') || ($menu['key'] === 'overview' && request()->is('dashboard/admin'));
 
                 $activeClass = $isActive
                     ? 'bg-primary text-white border-l-[5px] border-secondary'
@@ -134,7 +134,8 @@
     {{-- Bottom Pinned --}}
     <div class="mt-auto border-t-2 border-neutral-border pt-2">
         @php
-            $isActive = $currentPage === $bottomMenu['key'];
+            $bottomPath = ltrim(parse_url($bottomMenu['route'], PHP_URL_PATH), '/');
+            $isActive = request()->is($bottomPath . '*');
             $activeClass = $isActive
                 ? 'bg-primary text-white border-l-[5px] border-secondary'
                 : 'text-gray-600 hover:bg-neutral-border-light hover:text-gray-900 border-l-[5px] border-transparent';

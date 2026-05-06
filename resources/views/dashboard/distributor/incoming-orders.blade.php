@@ -59,12 +59,12 @@
         },
         
         openOrder(order) {
-            this.selectedOrder = order;
+            this.selectedOrder = {...order, status: order.raw_status};
             this.cancelMode = false;
             this.forceCompleteMode = false;
             this.cancelReason = '';
             this.waSent = false;
-            this.showResiInput = order.status === 'Dikirim';
+            this.showResiInput = order.raw_status === 'Dikirim';
             this.viewMode = 'detail';
             this.errors = {};
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -96,9 +96,10 @@
         },
 
         getWaLink(mode = 'normal') {
+            if (!this.selectedOrder) return '#';
             const phone = (this.selectedOrder?.phone ?? '').replace(/\D/g, '');
             const id = this.selectedOrder?.id ?? '';
-            const status = this.selectedOrder?.status;
+            const status = this.selectedOrder?.status ?? '';
             
             let msg = `Halo, Distributor CeeKlin di sini.\n\nUpdate pesanan ${id}:\nStatus saat ini: *${status.toUpperCase()}*\n\nTerima kasih!`;
             
@@ -584,6 +585,7 @@
                                                 <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest">No. Resi / Surat Jalan</label>
                                                 <input type="text" name="tracking_number"
                                                     :required="selectedOrder?.status === 'Dikirim'"
+                                                    :value="selectedOrder?.tracking_number || ''"
                                                     placeholder="Masukkan No. Resi Valid"
                                                     @input="delete errors.tracking_number"
                                                     class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest font-mono focus:border-primary focus:outline-none transition-all placeholder:text-slate-300">

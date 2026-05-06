@@ -39,7 +39,7 @@
                             <span class="font-headline font-black text-white text-lg uppercase tracking-tight italic">Status Inventori Gudang</span>
                             <p class="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5 italic">Pantau Pergerakan & Kapasitas Jual</p>
                         </div>
-                        <span class="text-[9px] font-bold text-secondary uppercase tracking-widest bg-gray-900 px-3 py-1.5 border border-white/20 italic">Update: {{ now()->translatedFormat('d M Y H:i') }}</span>
+                        <span class="text-[9px] font-bold text-secondary uppercase tracking-widest bg-gray-900 px-3 py-1.5 border border-white/20 italic">Update: {{ $lastUpdate->translatedFormat('d M Y H:i') }}</span>
                     </div>
                     
                     <div class="p-6 flex flex-col gap-8">

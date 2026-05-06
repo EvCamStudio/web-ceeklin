@@ -88,11 +88,12 @@ class ResellerDashboardController extends Controller
             'quantity' => 'required|integer|min:50', // Updated min to 50
         ]);
 
-        // BACKEND-TODO: Handle these new fields from the multi-step checkout
-        // $paymentMethod = $request->input('payment_method');
-        // $paymentSubMethod = $request->input('payment_sub_method');
-        // $shippingAddress = $request->input('shipping_address');
-        // $shippingNote = $request->input('shipping_note');
+        $upline = $user->upline;
+
+        // Security: Check if distributor has enough stock
+        if ($upline->stock < $request->quantity) {
+            return back()->with('error', "Stok distributor Anda saat ini tidak mencukupi (Tersedia: {$upline->stock} PCS). Silakan hubungi distributor Anda.");
+        }
 
         $resellerPrice = Pricing::where('tier', 'reseller')->first()->price ?? 15000;
         $totalPrice = $request->quantity * $resellerPrice;
@@ -178,8 +179,16 @@ class ResellerDashboardController extends Controller
             ->firstOrFail();
 
         if ($order->status === 'Dikirim') {
+            // Potong stok fisik distributor saat pesanan dinyatakan selesai
+            $distributor = $order->distributor;
+            if ($distributor->stock < $order->quantity) {
+                return back()->with('error', 'Gagal konfirmasi: Stok distributor tidak mencukupi untuk menyelesaikan transaksi ini.');
+            }
+            
+            $distributor->decrement('stock', $order->quantity);
+            
             $order->update(['status' => 'Selesai']);
-            return back()->with('success', 'Pesanan telah dikonfirmasi selesai. Terima kasih!');
+            return back()->with('success', 'Pesanan telah dikonfirmasi selesai. Stok gudang distributor telah diperbarui secara otomatis.');
         }
 
         return back()->with('error', 'Pesanan tidak dalam status dikirim.');

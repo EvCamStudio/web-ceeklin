@@ -64,7 +64,7 @@ class DistributorDashboardController extends Controller
         // Or if we subtract on paid, hold is orders processed but not finished.
         // Actually, let's define hold as orders with status 'Menunggu' and 'Diproses'
         $holdStock = ResellerOrder::where('distributor_id', $user->id)
-            ->whereIn('status', ['Menunggu Konfirmasi', 'Diproses', 'Dikirim'])
+            ->whereIn('status', ['Menunggu Konfirmasi', 'Menunggu Proses', 'Diproses', 'Dikemas', 'Dikirim', 'Menunggu'])
             ->sum('quantity');
         
         $readyStock = $physicalStock - $holdStock;
@@ -78,7 +78,7 @@ class DistributorDashboardController extends Controller
                 'type' => 'in', 
                 'desc' => "Restock Pabrik — {$log->order_number}", 
                 'qty' => '+' . number_format($log->quantity), 
-                'date' => $log->created_at->translatedFormat('d M Y'), 
+                'date' => $log->created_at->translatedFormat('d M Y, H:i'), 
                 'color' => 'text-green-600',
                 'status' => 'Selesai',
                 'note' => '',
@@ -93,7 +93,7 @@ class DistributorDashboardController extends Controller
                 'type' => 'out', 
                 'desc' => "Pesanan Reseller — " . ($log->reseller->name ?? 'User'), 
                 'qty' => '-' . number_format($log->quantity), 
-                'date' => $log->created_at->translatedFormat('d M Y'), 
+                'date' => $log->created_at->translatedFormat('d M Y, H:i'), 
                 'color' => 'text-red-600',
                 'status' => 'Selesai',
                 'note' => '',
@@ -102,9 +102,13 @@ class DistributorDashboardController extends Controller
 
         // Sync logs from a hypothetical StockAdjustment model or just Filtered Logs
         // For now, let's just use the two main sources
-        $logs = $incomingLogs->concat($outgoingLogs)->sortByDesc('timestamp')->take(15);
+        $allLogs = $incomingLogs->concat($outgoingLogs)->sortByDesc('timestamp');
+        $logs = $allLogs->take(15);
+        
+        // Ambil waktu dari aktivitas terbaru
+        $lastUpdate = $allLogs->first() ? $allLogs->first()['timestamp'] : $user->updated_at;
 
-        return view('dashboard.distributor.inventory', compact('user', 'physicalStock', 'holdStock', 'readyStock', 'stockPercentage', 'logs'));
+        return view('dashboard.distributor.inventory', compact('user', 'physicalStock', 'holdStock', 'readyStock', 'stockPercentage', 'logs', 'lastUpdate'));
     }
 
     public function resellers()
@@ -124,6 +128,15 @@ class DistributorDashboardController extends Controller
                 $totalSpent = $reseller->resellerOrders()->where('status', 'Selesai')->sum('total_price');
                 $totalVolume = $reseller->resellerOrders()->where('status', 'Selesai')->sum('quantity');
                 $orderCount = $reseller->resellerOrders()->where('status', 'Selesai')->count();
+
+                // Simple status based on database status
+                if ($reseller->status === 'pending') {
+                    $resellerStatus = 'Belum Terverifikasi';
+                } elseif ($reseller->status === 'active') {
+                    $resellerStatus = 'Aktif';
+                } else {
+                    $resellerStatus = 'Non-Aktif';
+                }
                 
                 $recentTransactions = $reseller->resellerOrders()
                     ->latest()
@@ -149,7 +162,7 @@ class DistributorDashboardController extends Controller
                     'address' => $reseller->address,
                     'joined_at' => $reseller->created_at->translatedFormat('d M Y'),
                     'last_order_date' => $lastOrder ? $lastOrder->created_at->translatedFormat('d M Y') : 'Belum ada',
-                    'status' => $reseller->status === 'verified' ? 'Aktif' : 'Non-Aktif',
+                    'status' => $resellerStatus,
                     'isPeralihan' => false, 
                     'origin' => 'N/A',
                     'stats' => [
@@ -187,6 +200,9 @@ class DistributorDashboardController extends Controller
                     'items' => 'CeeKlin 450ml (x' . $order->quantity . ')',
                     'is_peralihan' => false, // Placeholder logic
                     'address' => $order->reseller->address ?? 'Alamat tidak tersedia',
+                    'raw_status' => $order->status === 'Menunggu Konfirmasi' ? 'Menunggu Proses' : $order->status,
+                    'tracking_number' => $order->tracking_number,
+                    'courier_name' => $order->courier_name,
                 ];
             });
 
@@ -265,20 +281,20 @@ class DistributorDashboardController extends Controller
                     'Selesai' => 'border-green-600',
                 ];
 
-                return (object)[
-                    'id' => $order->order_number,
-                    'db_id' => $order->id,
+                return [
+                    'id' => (string)($order->order_number ?? 'N/A'),
+                    'db_id' => (int)$order->id,
                     'type' => 'Pembelian',
-                    'qty' => $order->quantity,
-                    'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
-                    'status' => $statusLabels[$order->status] ?? $order->status,
-                    'date' => $order->created_at->translatedFormat('d M Y'),
-                    'statusClass' => $statusColors[$order->status] ?? 'border-gray-500 text-gray-700',
-                    'leftBorder' => $leftBorders[$order->status] ?? 'border-gray-500',
-                    'tracking' => $order->tracking_number,
-                    'courier' => $order->courier_name,
-                    'notes' => $order->notes,
-                    'timestamp' => $order->created_at
+                    'qty' => (int)($order->quantity ?? 0),
+                    'total' => 'Rp ' . number_format($order->total_price ?? 0, 0, ',', '.'),
+                    'status' => (string)($statusLabels[$order->status] ?? ($order->status ?? 'Menunggu')),
+                    'date' => $order->created_at ? $order->created_at->translatedFormat('d M Y') : '-',
+                    'statusClass' => (string)($statusColors[$order->status] ?? 'border-gray-500 text-gray-700 bg-gray-50'),
+                    'leftBorder' => (string)($leftBorders[$order->status] ?? 'border-gray-500'),
+                    'tracking' => (string)($order->tracking_number ?? ''),
+                    'courier' => (string)($order->courier_name ?? ''),
+                    'notes' => (string)($order->notes ?? ''),
+                    'timestamp' => $order->created_at ? $order->created_at->toIso8601String() : now()->toIso8601String()
                 ];
             });
 
@@ -288,24 +304,24 @@ class DistributorDashboardController extends Controller
             ->where('status', 'Selesai')
             ->get()
             ->map(function($order) {
-                return (object)[
-                    'id' => $order->order_number,
-                    'db_id' => $order->id,
+                return [
+                    'id' => (string)($order->order_number ?? 'N/A'),
+                    'db_id' => (int)$order->id,
                     'type' => 'Penjualan',
-                    'qty' => $order->quantity,
-                    'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
-                    'status' => $order->status,
-                    'date' => $order->created_at->translatedFormat('d M Y'),
+                    'qty' => (int)($order->quantity ?? 0),
+                    'total' => 'Rp ' . number_format($order->total_price ?? 0, 0, ',', '.'),
+                    'status' => 'Selesai',
+                    'date' => $order->created_at ? $order->created_at->translatedFormat('d M Y') : '-',
                     'statusClass' => 'border-green-600 text-green-700 bg-green-50',
                     'leftBorder' => 'border-green-600',
-                    'tracking' => $order->tracking_number,
-                    'courier' => $order->courier_name,
-                    'notes' => $order->note,
-                    'timestamp' => $order->created_at
+                    'tracking' => (string)($order->tracking_number ?? ''),
+                    'courier' => (string)($order->courier_name ?? ''),
+                    'notes' => (string)($order->note ?? ''),
+                    'timestamp' => $order->created_at ? $order->created_at->toIso8601String() : now()->toIso8601String()
                 ];
             });
 
-        $history = $purchases->concat($sales)->sortByDesc('timestamp');
+        $history = $purchases->concat($sales)->sortByDesc('timestamp')->values();
 
         return view('dashboard.distributor.history', compact('history'));
     }
@@ -344,7 +360,7 @@ class DistributorDashboardController extends Controller
         $request->validate([
             'order_id' => 'required|exists:reseller_orders,id',
             'status' => 'required',
-            'courier_name' => 'required_if:status,Dikirim',
+            'courier_name' => 'nullable|string',
             'tracking_number' => 'required_if:status,Dikirim',
         ]);
 
@@ -366,6 +382,34 @@ class DistributorDashboardController extends Controller
             }
             
             $user->decrement('stock', $order->quantity);
+
+            // Bonus Target Calculation Logic
+            $reseller = $order->reseller;
+            $targetQty = \App\Models\Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
+            $targetReward = \App\Models\Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
+
+            // Get total volume for this month (including this order)
+            $monthlyVolume = \App\Models\ResellerOrder::where('reseller_id', $reseller->id)
+                ->where('status', 'Selesai')
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('quantity') + $order->quantity;
+
+            if ($monthlyVolume >= $targetQty) {
+                // Check if already awarded this month
+                $alreadyAwarded = \App\Models\BonusAllocation::where('user_id', $reseller->id)
+                    ->where('quarter', now()->format('F Y'))
+                    ->exists();
+
+                if (!$alreadyAwarded) {
+                    \App\Models\BonusAllocation::create([
+                        'user_id' => $reseller->id,
+                        'amount' => $targetReward,
+                        'status' => 'pending',
+                        'quarter' => now()->format('F Y')
+                    ]);
+                }
+            }
         }
 
         $updateData = ['status' => $request->status];
@@ -413,7 +457,7 @@ class DistributorDashboardController extends Controller
             'qty' => 'required|integer|min:1000'
         ]);
 
-        $price = 13000; // Harga modal distributor
+        $price = \App\Models\Pricing::where('tier', 'distributor')->first()?->price ?? 13000;
         $total = $request->qty * $price;
 
         DistributorOrder::create([

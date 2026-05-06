@@ -169,7 +169,7 @@
                     <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Nama Reseller</div>
                     <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Suplai Oleh</div>
                     <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Pencapaian</div>
-                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Progress Target</div>
+                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Progress Target (Bulan Ini)</div>
                     <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Potensi Bonus</div>
                 </div>
 

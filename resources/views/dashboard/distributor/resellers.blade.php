@@ -78,8 +78,12 @@
                             </div>
                             <div class="md:col-span-2 w-full flex justify-between md:block md:text-center">
                                 <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Status</p>
-                                <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic"
-                                    :class="reseller.status === 'Aktif' ? 'border-secondary text-secondary' : 'border-slate-300 text-slate-400'"
+                                <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic transition-colors"
+                                    :class="{
+                                        'border-green-600 text-green-700 bg-green-50': reseller.status === 'Aktif',
+                                        'border-slate-300 text-slate-400': reseller.status === 'Non-Aktif',
+                                        'border-red-500 text-red-600 bg-red-50': reseller.status === 'Belum Terverifikasi'
+                                    }"
                                     x-text="reseller.status"></span>
                             </div>
                             <div class="md:col-span-1 w-full flex justify-between md:block md:text-right">
@@ -201,8 +205,14 @@
                                     <p class="text-sm font-bold text-gray-900 uppercase" x-text="selectedReseller?.joined_at"></p>
                                 </div>
                                 <div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Status</p>
-                                    <p class="text-sm font-bold text-primary uppercase" x-text="selectedReseller?.status"></p>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Status Verifikasi</p>
+                                    <span class="inline-block px-3 py-1 border-2 text-[10px] font-black uppercase tracking-widest italic"
+                                        :class="{
+                                            'border-green-600 text-green-700 bg-green-50': selectedReseller?.status === 'Aktif',
+                                            'border-slate-300 text-slate-400': selectedReseller?.status === 'Non-Aktif',
+                                            'border-red-500 text-red-600 bg-red-50': selectedReseller?.status === 'Belum Terverifikasi'
+                                        }"
+                                        x-text="selectedReseller?.status"></span>
                                 </div>
                             </div>
                         </div>
@@ -212,7 +222,7 @@
         </div>
     </div>
 
-        {{-- VIEW: SEMUA TRANSAKSI RESELLER --}}
+        {{-- VIEW: SEMUA TRANSAKSI RESELLER (PLACEHOLDER FOR FUTURE EXPANSION) --}}
         <div x-show="viewMode === 'all_transactions'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0">
             {{-- Header --}}
             <div class="flex flex-col md:flex-row items-start md:items-center mb-8 gap-6">
@@ -224,40 +234,8 @@
             </div>
 
             <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)]">
-                {{-- Header Tabel --}}
-                <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-900">
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Order ID</div>
-                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Produk</div>
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Volume</div>
-                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Total</div>
-                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Status & Tanggal</div>
-                </div>
-
-                <div class="divide-y-2 divide-neutral-border">
-                    @php
-                    $fullHistory = [
-                        ['id' => '#ORD-201', 'date' => '12 Okt 2024', 'product' => 'CeeKlin 450ml', 'qty' => '100', 'total' => 'Rp 1.500.000', 'status' => 'Selesai'],
-                        ['id' => '#ORD-188', 'date' => '05 Okt 2024', 'product' => 'CeeKlin 450ml', 'qty' => '50', 'total' => 'Rp 750.000', 'status' => 'Selesai'],
-                        ['id' => '#ORD-165', 'date' => '20 Sep 2024', 'product' => 'CeeKlin 1L', 'qty' => '200', 'total' => 'Rp 4.000.000', 'status' => 'Selesai'],
-                        ['id' => '#ORD-142', 'date' => '12 Sep 2024', 'product' => 'CeeKlin 450ml', 'qty' => '100', 'total' => 'Rp 1.500.000', 'status' => 'Selesai'],
-                        ['id' => '#ORD-130', 'date' => '01 Sep 2024', 'product' => 'CeeKlin 450ml', 'qty' => '300', 'total' => 'Rp 4.500.000', 'status' => 'Dibatalkan'],
-                    ];
-                    @endphp
-
-                    @foreach($fullHistory as $item)
-                    <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-4 items-start md:items-center hover:bg-neutral-light transition-colors">
-                        <div class="md:col-span-2 font-bold text-xs uppercase">{{ $item['id'] }}</div>
-                        <div class="md:col-span-3">
-                            <p class="text-xs font-bold text-gray-900 uppercase">{{ $item['product'] }}</p>
-                        </div>
-                        <div class="md:col-span-2 md:text-right font-headline font-black text-sm text-primary tracking-tight">{{ $item['qty'] }} <span class="text-[9px] font-body text-slate-400">PCS</span></div>
-                        <div class="md:col-span-2 md:text-right font-bold text-xs text-gray-900">{{ $item['total'] }}</div>
-                        <div class="md:col-span-3 flex flex-col md:items-center gap-1">
-                            <span class="px-2 py-0.5 border-2 {{ $item['status'] === 'Selesai' ? 'border-green-600 text-green-700 bg-green-50' : 'border-red-500 text-red-700 bg-red-50' }} text-[8px] font-black uppercase tracking-widest">{{ $item['status'] }}</span>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $item['date'] }}</p>
-                        </div>
-                    </div>
-                    @endforeach
+                <div class="py-20 text-center">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Fitur Riwayat Lengkap Segera Hadir</p>
                 </div>
             </div>
         </div>

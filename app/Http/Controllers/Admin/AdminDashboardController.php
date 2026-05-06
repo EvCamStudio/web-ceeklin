@@ -129,14 +129,42 @@ class AdminDashboardController extends Controller
     {
         $targetQty = \App\Models\Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
         $targetReward = \App\Models\Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
+
+        // --- RETROACTIVE BONUS CHECK ---
+        // Find resellers who reached target this month but don't have a bonus record yet
+        $achievers = \App\Models\ResellerOrder::where('status', 'Selesai')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->select('reseller_id', DB::raw('SUM(quantity) as total_sales'))
+            ->groupBy('reseller_id')
+            ->having('total_sales', '>=', $targetQty)
+            ->get();
+
+        foreach ($achievers as $achiever) {
+            $alreadyAwarded = \App\Models\BonusAllocation::where('user_id', $achiever->reseller_id)
+                ->where('quarter', now()->format('F Y'))
+                ->exists();
+
+            if (!$alreadyAwarded) {
+                \App\Models\BonusAllocation::create([
+                    'user_id' => $achiever->reseller_id,
+                    'amount' => $targetReward,
+                    'status' => 'pending',
+                    'quarter' => now()->format('F Y')
+                ]);
+            }
+        }
+        // -------------------------------
         
         $bonusRequests = \App\Models\BonusAllocation::where('status', 'pending')
             ->with(['user', 'user.upline'])
             ->latest()
             ->get();
 
-        // Reseller Leaderboard
+        // Reseller Leaderboard (Monthly)
         $leaderboard = \App\Models\ResellerOrder::where('status', 'Selesai')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->with(['reseller', 'reseller.upline'])
             ->select('reseller_id', DB::raw('SUM(quantity) as total_sales'))
             ->groupBy('reseller_id')
@@ -144,7 +172,8 @@ class AdminDashboardController extends Controller
             ->get()
             ->map(function($item) use ($targetQty, $targetReward) {
                 $item->progress = min(100, round(($item->total_sales / $targetQty) * 100));
-                $item->potential = 'Rp ' . number_format($item->total_sales * 15, 0, ',', '.'); // Example potential
+                // Potential bonus is the full target reward if they are on track
+                $item->potential = 'Rp ' . number_format($targetReward, 0, ',', '.');
                 return $item;
             });
 
@@ -253,7 +282,6 @@ class AdminDashboardController extends Controller
             'order_id' => 'required|exists:distributor_orders,id',
             'status' => 'required',
             'tracking_number' => 'required_if:status,Dikirim',
-            'courier_name' => 'required_if:status,Dikirim',
             'note' => 'nullable|string'
         ]);
 
