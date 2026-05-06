@@ -89,6 +89,14 @@
                 $activeClass = $isActive
                     ? 'bg-white/10 text-secondary border-l-[5px] border-secondary'
                     : 'text-white/60 hover:bg-white/5 hover:text-white border-l-[5px] border-transparent';
+                
+                // Badge Logic
+                $badge = null;
+                if ($menu['key'] === 'incoming-orders') {
+                    $badge = \App\Models\ResellerOrder::where('distributor_id', auth()->id())
+                        ->where('status', 'Menunggu Konfirmasi')
+                        ->count();
+                }
             @endphp
             <a href="{{ $menu['route'] }}"
                aria-label="Menu {{ $menu['name'] }}"
@@ -97,18 +105,12 @@
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {!! $menu['icon'] !!}
                 </svg>
-                <span class="flex-1">{{ $menu['name'] }}</span>
-                {{-- Badge untuk Pesanan Masuk --}}
-                @if($menu['key'] === 'incoming-orders')
-                    @php
-                        $pendingOrdersCount = \App\Models\ResellerOrder::where('distributor_id', auth()->id())
-                            ->where('status', 'Menunggu Konfirmasi')
-                            ->count();
-                    @endphp
-                    @if($pendingOrdersCount > 0)
-                        <span class="bg-secondary text-gray-900 text-[8px] font-black px-1.5 py-0.5 rounded-sm leading-none">{{ $pendingOrdersCount }}</span>
+                <div class="flex-1 flex items-center justify-between">
+                    <span>{{ $menu['name'] }}</span>
+                    @if($badge && $badge > 0)
+                        <x-ui.badge-count :count="$badge" type="secondary" />
                     @endif
-                @endif
+                </div>
             </a>
         @endforeach
     @endforeach

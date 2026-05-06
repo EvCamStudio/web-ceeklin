@@ -36,7 +36,11 @@
 
         get filteredOrders() {
             return this.orders.filter(order => {
-                const matchesStatus = this.filterStatus === 'Semua Status' || order.status === this.filterStatus;
+                const matchesStatus = (this.filterStatus === 'Semua Status') || 
+                                     (this.filterStatus === 'Menunggu' && ['Menunggu', 'Menunggu Konfirmasi', 'Menunggu Proses'].includes(order.status)) ||
+                                     (this.filterStatus === 'Dikemas' && ['Dikemas', 'Diproses'].includes(order.status)) ||
+                                     (this.filterStatus === 'Dibatalkan' && ['Dibatalkan', 'Ditolak'].includes(order.status)) ||
+                                     (order.status === this.filterStatus);
                 const matchesSearch = order.reseller.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
                                      order.id.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                                      order.city.toLowerCase().includes(this.searchQuery.toLowerCase());
@@ -164,10 +168,11 @@
                             <select aria-label="Filter Status" x-model="filterStatus" @change="currentPage = 1"
                                 class="appearance-none bg-white border-[3px] border-gray-900 px-6 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer min-w-[180px] shadow-[4px_4px_0_rgba(0,0,0,0.05)] pr-10">
                                 <option value="Semua Status">Semua Status</option>
-                                <option value="Menunggu Proses">Menunggu</option>
-                                <option value="Diproses">Dikemas</option>
+                                <option value="Menunggu">Menunggu</option>
+                                <option value="Dikemas">Dikemas</option>
                                 <option value="Dikirim">Dikirim</option>
                                 <option value="Selesai">Selesai</option>
+                                <option value="Dibatalkan">Dibatalkan</option>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
@@ -243,12 +248,12 @@
                                             Status</p>
                                         <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap"
                                             :class="{
-                                                'border-gray-400 text-gray-500 bg-gray-50': order.status === 'Menunggu Proses' || order.status === 'Menunggu',
-                                                'border-yellow-500 text-yellow-700 bg-yellow-50': order.status === 'Diproses' || order.status === 'Dikemas',
-                                                'border-blue-500 text-blue-600 bg-blue-50': order.status === 'Dikirim',
+                                                'border-red-500 text-red-600 bg-red-50': ['Menunggu Proses', 'Menunggu', 'Menunggu Konfirmasi'].includes(order.status),
+                                                'border-yellow-500 text-yellow-800 bg-yellow-50': order.status === 'Diproses' || order.status === 'Dikemas',
+                                                'border-blue-500 text-blue-700 bg-blue-50': order.status === 'Dikirim',
                                                 'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
-                                                'border-slate-300 text-slate-400 bg-slate-50': order.status === 'Ditolak' || order.status === 'Dibatalkan'
-                                            }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Ditolak', 'Dibatalkan'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
+                                                'border-gray-400 text-gray-500 bg-gray-50': order.status === 'Ditolak' || order.status === 'Dibatalkan'
+                                            }" x-text="['Menunggu Proses', 'Menunggu', 'Menunggu Konfirmasi'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Ditolak', 'Dibatalkan'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
                                     </div>
 
                                     <button @click="openOrder(order)"

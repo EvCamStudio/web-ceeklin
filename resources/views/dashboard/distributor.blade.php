@@ -164,17 +164,23 @@
                         @php
                             $statusColors = [
                                 'Menunggu Konfirmasi' => 'border-red-500 text-red-600 bg-red-50',
-                                'Diproses' => 'border-yellow-500 text-yellow-700 bg-yellow-50',
-                                'Dikirim' => 'border-blue-500 text-blue-600 bg-blue-50',
+                                'Menunggu Proses' => 'border-red-500 text-red-600 bg-red-50',
+                                'Menunggu' => 'border-red-500 text-red-600 bg-red-50',
+                                'Diproses' => 'border-yellow-500 text-yellow-800 bg-yellow-50',
+                                'Dikirim' => 'border-blue-500 text-blue-700 bg-blue-50',
                                 'Selesai' => 'border-green-600 text-green-700 bg-green-50',
+                                'Dibatalkan' => 'border-gray-400 text-gray-500 bg-gray-50',
+                                'Ditolak' => 'border-gray-400 text-gray-500 bg-gray-50',
                             ];
+                            
+                            $displayStatus = $order->status;
+                            if (in_array($order->status, ['Menunggu Konfirmasi', 'Menunggu Proses', 'Menunggu'])) $displayStatus = 'Menunggu';
+                            if ($order->status === 'Diproses') $displayStatus = 'Dikemas';
+                            if (in_array($order->status, ['Dibatalkan', 'Ditolak'])) $displayStatus = 'Dibatalkan';
                         @endphp
-                        <span class="px-2 py-1 border-2 text-[10px] font-bold uppercase tracking-widest italic {{ $statusColors[$order->status] ?? 'border-gray-400 text-gray-500' }}">
-                            {{ $order->status }}
+                        <span class="w-[130px] px-2 py-1 border-2 text-[10px] font-black uppercase tracking-widest italic text-center block whitespace-nowrap {{ $statusColors[$order->status] ?? 'border-gray-400 text-gray-500 bg-gray-50' }}">
+                            {{ $displayStatus }}
                         </span>
-                        @if($order->status === 'Menunggu Konfirmasi')
-                        <a href="/dashboard/distributor/incoming-orders" class="bg-primary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-primary-hover italic">Proses</a>
-                        @endif
                     </div>
                 </div>
                 @empty

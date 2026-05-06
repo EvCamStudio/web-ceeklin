@@ -182,7 +182,7 @@ class DistributorDashboardController extends Controller
                     'city' => ($order->reseller->city_name ?? 'N/A'),
                     'qty' => $order->quantity,
                     'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
-                    'status' => $order->status === 'Menunggu Konfirmasi' ? 'Menunggu' : $order->status,
+                    'status' => in_array($order->status, ['Menunggu Konfirmasi', 'Menunggu Proses']) ? 'Menunggu' : ($order->status === 'Diproses' ? 'Dikemas' : $order->status),
                     'date' => $order->created_at->translatedFormat('d M Y, H:i'),
                     'items' => 'CeeKlin 450ml (x' . $order->quantity . ')',
                     'is_peralihan' => false, // Placeholder logic
@@ -192,7 +192,7 @@ class DistributorDashboardController extends Controller
 
         $stats = [
             'Menunggu' => $orders->where('status', 'Menunggu')->count(),
-            'Dikemas' => $orders->where('status', 'Diproses')->count(),
+            'Dikemas' => $orders->where('status', 'Dikemas')->count(),
             'Dikirim' => $orders->where('status', 'Dikirim')->count(),
         ];
 
@@ -240,15 +240,16 @@ class DistributorDashboardController extends Controller
             ->get()
             ->map(function($order) {
                 $statusColors = [
-                    'Menunggu Proses' => 'border-gray-400 text-gray-500 bg-gray-50',
-                    'Diproses' => 'border-yellow-500 text-yellow-700 bg-yellow-50',
+                    'Menunggu Proses' => 'border-red-500 text-red-600 bg-red-50',
+                    'Diproses' => 'border-yellow-500 text-yellow-800 bg-yellow-50',
                     'Dikirim' => 'border-blue-500 text-blue-700 bg-blue-50',
                     'Selesai' => 'border-green-600 text-green-700 bg-green-50',
-                    'Dibatalkan' => 'border-slate-300 text-slate-400 bg-slate-50',
-                    'Ditolak' => 'border-slate-300 text-slate-400 bg-slate-50',
+                    'Dibatalkan' => 'border-gray-400 text-gray-500 bg-gray-50',
+                    'Ditolak' => 'border-gray-400 text-gray-500 bg-gray-50',
                 ];
 
                 $statusLabels = [
+                    'Menunggu Konfirmasi' => 'Menunggu',
                     'Menunggu Proses' => 'Menunggu',
                     'Diproses' => 'Dikemas',
                     'Dikirim' => 'Dikirim',
