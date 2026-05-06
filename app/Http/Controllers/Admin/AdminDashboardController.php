@@ -34,8 +34,8 @@ class AdminDashboardController extends Controller
                 ];
             });
 
-        // Fetch recent transactions from both distributor and reseller orders
-        $distributorOrders = \App\Models\DistributorOrder::with('user')->latest()->take(5)->get()->map(function($order) {
+        // Fetch recent transactions from distributor orders
+        $recentTransactions = \App\Models\DistributorOrder::with('user')->latest()->take(7)->get()->map(function($order) {
             return [
                 'time' => $order->created_at->diffForHumans(),
                 'name' => $order->user->name,
@@ -46,20 +46,6 @@ class AdminDashboardController extends Controller
                 'created_at' => $order->created_at
             ];
         });
-
-        $resellerOrders = \App\Models\ResellerOrder::with('reseller')->latest()->take(5)->get()->map(function($order) {
-            return [
-                'time' => $order->created_at->diffForHumans(),
-                'name' => $order->reseller->name ?? 'N/A',
-                'type' => 'Reseller',
-                'qty' => $order->quantity,
-                'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
-                'status' => strtoupper($order->status),
-                'created_at' => $order->created_at
-            ];
-        });
-
-        $recentTransactions = $distributorOrders->concat($resellerOrders)->sortByDesc('created_at')->take(5);
 
         // Top Performers (based on volume)
         $topPerformers = \App\Models\DistributorOrder::where('status', 'Selesai')

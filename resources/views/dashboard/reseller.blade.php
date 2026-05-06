@@ -1,6 +1,6 @@
 <x-layouts.dashboard bgTheme="dark">
     <x-slot:subtitleSlot>
-        <span class="text-[10px] uppercase font-bold text-primary tracking-widest mt-1">RESELLER TEROTORISASI</span>
+        <span class="text-[10px] uppercase font-bold text-secondary tracking-widest mt-1">PORTAL RESELLER</span>
     </x-slot:subtitleSlot>
     <x-slot:topbarTitle>BERANDA</x-slot:topbarTitle>
     <x-slot:menuSlot>@include('dashboard.reseller._menu')</x-slot:menuSlot>

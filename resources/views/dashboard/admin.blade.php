@@ -23,7 +23,10 @@
                     </div>
                 </div>
                 <div class="hidden md:block">
-                    <span class="bg-red-600 text-white px-4 py-1.5 font-headline font-bold text-xs uppercase tracking-widest shadow-[4px_4px_0_rgba(0,0,0,0.2)]">TOTAL: {{ $pendingVerificationsCount + $pendingDistributorOrdersCount + $pendingBonusRequestsCount }} ANTREAN</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Antrean Tertunda:</span>
+                        <x-ui.badge-count :count="$pendingVerificationsCount + $pendingDistributorOrdersCount + $pendingBonusRequestsCount" type="danger" class="scale-125" />
+                    </div>
                 </div>
             </div>
 
@@ -32,7 +35,7 @@
                 <a href="{{ route('admin.verify.index') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Pendaftaran</span>
-                        <span class="bg-red-600 text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-red-600 transition-colors">{{ $pendingVerificationsCount }} BARU</span>
+                        <x-ui.badge-count :count="$pendingVerificationsCount" type="danger" />
                     </div>
                     <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Verifikasi Reseller</h5>
                     <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Review NIK & Wilayah</p>
@@ -46,7 +49,7 @@
                 <a href="{{ route('admin.distributor-orders') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-secondary hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Logistik</span>
-                        <span class="bg-gray-900 text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-gray-900 transition-colors">{{ $pendingDistributorOrdersCount }} ORDER</span>
+                        <x-ui.badge-count :count="$pendingDistributorOrdersCount" type="secondary" />
                     </div>
                     <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Pesanan Distributor</h5>
                     <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Kirim & Input Resi</p>
@@ -60,7 +63,7 @@
                 <a href="{{ route('admin.bonus') }}" class="group relative bg-neutral-light border-[3px] border-gray-900 p-5 hover:bg-primary-hover hover:text-white transition-all duration-300 shadow-[6px_6px_0_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1">
                     <div class="flex justify-between items-start mb-4">
                         <span class="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100">Keuangan</span>
-                        <span class="bg-primary text-white px-2 py-0.5 text-[10px] font-black group-hover:bg-white group-hover:text-primary transition-colors">{{ $pendingBonusRequestsCount }} PENGAJUAN</span>
+                        <x-ui.badge-count :count="$pendingBonusRequestsCount" type="primary" />
                     </div>
                     <h5 class="font-headline font-black text-lg uppercase tracking-tight mb-1">Pencairan Bonus</h5>
                     <p class="text-[9px] font-bold uppercase tracking-widest opacity-50 group-hover:opacity-80 leading-tight">Validasi Komisi Mitra</p>
@@ -99,39 +102,75 @@
                 </div>
 
                 <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)] overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-900 text-white">
-                            <tr>
-                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Waktu</th>
-                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Mitra / Buyer</th>
-                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center">Volume</th>
-                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Total</th>
-                                <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y-2 divide-neutral-border">
-                            @forelse($recentTransactions ?? [] as $trx)
-                            <tr class="hover:bg-neutral-light transition-colors group">
-                                <td class="px-6 py-5 text-[10px] font-bold text-slate-500 uppercase italic">{{ $trx['time'] }}</td>
-                                <td class="px-6 py-5">
-                                    <p class="font-headline font-black text-sm uppercase text-gray-900 leading-none">{{ $trx['name'] }}</p>
+                    {{-- Desktop Table --}}
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-900 text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Waktu</th>
+                                    <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Mitra / Buyer</th>
+                                    <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center">Volume</th>
+                                    <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Total</th>
+                                    <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-center min-w-[140px]">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y-2 divide-neutral-border">
+                                @forelse($recentTransactions ?? [] as $trx)
+                                <tr class="hover:bg-neutral-light transition-colors group">
+                                    <td class="px-6 py-5 text-[10px] font-bold text-slate-500 uppercase italic">{{ $trx['time'] }}</td>
+                                    <td class="px-6 py-5">
+                                        <p class="font-headline font-black text-sm uppercase text-gray-900 leading-none">{{ $trx['name'] }}</p>
+                                        <span class="text-[8px] font-black uppercase tracking-widest text-primary">{{ $trx['type'] }}</span>
+                                    </td>
+                                    <td class="px-6 py-5 text-center font-headline font-black text-lg">{{ $trx['qty'] }} <span class="text-[9px] text-slate-400">PCS</span></td>
+                                    <td class="px-6 py-5 text-right font-headline font-black text-lg text-primary">{{ $trx['total'] }}</td>
+                                    <td class="px-6 py-5 text-center">
+                                        <span class="inline-block whitespace-nowrap px-3 py-1 text-[8px] font-black uppercase tracking-widest {{ $trx['status'] === 'SELESAI' ? 'bg-green-100 text-green-700 border-green-700/20' : 'bg-orange-100 text-orange-700 border-orange-700/20' }} border-2">
+                                            {{ $trx['status'] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center font-bold text-slate-400 uppercase text-[10px]">Belum ada transaksi hari ini</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Mobile Cards --}}
+                    <div class="md:hidden divide-y-2 divide-neutral-border">
+                        @forelse($recentTransactions ?? [] as $trx)
+                        <div class="p-5 hover:bg-neutral-light transition-colors">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">{{ $trx['time'] }}</span>
+                                    <h5 class="font-headline font-black text-sm text-gray-900 uppercase leading-none">{{ $trx['name'] }}</h5>
                                     <span class="text-[8px] font-black uppercase tracking-widest text-primary">{{ $trx['type'] }}</span>
-                                </td>
-                                <td class="px-6 py-5 text-center font-headline font-black text-lg">{{ $trx['qty'] }} <span class="text-[9px] text-slate-400">PCS</span></td>
-                                <td class="px-6 py-5 text-right font-headline font-black text-lg text-primary">{{ $trx['total'] }}</td>
-                                <td class="px-6 py-5 text-center">
-                                    <span class="px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $trx['status'] === 'SELESAI' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' }} border-2 {{ $trx['status'] === 'SELESAI' ? 'border-green-700/20' : 'border-orange-700/20' }}">
-                                        {{ $trx['status'] }}
-                                    </span>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-10 text-center font-bold text-slate-400 uppercase text-[10px]">Belum ada transaksi hari ini</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                </div>
+                                <span class="inline-block whitespace-nowrap px-2 py-1 text-[7px] font-black uppercase tracking-widest {{ $trx['status'] === 'SELESAI' ? 'bg-green-100 text-green-700 border-green-700/20' : 'bg-orange-100 text-orange-700 border-orange-700/20' }} border-2">
+                                    {{ $trx['status'] }}
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-neutral-border/50">
+                                <div class="space-y-1">
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Volume</p>
+                                    <p class="font-headline font-black text-base text-gray-900">{{ $trx['qty'] }} <span class="text-[9px] font-bold">PCS</span></p>
+                                </div>
+                                <div class="space-y-1 text-right">
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total Nilai</p>
+                                    <p class="font-headline font-black text-base text-primary">{{ $trx['total'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="px-6 py-10 text-center font-bold text-slate-400 uppercase text-[10px]">
+                            Belum ada transaksi hari ini
+                        </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 

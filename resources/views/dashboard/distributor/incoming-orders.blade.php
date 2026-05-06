@@ -80,9 +80,7 @@
             
             if (formType === 'update') {
                 if (this.selectedOrder.status === 'Dikirim') {
-                    const courier = document.querySelector('input[name=\'courier_name\']').value;
                     const resi = document.querySelector('input[name=\'tracking_number\']').value;
-                    if (!courier) this.errors.courier_name = 'Nama kurir wajib diisi';
                     if (!resi) this.errors.tracking_number = 'Nomor resi wajib diisi';
                 }
             } else if (formType === 'cancel') {
@@ -117,11 +115,8 @@
             {{-- Header & Stats Summary --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 items-end">
                 <div class="lg:col-span-7">
-                    <h2
-                        class="font-headline font-black text-4xl text-primary tracking-tighter uppercase leading-none italic">
-                        Manajemen Pesanan</h2>
-                    <p
-                        class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-4 flex items-center gap-2">
+                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase leading-none italic">Manajemen Pesanan</h2>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
                         Pantau & Proses Distribusi ke Jaringan Reseller
                     </p>
@@ -156,7 +151,7 @@
                     <div class="relative flex-1 max-w-md">
                         <input type="text" x-model="searchQuery" @input="currentPage = 1"
                             placeholder="Cari Reseller, Wilayah, atau No. Order..."
-                            class="w-full bg-neutral-light border-[3px] border-gray-900 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary transition-all">
+                            class="w-full bg-white border-[3px] border-gray-900 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary transition-all shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -165,22 +160,24 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <select aria-label="Filter Status" x-model="filterStatus" @change="currentPage = 1"
-                            class="bg-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-900 focus:outline-none focus:border-secondary cursor-pointer min-w-[160px]">
-                            <option value="Semua Status">Semua Status</option>
-                            <option value="Menunggu">Menunggu</option>
-                            <option value="Dikemas">Dikemas</option>
-                            <option value="Dikirim">Dikirim</option>
-                            <option value="Selesai">Selesai</option>
-                        </select>
+                        <div class="relative">
+                            <select aria-label="Filter Status" x-model="filterStatus" @change="currentPage = 1"
+                                class="appearance-none bg-white border-[3px] border-gray-900 px-6 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer min-w-[180px] shadow-[4px_4px_0_rgba(0,0,0,0.05)] pr-10">
+                                <option value="Semua Status">Semua Status</option>
+                                <option value="Menunggu Proses">Menunggu</option>
+                                <option value="Diproses">Dikemas</option>
+                                <option value="Dikirim">Dikirim</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Update
-                        Terakhir: {{ now()->format('H:i') }}</span>
-                    <button
-                        class="bg-primary text-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all">Export
-                        Laporan</button>
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Update Terakhir: {{ now()->format('H:i') }}</span>
+                    <button class="bg-primary text-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all">Export Laporan</button>
                 </div>
             </div>
 
@@ -192,7 +189,7 @@
                         <div class="flex flex-col lg:flex-row">
                             {{-- ID & Info Column --}}
                             <div
-                                class="lg:w-72 p-6 bg-neutral-light border-b-[4px] lg:border-b-0 lg:border-r-[4px] border-gray-900 relative">
+                                class="lg:w-80 p-6 bg-neutral-light border-b-[4px] lg:border-b-0 lg:border-r-[4px] border-gray-900 relative">
                                 <div class="flex justify-between items-start mb-4">
                                     <span
                                         class="bg-gray-900 text-white text-[9px] font-black px-2 py-1 uppercase tracking-widest"
@@ -219,9 +216,7 @@
                             <div
                                 class="flex-1 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 sm:gap-8">
                                 <div class="w-full sm:w-auto">
-                                    <p
-                                        class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 italic">
-                                        Ringkasan Item</p>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 italic">Volume Produk</p>
                                     <div class="flex items-center gap-4">
                                         <div
                                             class="w-12 h-12 bg-gray-100 border-2 border-gray-900 flex items-center justify-center">
@@ -230,8 +225,7 @@
                                         </div>
                                         <div>
                                             <p class="font-bold text-sm text-gray-900" x-text="order.items"></p>
-                                            <p class="text-[9px] font-bold text-green-600 uppercase tracking-widest">
-                                                Sudah Dibayar ✓</p>
+                                            <p class="text-[9px] font-bold text-green-600 uppercase tracking-widest">Pembayaran Terverifikasi ✓</p>
                                         </div>
                                     </div>
                                 </div>
@@ -244,17 +238,17 @@
                                         <p class="font-headline font-black text-xl text-primary tracking-tighter italic"
                                             x-text="order.total"></p>
                                     </div>
-                                    <div class="text-center min-w-[100px]">
+                                    <div class="text-center min-w-[130px]">
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                                             Status</p>
-                                        <span
-                                            class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block"
+                                        <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap"
                                             :class="{
-                                                'border-red-500 text-red-600 bg-red-50': order.status === 'Menunggu',
-                                                'border-yellow-500 text-yellow-700 bg-yellow-50': order.status === 'Dikemas',
+                                                'border-gray-400 text-gray-500 bg-gray-50': order.status === 'Menunggu Proses' || order.status === 'Menunggu',
+                                                'border-yellow-500 text-yellow-700 bg-yellow-50': order.status === 'Diproses' || order.status === 'Dikemas',
                                                 'border-blue-500 text-blue-600 bg-blue-50': order.status === 'Dikirim',
-                                                'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai'
-                                            }" x-text="order.status"></span>
+                                                'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
+                                                'border-slate-300 text-slate-400 bg-slate-50': order.status === 'Ditolak' || order.status === 'Dibatalkan'
+                                            }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Ditolak', 'Dibatalkan'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
                                     </div>
 
                                     <button @click="openOrder(order)"
@@ -329,12 +323,12 @@
                 </div>
 
                 <div class="flex gap-4 w-full lg:w-auto">
-                    <button
-                        class="flex-1 lg:flex-none bg-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-light transition-all shadow-[4px_4px_0_var(--color-gray-900)]">Cetak
-                        Invoice</button>
+                    <button class="flex-1 lg:flex-none bg-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-light transition-all shadow-[4px_4px_0_var(--color-gray-900)]">Cetak Surat Jalan</button>
                     <a :href="getWaLink()" target="_blank"
-                        class="flex-1 lg:flex-none bg-[#25D366] text-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#1DA851] shadow-[4px_4px_0_var(--color-gray-900)] transition-all flex items-center justify-center gap-2">WhatsApp
-                        Reseller</a>
+                        class="flex-1 lg:flex-none bg-[#25D366] text-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#1DA851] shadow-[4px_4px_0_var(--color-gray-900)] transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <span>WhatsApp Reseller</span>
+                    </a>
                 </div>
             </div>
 
@@ -349,14 +343,14 @@
                             {{-- Connector Line --}}
                             <div class="hidden md:block absolute top-6 left-10 right-10 h-[4px] bg-neutral-light -z-10">
                                 <div class="h-full bg-primary transition-all duration-700"
-                                    :style="'width: ' + (['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status) * 33.33) + '%'">
+                                    :style="'width: ' + (['Menunggu Proses', 'Diproses', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status === 'Menunggu' ? 'Menunggu Proses' : (selectedOrder?.status === 'Dikemas' ? 'Diproses' : selectedOrder?.status)) * 33.33) + '%'">
                                 </div>
                             </div>
 
                             @foreach(['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'] as $i => $step)
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-12 h-12 flex items-center justify-center border-[4px] transition-all duration-500"
-                                        :class="['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status) >= {{ $i }} ? 'bg-primary border-gray-900 text-white shadow-[4px_4px_0_rgba(0,0,0,0.2)]' : 'bg-white border-neutral-light text-slate-300'">
+                                        :class="['Menunggu Proses', 'Diproses', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status === 'Menunggu' ? 'Menunggu Proses' : (selectedOrder?.status === 'Dikemas' ? 'Diproses' : selectedOrder?.status)) >= {{ $i }} ? 'bg-primary border-gray-900 text-white shadow-[4px_4px_0_rgba(0,0,0,0.2)]' : 'bg-white border-neutral-light text-slate-300'">
                                         @if($i == 0) <svg class="w-6 h-6" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -379,7 +373,7 @@
                                         @endif
                                     </div>
                                     <span class="text-[9px] font-black uppercase tracking-widest text-center"
-                                        :class="['Menunggu', 'Dikemas', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status) >= {{ $i }} ? 'text-gray-900' : 'text-slate-300'">{{ $step }}</span>
+                                        :class="['Menunggu Proses', 'Diproses', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status === 'Menunggu' ? 'Menunggu Proses' : (selectedOrder?.status === 'Dikemas' ? 'Diproses' : selectedOrder?.status)) >= {{ $i }} ? 'text-gray-900' : 'text-slate-300'">{{ $step }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -442,9 +436,7 @@
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-[9px] font-black text-slate-400 uppercase">Status Bayar</span>
-                                        <span
-                                            class="px-2 py-0.5 bg-green-100 text-green-700 text-[8px] font-black uppercase border border-green-600">Lunas
-                                            ✓</span>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[8px] font-black uppercase border border-green-600">Lunas / Terverifikasi ✓</span>
                                     </div>
                                     <div class="pt-5 border-t-2 border-dashed border-gray-200">
                                         <div class="flex justify-between items-center mb-1">
@@ -545,9 +537,7 @@
                     <div
                         class="bg-white border-[4px] border-gray-900 shadow-[12px_12px_0_var(--color-primary-darkest)] overflow-hidden">
                         <div class="bg-primary p-6 border-b-[4px] border-gray-900">
-                            <h3
-                                class="font-headline font-black text-white text-xl uppercase tracking-tighter italic leading-none">
-                                Kontrol Status</h3>
+                            <h3 class="font-headline font-black text-white text-xl uppercase tracking-tighter italic leading-none">Kontrol Progres</h3>
                         </div>
 
                         <div class="p-8">
@@ -557,25 +547,23 @@
                                     class="space-y-8" novalidate @submit.prevent="if(validate('update')) $el.submit()">
                                     @csrf
                                     <input type="hidden" name="order_id" :value="selectedOrder?.db_id">
-                                    <input type="hidden" name="status"
-                                        :value="selectedOrder?.status === 'Menunggu' ? 'Menunggu Konfirmasi' : (selectedOrder?.status === 'Dikemas' ? 'Diproses' : selectedOrder?.status)">
+                                    <input type="hidden" name="status" :value="selectedOrder?.status">
 
                                     <div class="space-y-4">
-                                        <label
-                                            class="text-[10px] font-black text-gray-900 uppercase tracking-widest italic block mb-2">Pilih
-                                            Tahapan Berikutnya:</label>
+                                        <label class="text-[10px] font-black text-gray-900 uppercase tracking-widest italic block mb-2">Update Tahapan Pengiriman:</label>
 
                                         {{-- Custom Radio Group for Status --}}
                                         <div class="flex flex-col gap-3">
-                                            <template x-for="status in ['Menunggu', 'Dikemas', 'Dikirim']">
+                                            <template x-for="status in ['Menunggu Proses', 'Diproses', 'Dikirim']">
                                                 <button type="button"
                                                     @click="selectedOrder.status = status; showResiInput = (status === 'Dikirim'); errors = {}"
                                                     :disabled="selectedOrder?.status === 'Selesai'"
                                                     :class="selectedOrder?.status === status ? 'bg-primary text-white border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]' : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
                                                     class="w-full px-5 py-4 border-[3px] font-headline font-black text-[11px] uppercase tracking-widest text-left transition-all flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed">
-                                                    <span x-text="status"></span>
-                                                    <div :class="selectedOrder?.status === status ? 'bg-white' : 'bg-gray-100'"
-                                                        class="w-4 h-4 rounded-full border-2 border-gray-900"></div>
+                                                    <span x-text="status === 'Menunggu Proses' ? 'Menunggu' : (status === 'Diproses' ? 'Dikemas' : status)"></span>
+                                                    <div :class="selectedOrder?.status === status ? 'bg-white border-white shadow-[2px_2px_0_rgba(0,0,0,0.2)] text-primary' : 'bg-gray-50 border-gray-300 text-transparent'" class="w-6 h-6 border-[3px] flex items-center justify-center transition-all duration-300">
+                                                        <svg class="w-4 h-4 transition-all duration-300" :class="selectedOrder?.status === status ? 'scale-100 opacity-100' : 'scale-50 opacity-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
+                                                    </div>
                                                 </button>
                                             </template>
                                         </div>
@@ -584,26 +572,11 @@
                                     {{-- Input Resi & Kurir --}}
                                     <div x-show="showResiInput" x-transition
                                         class="space-y-4 p-5 bg-blue-50 border-2 border-blue-200 border-dashed">
-                                        <p
-                                            class="text-[9px] font-black text-blue-700 uppercase tracking-widest mb-2 italic">
-                                            Pengiriman (Wajib Diisi):</p>
+                                        <p class="text-[9px] font-black text-blue-700 uppercase tracking-widest mb-2 italic">Informasi Logistik (Wajib Diisi):</p>
 
                                         <div class="space-y-3">
                                             <div class="space-y-1 relative">
-                                                <label
-                                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Nama
-                                                    Kurir / Logistik</label>
-                                                <input type="text" name="courier_name"
-                                                    :required="selectedOrder?.status === 'Dikirim'"
-                                                    placeholder="Contoh: JNE, J&T, atau Kurir Internal"
-                                                    @input="delete errors.courier_name"
-                                                    class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest focus:border-primary focus:outline-none transition-all placeholder:text-slate-300">
-                                                <x-ui.error name="courier_name" />
-                                            </div>
-                                            <div class="space-y-1 relative">
-                                                <label
-                                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Nomor
-                                                    Resi</label>
+                                                <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest">No. Resi / Surat Jalan</label>
                                                 <input type="text" name="tracking_number"
                                                     :required="selectedOrder?.status === 'Dikirim'"
                                                     placeholder="Masukkan No. Resi Valid"
@@ -614,27 +587,30 @@
                                         </div>
                                     </div>
 
-                                    <div class="pt-4 border-t-2 border-neutral-light">
+                                    <div class="pt-8 mt-8 border-t-[4px] border-gray-100 space-y-6">
                                         <button type="submit" :disabled="selectedOrder?.status === 'Selesai'"
-                                            class="w-full bg-primary text-white py-6 font-headline font-black text-lg uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
-                                            SIMPAN PERUBAHAN
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
+                                            class="w-full bg-primary text-white py-6 font-headline font-black text-xl uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-4 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed group">
+                                            <span>SIMPAN PERUBAHAN</span>
+                                            <svg class="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                                         </button>
 
-                                        {{-- Aksi Cadangan: Selesaikan Manual --}}
-                                        <template x-if="selectedOrder?.status === 'Dikirim'">
-                                            <button type="button" @click="forceCompleteMode = true"
-                                                class="w-full mt-6 bg-white text-secondary border-[3px] border-secondary py-3 font-headline font-black text-[10px] uppercase tracking-widest hover:bg-secondary/5 transition-all">Selesaikan
-                                                Pesanan Secara Manual</button>
-                                        </template>
+                                        <div class="flex flex-col gap-4">
+                                            <template x-if="selectedOrder?.status === 'Dikirim'">
+                                                <button type="button" @click="forceCompleteMode = true"
+                                                    class="w-full bg-white text-secondary border-[3px] border-secondary py-4 font-headline font-black text-[11px] uppercase tracking-widest hover:bg-secondary hover:text-white transition-all shadow-[4px_4px_0_rgba(0,0,0,0.1)] active:translate-y-1 active:shadow-none flex items-center justify-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    Selesaikan Manual
+                                                </button>
+                                            </template>
 
-                                        <button type="button" @click="cancelMode = true"
-                                            :disabled="selectedOrder?.status === 'Selesai'"
-                                            class="w-full mt-4 text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline transition-all disabled:hidden">Batalkan
-                                            Pesanan Ini</button>
+                                            <button type="button" @click="cancelMode = true"
+                                                x-show="!['Selesai', 'Dibatalkan', 'Dikirim'].includes(selectedOrder?.status)"
+                                                class="w-full py-2 text-[10px] font-black text-red-500 uppercase tracking-[0.2em] hover:text-red-700 transition-all flex items-center justify-center gap-3 group">
+                                                <span class="h-[2px] w-4 bg-red-100 group-hover:bg-red-400 transition-all"></span>
+                                                BATALKAN PESANAN INI
+                                                <span class="h-[2px] w-4 bg-red-100 group-hover:bg-red-400 transition-all"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -667,8 +643,9 @@
                                             SELESAIKAN PESANAN</button>
 
                                         <a :href="getWaLink('manual_complete')" target="_blank"
-                                            class="w-full bg-[#25D366] text-white py-3 font-headline font-bold text-[10px] uppercase tracking-widest border-[3px] border-gray-900 flex items-center justify-center gap-2 italic">
-                                            KIRIM INFO WA KE RESELLER
+                                            class="w-full bg-[#25D366] text-white py-3 font-headline font-bold text-[10px] uppercase tracking-widest border-[3px] border-gray-900 flex items-center justify-center gap-2 italic hover:bg-[#1DA851] transition-all">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                            <span>KIRIM INFO WA KE RESELLER</span>
                                         </a>
 
                                         <button type="button" @click="forceCompleteMode = false"

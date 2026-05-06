@@ -4,7 +4,7 @@
 
     $menuGroups = [
         [
-            'label' => null,
+            'label' => 'Utama',
             'items' => [
                 [
                     'key'   => 'overview',

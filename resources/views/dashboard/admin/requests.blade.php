@@ -80,28 +80,31 @@
         {{-- Header --}}
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
             <div>
-                <h2 class="font-headline font-black text-3xl text-primary tracking-tighter uppercase leading-none">Persetujuan Stok</h2>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-3 italic">Validasi audit stok gudang Distributor</p>
+                <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase leading-none">Persetujuan Stok</h2>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3">Validasi audit stok gudang Distributor</p>
             </div>
 
             {{-- Filters --}}
             <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                {{-- Search Bar First --}}
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Cari Distributor..." 
+                        class="w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                </div>
+
+                {{-- Filter Second --}}
                 <div class="relative w-full sm:w-48">
                     <select x-model="filterRegion" aria-label="Filter Wilayah"
-                        class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                        class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                         <option>Semua Wilayah</option>
                         <option>Jawa Barat</option>
                         <option>Jawa Timur</option>
                     </select>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-                <div class="relative w-full sm:w-64">
-                    <input type="text" x-model="searchQuery" placeholder="Cari Distributor..." 
-                        class="w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
                 </div>
             </div>
@@ -138,55 +141,106 @@
         <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)]">
             <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-gray-900 text-white">
                 <div class="col-span-3 text-[10px] font-headline font-bold uppercase tracking-widest">Distributor</div>
-                <div class="col-span-2 text-center text-[10px] font-headline font-bold uppercase tracking-widest">Sistem vs Fisik</div>
-                <div class="col-span-1 text-center text-[10px] font-headline font-bold uppercase tracking-widest">Selisih</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold uppercase tracking-widest">Sistem vs Fisik</div>
+                <div class="col-span-1 text-[10px] font-headline font-bold uppercase tracking-widest">Selisih</div>
                 <div class="col-span-4 text-[10px] font-headline font-bold uppercase tracking-widest">Alasan Pengajuan</div>
                 <div class="col-span-2 text-right text-[10px] font-headline font-bold uppercase tracking-widest">Aksi</div>
             </div>
 
             <div class="divide-y-2 divide-neutral-border">
-                <template x-for="(req, index) in filteredSync" :key="req.id">
-                    <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-8 py-6 items-start md:items-center hover:bg-neutral-light transition-colors group">
-                        <div class="md:col-span-3 w-full">
-                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pengaju</p>
-                            <div class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight" x-text="req.requester"></div>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-[9px] font-bold text-slate-500 uppercase" x-text="req.city"></span>
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase" x-text="req.date"></span>
+                {{-- Desktop List --}}
+                <div class="hidden md:block">
+                    <template x-for="(req, index) in filteredSync" :key="req.id">
+                        <div class="grid grid-cols-12 gap-4 px-8 py-6 items-center hover:bg-neutral-light transition-colors group">
+                            <div class="col-span-3">
+                                <div class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight" x-text="req.requester"></div>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase" x-text="req.city"></span>
+                                    <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase" x-text="req.date"></span>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex items-center gap-2 font-bold">
+                                    <span class="text-xs text-slate-400" x-text="req.current"></span>
+                                    <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                    <span class="text-sm font-headline font-black text-gray-900" x-text="req.actual"></span>
+                                </div>
+                            </div>
+                            <div class="col-span-1 font-headline font-black italic">
+                                <span :class="req.diff.startsWith('+') ? 'text-green-600' : 'text-red-600'" x-text="req.diff"></span>
+                            </div>
+                            <div class="col-span-4">
+                                <p class="text-[11px] text-slate-600 font-bold leading-relaxed line-clamp-2" x-text="req.reason"></p>
+                            </div>
+                            <div class="col-span-2 flex justify-end gap-2 text-right">
+                                <a :href="getWaLink(req)" target="_blank"
+                                    class="p-2 border-[3px] border-gray-900 bg-white text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                </a>
+                                <button @click="openDetail(req)" class="bg-primary text-white px-4 py-2 text-[9px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
+                                    TINJAU
+                                </button>
                             </div>
                         </div>
-                        <div class="md:col-span-2 w-full md:text-center">
-                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Perbandingan</p>
-                            <div class="flex items-center justify-center gap-2 font-bold">
-                                <span class="text-xs text-slate-400" x-text="req.current"></span>
-                                <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                <span class="text-sm font-headline font-black text-gray-900" x-text="req.actual"></span>
+                    </template>
+                </div>
+
+                {{-- Mobile Cards --}}
+                <div class="md:hidden">
+                    <template x-for="(req, index) in filteredSync" :key="req.id">
+                        <div class="p-6 hover:bg-neutral-light transition-colors space-y-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h5 class="font-headline font-black text-sm text-gray-900 uppercase tracking-tight" x-text="req.requester"></h5>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1" x-text="req.city + ' — ' + req.date"></p>
+                                </div>
+                                <div class="font-headline font-black italic text-sm">
+                                    <span :class="req.diff.startsWith('+') ? 'text-green-600' : 'text-red-600'" x-text="req.diff"></span>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral p-4 border-2 border-gray-900 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Perbandingan Stok</p>
+                                <div class="flex items-center gap-4 font-bold">
+                                    <div>
+                                        <p class="text-[7px] text-slate-400 uppercase">Sistem</p>
+                                        <p class="text-sm" x-text="req.current"></p>
+                                    </div>
+                                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                    <div>
+                                        <p class="text-[7px] text-primary uppercase">Fisik (Audit)</p>
+                                        <p class="text-base font-headline font-black text-gray-900" x-text="req.actual"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-[11px] text-slate-600 font-bold leading-relaxed italic" x-text="'“' + req.reason + '”'"></p>
+
+                            <div class="flex gap-3 pt-2">
+                                <a :href="getWaLink(req)" target="_blank"
+                                    class="flex-1 flex items-center justify-center gap-2 py-3 border-[3px] border-gray-900 bg-white text-[#25D366] font-bold text-[10px] uppercase tracking-widest shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                    <span>WhatsApp</span>
+                                </a>
+                                <button @click="openDetail(req)"
+                                    class="flex-1 py-3 bg-primary text-white font-headline font-black text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none transition-all">
+                                    Tinjau Audit
+                                </button>
                             </div>
                         </div>
-                        <div class="md:col-span-1 w-full md:text-center font-headline font-black italic">
-                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Selisih</p>
-                            <span :class="req.diff.startsWith('+') ? 'text-green-600' : 'text-red-600'" x-text="req.diff"></span>
-                        </div>
-                        <div class="md:col-span-4 w-full">
-                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Alasan</p>
-                            <p class="text-[11px] text-slate-600 font-bold leading-relaxed line-clamp-2" x-text="req.reason"></p>
-                        </div>
-                        <div class="md:col-span-2 w-full flex justify-end gap-2 text-right">
-                            {{-- WA Button --}}
-                            <a :href="getWaLink(req)" target="_blank"
-                                class="p-2 border-[3px] border-gray-900 bg-white text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all shadow-[3px_3px_0_var(--color-gray-900)] active:translate-y-0.5 active:shadow-none">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                            </a>
-                            <button @click="openDetail(req)" class="bg-primary text-white px-4 py-2 text-[9px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-0.5 active:shadow-none transition-all">
-                                TINJAU
-                            </button>
-                        </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
+
                 <template x-if="filteredSync.length === 0">
-                    <div class="px-8 py-20 text-center">
-                        <p class="font-headline font-bold text-slate-300 text-xl uppercase italic tracking-widest">Tidak ada pengajuan sinkronisasi</p>
+                    <div class="px-8 py-20 text-center bg-neutral-light/50">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                            <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Audit Selesai!</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                            Tidak ada pengajuan sinkronisasi stok yang menunggu persetujuan saat ini.
+                        </p>
                     </div>
                 </template>
             </div>

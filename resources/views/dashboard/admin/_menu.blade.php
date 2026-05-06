@@ -3,7 +3,7 @@
 
     $menuGroups = [
         [
-            'label' => null,
+            'label' => 'Utama',
             'items' => [
                 [
                     'key'   => 'overview',
@@ -124,7 +124,7 @@
                 <div class="flex-1 flex items-center justify-between">
                     <span>{{ $menu['name'] }}</span>
                     @if(isset($menu['badge']) && $menu['badge'] > 0)
-                        <span class="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm">{{ $menu['badge'] }}</span>
+                        <x-ui.badge-count :count="$menu['badge']" type="danger" />
                     @endif
                 </div>
             </a>

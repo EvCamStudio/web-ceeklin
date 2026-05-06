@@ -73,20 +73,25 @@
         }
     }" class="max-w-6xl mx-auto">
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        {{-- Unified Header --}}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
             <div x-show="view === 'list'">
-                <h2 class="font-headline font-black text-2xl text-primary uppercase tracking-tighter">Database Distributor</h2>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Manajemen Mitra & Wilayah Operasional</p>
+                <div class="flex items-center gap-4">
+                    <h2 class="font-headline font-black text-2xl text-primary uppercase tracking-tighter">Database Distributor</h2>
+                    <x-ui.badge-count :count="count($distributors)" type="secondary" class="scale-110" />
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3 leading-tight">Manajemen Mitra & Wilayah Operasional</p>
             </div>
             <div x-show="view === 'create'" x-cloak style="display: none;">
                 <h2 class="font-headline font-black text-2xl text-primary uppercase tracking-tighter">Registrasi Mitra</h2>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Pembuatan Akun Distributor Resmi CeeKlin</p>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3 leading-tight">Pembuatan Akun Distributor Resmi CeeKlin</p>
             </div>
 
-            <div class="w-full sm:w-auto flex flex-wrap gap-3">
-                {{-- Filter Wilayah (Hanya tampil di List) --}}
-                <div x-show="view === 'list'" class="relative w-full sm:w-auto">
-                    <select x-model="filterRegion" aria-label="Filter wilayah" class="appearance-none w-full sm:w-auto bg-white border-[3px] border-gray-900 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10">
+            <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                {{-- Filter Wilayah --}}
+                <div x-show="view === 'list'" class="relative w-full sm:w-48">
+                    <select x-model="filterRegion" aria-label="Filter wilayah" 
+                        class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                         <option>Semua Wilayah</option>
                         @foreach($provinces as $province)
                             <option>{{ $province->name }}</option>
@@ -98,12 +103,12 @@
                 </div>
 
                 <button x-show="view === 'list'" @click="view = 'create'; successMode = false; resetForm()"
-                    class="w-full sm:w-auto bg-primary text-white px-6 py-3 font-headline font-black text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3">
+                    class="w-full sm:w-auto bg-primary text-white px-6 py-3 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
                     TAMBAH AKUN
                 </button>
                 <button x-show="view === 'create'" x-cloak style="display: none;" @click="view = 'list'; resetForm()"
-                    class="w-full sm:w-auto bg-white text-gray-900 px-6 py-3 font-headline font-black text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-gray-100 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3">
+                    class="w-full sm:w-auto bg-white text-gray-900 px-6 py-3 font-headline font-black text-xs uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-gray-100 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     BATAL / KEMBALI
                 </button>
@@ -116,18 +121,12 @@
         <div x-show="view === 'list'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
              class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
             
-            <div class="bg-gray-900 px-6 py-4 flex items-center justify-between border-b-2 border-gray-900">
-                <span class="font-headline font-bold text-white text-[10px] uppercase tracking-widest">Master Data Distributor</span>
-                <span class="text-[10px] font-bold text-secondary uppercase tracking-widest">{{ count($distributors) }} Mitra Terdaftar</span>
-            </div>
-
-            {{-- Table Header (Desktop) --}}
-            <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-neutral-light border-b-2 border-neutral-border">
-                <div class="col-span-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Distributor</div>
-                <div class="col-span-3 text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Wilayah</div>
-                <div class="col-span-2 text-center text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Stok (PCS)</div>
-                <div class="col-span-1 text-center text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Mitra</div>
-                <div class="col-span-2 text-right text-[10px] font-headline font-bold text-primary uppercase tracking-widest">Manajemen</div>
+            <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-gray-900 text-white">
+                <div class="col-span-4 text-[10px] font-headline font-bold uppercase tracking-widest">Distributor</div>
+                <div class="col-span-3 text-[10px] font-headline font-bold uppercase tracking-widest">Wilayah</div>
+                <div class="col-span-2 text-center text-[10px] font-headline font-bold uppercase tracking-widest">Stok (PCS)</div>
+                <div class="col-span-1 text-center text-[10px] font-headline font-bold uppercase tracking-widest">Mitra</div>
+                <div class="col-span-2 text-right text-[10px] font-headline font-bold uppercase tracking-widest">Aksi</div>
             </div>
 
             <div class="divide-y-2 divide-neutral-border" x-data="{ expandedId: null }">
@@ -158,9 +157,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="md:col-span-3 w-full">
+                        <div class="md:col-span-3 w-full text-left md:text-left">
                             <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Wilayah</p>
-                            <div class="text-[10px] font-black text-gray-700 uppercase tracking-widest flex items-center gap-2">
+                            <div class="text-xs font-black text-gray-700 uppercase tracking-widest flex items-center justify-start gap-2">
                                 <svg class="w-3 h-3 text-secondary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                                 {{ is_numeric($distributor->province_name) ? 'WILAYAH #' . $distributor->province_name : $distributor->province_name }}
                             </div>
@@ -191,7 +190,7 @@
                                     resellerCount: {{ $distributor->resellers_count }},
                                     username: '{{ $distributor->user->username ?? 'N/A' }}'
                                 }"
-                                    class="bg-primary text-white px-3 py-1.5 text-[9px] font-black uppercase tracking-widest border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all">
+                                    class="bg-primary text-white px-3 py-1.5 text-xs font-black uppercase tracking-widest border-2 border-gray-900 shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all">
                                     DETAIL
                                 </button>
                             </div>
@@ -200,17 +199,34 @@
 
                 </div>
                 @empty
-                <div class="px-8 py-16 text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Belum ada distributor terdaftar</p>
+                <div class="px-8 py-20 text-center bg-neutral-light/50">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                        <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Distributor</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                        Belum ada distributor terdaftar di sistem.
+                    </p>
                 </div>
                 @endforelse
 
                 <!-- Empty State for Filter/Search -->
-                <div x-show="[...$el.parentElement.children].filter(el => el.hasAttribute('x-show') && el.style.display !== 'none').length === 0"
-                     x-cloak class="px-8 py-16 text-center animate-in">
-                    <svg class="w-12 h-12 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tidak ada distributor di wilayah ini</p>
+                @if(count($distributors) > 0)
+                <div x-show="![
+                        @foreach($distributors as $distributor)
+                            '{{ addslashes($distributor->province_name) }}',
+                        @endforeach
+                    ].some(p => filterRegion === 'Semua Wilayah' || p === filterRegion)"
+                     x-cloak class="px-8 py-20 text-center bg-neutral-light/50 animate-in">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                        <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Wilayah Kosong!</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                        Tidak ada distributor yang ditemukan di wilayah ini.
+                    </p>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -364,20 +380,20 @@
         <div x-show="view === 'detail'" x-cloak style="display: none;" x-transition
              class="max-w-[1400px] mx-auto">
             
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
-                <div class="space-y-1">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
+                <div>
                     <h2 class="font-headline font-black text-2xl text-primary uppercase italic leading-none" x-text="selectedDistributor?.name"></h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Manajemen Detail & Daftar Reseller Terdaftar</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3 leading-tight">Manajemen Detail & Daftar Reseller Terdaftar</p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
                     <button @click="view = 'list'; selectedDistributor = null" 
-                        class="bg-white text-gray-900 px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-gray-100 active:translate-y-1 active:shadow-none transition-all flex items-center gap-2">
+                        class="w-full sm:w-auto bg-white text-gray-900 px-6 py-3 text-xs font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-gray-100 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         KEMBALI KE DAFTAR
                     </button>
                     <a :href="'https://wa.me/' + selectedDistributor?.phone" target="_blank"
-                        class="bg-[#25D366] text-white px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-[#1DA851] transition-all flex items-center gap-2">
+                        class="w-full sm:w-auto bg-[#25D366] text-white px-6 py-3 text-xs font-headline font-black uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-[#1DA851] transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                         HUBUNGI DISTRIBUTOR
                     </a>
@@ -445,7 +461,7 @@
                             <div class="w-8 h-8 bg-primary text-white flex items-center justify-center font-black text-xs border-2 border-gray-900">R</div>
                             <h4 class="font-headline font-black text-xs uppercase tracking-widest text-primary">Manajemen Reseller Terdaftar</h4>
                         </div>
-                        <span class="bg-gray-900 text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest" x-text="selectedDistributor?.resellerCount + ' Reseller Aktif'"></span>
+                        <span class="bg-gray-900 text-white px-3 py-1 text-xs font-black uppercase tracking-widest" x-text="selectedDistributor?.resellerCount + ' Reseller Aktif'"></span>
                     </div>
                     
                     <div :class="tableExpanded ? 'max-h-none' : 'max-h-[450px]'" class="overflow-hidden relative transition-all duration-500">
@@ -485,6 +501,19 @@
                                             </td>
                                         </tr>
                                     </template>
+                                    <template x-if="selectedDistributor?.resellerCount === 0">
+                                        <tr>
+                                            <td colspan="5" class="px-8 py-20 text-center bg-neutral-light/50">
+                                                <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                                    <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                                </div>
+                                                <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Mitra</h3>
+                                                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                                                    Distributor ini belum memiliki reseller yang terdaftar.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
@@ -518,6 +547,17 @@
                                             <p class="text-[9px] font-black text-gray-700 uppercase tracking-tight">12 Mei 2024</p>
                                         </div>
                                     </div>
+                                </div>
+                            </template>
+                            <template x-if="selectedDistributor?.resellerCount === 0">
+                                <div class="px-8 py-20 text-center bg-neutral-light/50">
+                                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                        <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                    </div>
+                                    <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Mitra</h3>
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                                        Distributor ini belum memiliki reseller yang terdaftar.
+                                    </p>
                                 </div>
                             </template>
                         </div>
@@ -585,8 +625,8 @@
                             <input type="password" x-model="confirmPassword" placeholder="MASUKKAN PASSWORD ADMIN..." 
                                 class="w-full bg-slate-50 border-3 border-gray-900 px-4 py-3 font-bold text-xs focus:bg-white outline-none focus:ring-4 focus:ring-primary/20 transition-all uppercase tracking-widest">
                             <div class="grid grid-cols-2 gap-3">
-                                <button @click="confirmMode = 'none'" class="py-3 border-3 border-gray-900 font-headline font-black text-[9px] uppercase tracking-widest hover:bg-slate-100">BATAL</button>
-                                <button class="py-3 bg-primary text-white font-headline font-black text-[9px] uppercase tracking-widest border-3 border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-1 active:shadow-none">KONFIRMASI</button>
+                                <button @click="confirmMode = 'none'" class="py-3 border-3 border-gray-900 font-headline font-black text-xs uppercase tracking-widest hover:bg-slate-100">BATAL</button>
+                                <button class="py-3 bg-primary text-white font-headline font-black text-xs uppercase tracking-widest border-3 border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-1 active:shadow-none">KONFIRMASI</button>
                             </div>
                         </div>
                     </div>
@@ -612,8 +652,8 @@
                             <input type="password" x-model="confirmPassword" placeholder="PASSWORD KONFIRMASI..." 
                                 class="w-full bg-red-50 border-3 border-red-600 px-4 py-3 font-bold text-xs focus:bg-white outline-none focus:ring-4 focus:ring-red-100 transition-all uppercase tracking-widest text-red-600 placeholder:text-red-200">
                             <div class="grid grid-cols-2 gap-3">
-                                <button @click="confirmMode = 'none'" class="py-3 border-3 border-gray-900 font-headline font-black text-[9px] uppercase tracking-widest hover:bg-slate-100">BATAL</button>
-                                <button class="py-3 bg-red-600 text-white font-headline font-black text-[9px] uppercase tracking-widest border-3 border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-1 active:shadow-none">HAPUS DATA</button>
+                                <button @click="confirmMode = 'none'" class="py-3 border-3 border-gray-900 font-headline font-black text-xs uppercase tracking-widest hover:bg-slate-100">BATAL</button>
+                                <button class="py-3 bg-red-600 text-white font-headline font-black text-xs uppercase tracking-widest border-3 border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] active:translate-y-1 active:shadow-none">HAPUS DATA</button>
                             </div>
                         </div>
                     </div>

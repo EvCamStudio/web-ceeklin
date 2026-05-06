@@ -131,27 +131,27 @@
              x-transition:enter-start="opacity-0 translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0">
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
                 <div>
-                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase">Menunggu Peninjauan</h2>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{{ count($pendingResellers) }} Pendaftar Baru</p>
+                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase leading-none">Menunggu Peninjauan</h2>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-3">{{ count($pendingResellers) }} Pendaftar Baru</p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:w-64">
+                <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" x-model="searchQuery" placeholder="Cari Nama / NIK..." 
-                            class="w-full bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                            class="w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                         <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                     </div>
-                    <div class="relative">
-                        <select x-model="filterRegion" aria-label="Filter wilayah" class="appearance-none bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-8 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                    <div class="relative w-full sm:w-48">
+                        <select x-model="filterRegion" aria-label="Filter wilayah" class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                             <option>Semua Wilayah</option>
                             <option>Jawa Barat</option>
                             <option>Jawa Tengah</option>
                             <option>Jawa Timur</option>
                         </select>
-                        <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </div>
@@ -168,7 +168,7 @@
                 </div>
 
                 <div class="divide-y-2 divide-neutral-border">
-                    @foreach($pendingResellers as $reseller)
+                    @forelse($pendingResellers as $reseller)
                     <div x-show="(filterRegion === 'Semua Wilayah' || '{{ $reseller->province_name }}' === filterRegion) && 
                                  (!searchQuery || '{{ strtolower($reseller->name) }}'.includes(searchQuery.toLowerCase()) || '{{ $reseller->nik }}'.includes(searchQuery))"
                          class="animate-in stagger-{{ ($loop->iteration % 5) + 1 }} flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors">
@@ -211,14 +211,26 @@
                             </button>
                         </div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="px-8 py-20 text-center bg-neutral-light/50">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                            <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Antrean Bersih!</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                            Tidak ada reseller baru yang menunggu verifikasi saat ini. Kerja bagus!
+                        </p>
+                    </div>
+                    @endforelse
 
-                    <!-- Empty State for Filter/Search -->
+                    <!-- Empty State for Filter/Search (only if list originally has items) -->
+                    @if(count($pendingResellers) > 0)
                     <div x-show="[...$el.parentElement.children].filter(el => el.hasAttribute('x-show') && el.style.display !== 'none').length === 0"
                          x-cloak class="px-8 py-16 text-center animate-in">
-                        <svg class="w-12 h-12 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg class="w-12 h-12 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tidak ada data yang cocok dengan pencarian Anda</p>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -354,7 +366,7 @@
                         <button @click="step = 2; window.scrollTo({ top: 0, behavior: 'smooth' })"
                             class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            SETUJUI — LANJUT TETAPKAN DISTRIBUTOR
+                            DATA SESUAI — LANJUT TETAPKAN DISTRIBUTOR
                         </button>
                     </div>
                 </div>
@@ -404,7 +416,7 @@
                         </div>
                     </div>
 
-                    <div class="p-6 md:p-8 bg-neutral-light">
+                    <div class="p-6 md:p-8 bg-neutral-light border-b-[4px] border-gray-900">
 
                         {{-- Info Wilayah Reseller --}}
                         <div class="bg-white border-[3px] border-primary p-4 mb-6 flex items-center gap-4">
@@ -545,20 +557,22 @@
                                 </div>
                             </div>
 
-                            {{-- Tombol Final --}}
-                            <div class="mt-8 border-t border-dashed border-gray-300 pt-6">
-                                <div class="flex flex-col sm:flex-row gap-4">
-                                    <button type="button" @click="step = 1; window.scrollTo({ top: 0, behavior: 'smooth' })"
-                                        class="w-full sm:w-1/3 bg-white text-gray-600 border-[3px] border-gray-400 px-6 py-4 font-headline font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-[4px_4px_0_var(--color-gray-400)] active:translate-y-1 active:shadow-none">
-                                        Kembali
-                                    </button>
-                                    <button type="submit" :disabled="selectedDistributorId === ''"
-                                        class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                        SETUJUI & TETAPKAN DISTRIBUTOR
-                                    </button>
-                                </div>
-                            </div>
+                    </div> {{-- End of Neutral Light Body --}}
+ 
+                    {{-- Tombol Final (Standardized Action Footer) --}}
+                    <div class="p-6 md:p-8 bg-white border-t-[4px] border-gray-900">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button type="button" @click="step = 1; window.scrollTo({ top: 0, behavior: 'smooth' })"
+                                class="w-full sm:w-1/3 bg-white text-gray-600 border-[3px] border-gray-400 px-6 py-4 font-headline font-bold text-sm uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-[4px_4px_0_var(--color-gray-400)] active:translate-y-1 active:shadow-none">
+                                Kembali
+                            </button>
+                            <button type="submit" :disabled="selectedDistributorId === ''"
+                                class="w-full sm:w-2/3 bg-primary text-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-gray-900)] px-6 py-4 font-headline font-black text-sm uppercase tracking-widest hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                SETUJUI & TETAPKAN DISTRIBUTOR
+                            </button>
+                        </div>
+                    </div>
                         </form>
                     </div>
                 </div>

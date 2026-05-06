@@ -106,97 +106,117 @@
         {{-- TAB 1: ANTREAN PENCAIRAN --}}
         <div x-show="activeTab === 'pencairan'" x-transition>
             <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-900 text-white">
-                        <tr>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Penerima Bonus</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">Suplai Oleh</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest">ID / Tgl</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Nominal</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold uppercase tracking-widest text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y-2 divide-neutral-border">
-                        <template x-for="req in bonusRequests" :key="req.id">
-                            <tr class="hover:bg-neutral-light transition-colors group text-gray-900">
-                                <td class="px-6 py-4">
-                                    <p class="font-headline font-black text-sm uppercase tracking-tight" x-text="req.requester"></p>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase" x-text="req.city"></p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-[8px] font-black text-primary uppercase mb-0.5 tracking-tighter">Distributor</span>
-                                        <p class="text-[10px] font-bold text-slate-500 uppercase leading-none italic" x-text="req.distributor"></p>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-[10px] font-black text-secondary uppercase leading-none" x-text="req.id"></p>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-1" x-text="req.date"></p>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <p class="font-headline font-black text-lg text-primary tracking-tighter" x-text="req.amount"></p>
-                                    <p class="text-[8px] font-black text-slate-400 uppercase" x-text="req.period"></p>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button @click="openDetail(req)"
-                                        class="bg-primary text-white border-[3px] border-gray-900 px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-0.5 active:shadow-none">
-                                        CAIRKAN
-                                    </button>
-                                </td>
-                            </tr>
-                        </template>
-                        <template x-if="bonusRequests.length === 0">
-                            <tr>
-                                <td colspan="5" class="px-6 py-20 text-center">
-                                    <p class="font-headline font-bold text-slate-300 text-xl uppercase italic">Tidak ada antrean pencairan bonus</p>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
+                <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-900 border-b-2 border-gray-900">
+                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Penerima Bonus</div>
+                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Suplai Oleh</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest">ID / Tgl</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Nominal</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Aksi</div>
+                </div>
+
+                <div class="divide-y-2 divide-neutral-border">
+                    <template x-for="(req, index) in bonusRequests" :key="req.id">
+                        <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors text-gray-900">
+                            <div class="md:col-span-3 w-full">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Penerima Bonus</p>
+                                <p class="font-headline font-black text-sm uppercase tracking-tight" x-text="req.requester"></p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase" x-text="req.city"></p>
+                            </div>
+                            <div class="md:col-span-3 w-full">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Suplai Oleh</p>
+                                <div class="flex flex-col">
+                                    <span class="text-[8px] font-black text-primary uppercase mb-0.5 tracking-tighter">Distributor</span>
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase leading-none italic" x-text="req.distributor"></p>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2 w-full">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">ID / Tgl</p>
+                                <p class="text-[10px] font-black text-secondary uppercase leading-none" x-text="req.id"></p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1" x-text="req.date"></p>
+                            </div>
+                            <div class="md:col-span-2 w-full md:text-right">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nominal</p>
+                                <p class="font-headline font-black text-lg text-primary tracking-tighter" x-text="req.amount"></p>
+                                <p class="text-[8px] font-black text-slate-400 uppercase" x-text="req.period"></p>
+                            </div>
+                            <div class="md:col-span-2 w-full flex justify-start md:justify-end mt-2 md:mt-0">
+                                <button @click="openDetail(req)"
+                                    class="bg-primary text-white border-[3px] border-gray-900 px-4 py-2 text-[10px] font-headline font-black uppercase tracking-widest shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-0.5 active:shadow-none">
+                                    CAIRKAN
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="bonusRequests.length === 0">
+                        <div class="px-8 py-20 text-center bg-neutral-light/50">
+                            <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Antrean Bersih!</h3>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                                Tidak ada antrean pencairan bonus saat ini.
+                            </p>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
 
         {{-- TAB 2: MONITORING PERFORMA --}}
         <div x-show="activeTab === 'monitoring'" x-transition style="display: none;">
             <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-neutral-light border-b-2 border-gray-900">
-                        <tr>
-                            <th class="px-8 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Nama Reseller</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Suplai Oleh</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest text-center">Pencapaian</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest">Progress Target</th>
-                            <th class="px-8 py-4 text-[10px] font-headline font-bold text-gray-900 uppercase tracking-widest text-right">Potensi Bonus</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y-2 divide-neutral-border">
-                        <template x-for="item in leaderboard" :key="item.id">
-                            <tr class="hover:bg-neutral-light transition-colors">
-                                <td class="px-8 py-6">
-                                    <p class="font-headline font-bold text-sm text-gray-900 uppercase" x-text="item.name"></p>
-                                    <p class="text-[9px] font-bold text-slate-500 uppercase" x-text="item.city"></p>
-                                </td>
-                                <td class="px-6 py-6">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase italic leading-tight" x-text="item.distributor"></p>
-                                </td>
-                                <td class="px-6 py-6 text-center">
+                <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-900 border-b-2 border-gray-900">
+                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Nama Reseller</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Suplai Oleh</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Pencapaian</div>
+                    <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Progress Target</div>
+                    <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Potensi Bonus</div>
+                </div>
+
+                <div class="divide-y-2 divide-neutral-border">
+                    <template x-for="(item, index) in leaderboard" :key="item.id">
+                        <div class="flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-5 items-start md:items-center hover:bg-neutral-light transition-colors text-gray-900">
+                            <div class="md:col-span-3 w-full">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nama Reseller</p>
+                                <p class="font-headline font-bold text-sm text-gray-900 uppercase" x-text="item.name"></p>
+                                <p class="text-[9px] font-bold text-slate-500 uppercase" x-text="item.city"></p>
+                            </div>
+                            <div class="md:col-span-2 w-full">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Suplai Oleh</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase italic leading-tight" x-text="item.distributor"></p>
+                            </div>
+                            <div class="md:col-span-2 w-full md:text-center mt-2 md:mt-0">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pencapaian</p>
+                                <div class="flex items-end gap-1 md:justify-center">
                                     <p class="font-headline font-black text-xl text-primary leading-none" x-text="item.sales"></p>
-                                    <p class="text-[8px] font-black uppercase mt-1 text-slate-400">PCS</p>
-                                </td>
-                                <td class="px-6 py-6">
-                                    <div class="w-full bg-slate-100 border-2 border-gray-900 h-6 relative overflow-hidden">
-                                        <div class="absolute inset-0 bg-primary border-r-2 border-gray-900 transition-all duration-500" :style="'width: ' + item.progress + '%'"></div>
-                                        <span class="absolute inset-0 flex items-center justify-center text-[9px] font-black text-gray-900 uppercase mix-blend-difference" x-text="item.progress + '%'"></span>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6 text-right">
-                                    <p class="font-headline font-black text-lg text-gray-900 tracking-tighter" x-text="item.potential"></p>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
+                                    <p class="text-[8px] font-black uppercase text-slate-400 mb-0.5">PCS</p>
+                                </div>
+                            </div>
+                            <div class="md:col-span-3 w-full mt-2 md:mt-0">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Progress Target</p>
+                                <div class="w-full bg-slate-100 border-2 border-gray-900 h-6 relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-primary border-r-2 border-gray-900 transition-all duration-500" :style="'width: ' + item.progress + '%'"></div>
+                                    <span class="absolute inset-0 flex items-center justify-center text-[9px] font-black text-gray-900 uppercase mix-blend-difference" x-text="item.progress + '%'"></span>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2 w-full md:text-right mt-2 md:mt-0">
+                                <p class="md:hidden text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Potensi Bonus</p>
+                                <p class="font-headline font-black text-lg text-gray-900 tracking-tighter" x-text="item.potential"></p>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="leaderboard.length === 0">
+                        <div class="px-8 py-20 text-center bg-neutral-light/50">
+                            <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            </div>
+                            <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Data</h3>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                                Monitoring performa masih kosong.
+                            </p>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
 

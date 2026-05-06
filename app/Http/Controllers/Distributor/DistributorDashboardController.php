@@ -240,10 +240,21 @@ class DistributorDashboardController extends Controller
             ->get()
             ->map(function($order) {
                 $statusColors = [
-                    'Menunggu Proses' => 'border-gray-500 text-gray-500 bg-gray-50',
+                    'Menunggu Proses' => 'border-gray-400 text-gray-500 bg-gray-50',
                     'Diproses' => 'border-yellow-500 text-yellow-700 bg-yellow-50',
                     'Dikirim' => 'border-blue-500 text-blue-700 bg-blue-50',
                     'Selesai' => 'border-green-600 text-green-700 bg-green-50',
+                    'Dibatalkan' => 'border-slate-300 text-slate-400 bg-slate-50',
+                    'Ditolak' => 'border-slate-300 text-slate-400 bg-slate-50',
+                ];
+
+                $statusLabels = [
+                    'Menunggu Proses' => 'Menunggu',
+                    'Diproses' => 'Dikemas',
+                    'Dikirim' => 'Dikirim',
+                    'Selesai' => 'Selesai',
+                    'Dibatalkan' => 'Dibatalkan',
+                    'Ditolak' => 'Dibatalkan',
                 ];
 
                 $leftBorders = [
@@ -259,7 +270,7 @@ class DistributorDashboardController extends Controller
                     'type' => 'Pembelian',
                     'qty' => $order->quantity,
                     'total' => 'Rp ' . number_format($order->total_price, 0, ',', '.'),
-                    'status' => $order->status,
+                    'status' => $statusLabels[$order->status] ?? $order->status,
                     'date' => $order->created_at->translatedFormat('d M Y'),
                     'statusClass' => $statusColors[$order->status] ?? 'border-gray-500 text-gray-700',
                     'leftBorder' => $leftBorders[$order->status] ?? 'border-gray-500',
