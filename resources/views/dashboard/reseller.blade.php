@@ -25,17 +25,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <a href="/dashboard/reseller/history" 
-               class="bg-blue-50 border-[4px] border-blue-600 p-6 flex items-center justify-between group hover:bg-blue-600 transition-all duration-300 shadow-[8px_8px_0_var(--color-gray-900)]">
+               class="bg-secondary/5 border-[4px] border-secondary p-6 flex items-center justify-between group hover:bg-secondary transition-all duration-300 shadow-[8px_8px_0_var(--color-gray-900)]">
                 <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 bg-blue-600 flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-colors">
+                    <div class="w-14 h-14 bg-secondary flex items-center justify-center text-white group-hover:bg-white group-hover:text-yellow-600 transition-colors">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1-1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
                     </div>
                     <div>
-                        <h4 class="font-headline font-black text-blue-600 group-hover:text-white text-xl uppercase leading-none tracking-tighter">{{ $urgentShippingCount }} Pesanan Dikirim</h4>
-                        <p class="text-[10px] font-bold text-blue-400 group-hover:text-blue-100 uppercase tracking-widest mt-1 italic">Pantau status perjalanan kurir</p>
+                        <h4 class="font-headline font-black text-yellow-600 group-hover:text-white text-xl uppercase leading-none tracking-tighter">{{ $urgentShippingCount }} Pesanan Dikirim</h4>
+                        <p class="text-[10px] font-bold text-secondary group-hover:text-white/80 uppercase tracking-widest mt-1 italic">Klik untuk konfirmasi jika paket telah sampai</p>
                     </div>
                 </div>
-                <svg class="w-8 h-8 text-blue-600 group-hover:text-white transition-transform group-hover:translate-x-2 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7"/></svg>
+                <svg class="w-8 h-8 text-yellow-600 group-hover:text-white transition-transform group-hover:translate-x-2 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7"/></svg>
             </a>
         </div>
     </div>
@@ -52,7 +52,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{-- Saldo Bonus --}}
             <div class="bg-white border-[3px] border-primary shadow-[8px_8px_0_var(--color-primary-darkest)] p-6">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 italic">Total Saldo Bonus</p>
+                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1 italic">Total Saldo Bonus</p>
                 <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic">Rp {{ number_format($totalBonus, 0, ',', '.') }}</h3>
                 <div class="mt-6 flex gap-4">
                     <a href="/dashboard/reseller/referrals?type=target" class="text-[9px] font-black text-primary uppercase border-b-2 border-primary hover:opacity-70 transition-all italic">TARGET</a>
@@ -61,25 +61,25 @@
             </div>
 
             {{-- Progress Target --}}
-            <div class="bg-primary text-white border-[3px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] p-6 relative overflow-hidden">
+            <div class="bg-primary text-white border-[3px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] p-6 relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
                 <div class="flex justify-between items-start mb-1">
-                    <p class="text-[10px] text-white/70 font-bold uppercase tracking-widest italic">Target Bulanan</p>
-                    <span class="text-[9px] font-black uppercase tracking-widest">GOAL: {{ number_format($targetQty) }}</span>
+                    <p class="text-[10px] text-secondary font-bold uppercase tracking-widest italic">Target Bulanan</p>
+                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest">GOAL: {{ number_format($targetQty) }}</span>
                 </div>
-                <h3 class="font-headline font-black text-4xl text-white tracking-tighter italic mb-3">{{ number_format($currentMonthOrders) }} <span class="text-xs font-body opacity-60">PCS</span></h3>
+                <h3 class="font-headline font-black text-4xl text-white tracking-tighter italic mb-3">{{ number_format($currentMonthOrders) }} <span class="text-xs font-body text-white/60">PCS</span></h3>
                 <div class="w-full bg-white/20 h-1.5 mb-2 border border-black/10">
                     <div class="bg-white h-full" style="width: {{ $targetProgress }}%"></div>
                 </div>
-                <p class="text-[9px] font-bold text-white/80 uppercase tracking-widest italic">
+                <p class="text-[9px] font-bold text-secondary uppercase tracking-widest italic">
                     {{ $neededForTarget > 0 ? number_format($neededForTarget) . ' pcs lagi ke bonus target' : 'Target bulan ini tercapai! 🔥' }}
                 </p>
             </div>
 
             {{-- Total Pesanan --}}
-            <div class="bg-white border-[3px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] p-6">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 italic">Total Pesanan Selesai</p>
-                <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic">{{ number_format($completedOrders) }} <span class="text-xs font-body text-slate-400">ORDER</span></h3>
+            <div class="bg-white border-[3px] border-primary shadow-[8px_8px_0_var(--color-primary-darkest)] p-6">
+                <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1 italic">Total Pesanan Selesai</p>
+                <h3 class="font-headline font-black text-4xl text-primary tracking-tighter italic">{{ number_format($completedOrders) }} <span class="text-xs font-body text-primary/60">ORDER</span></h3>
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-3 italic">Dari total {{ number_format($totalOrders) }} transaksi</p>
             </div>
         </div>
@@ -90,8 +90,8 @@
         {{-- Quick Actions (Kiri) --}}
         <div class="xl:col-span-4 flex flex-col gap-4">
             <div class="flex items-center gap-3 mb-2">
-                <span class="w-8 h-1 bg-gray-900"></span>
-                <h2 class="font-headline font-black text-lg text-gray-900 uppercase tracking-tight italic">Navigasi Cepat</h2>
+                <span class="w-8 h-1 bg-primary"></span>
+                <h2 class="font-headline font-black text-lg text-primary uppercase tracking-tight italic">Navigasi Cepat</h2>
             </div>
             <a href="/dashboard/reseller/order"
                class="bg-primary border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] p-5 flex items-center gap-4 hover:bg-primary-hover transition-all group hover:-translate-y-1">
@@ -104,7 +104,7 @@
                 </div>
             </a>
             <a href="/dashboard/reseller/referrals?type=target"
-               class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex items-center gap-4 hover:bg-neutral-light transition-all group hover:-translate-y-1">
+               class="bg-white border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex items-center gap-4 hover:bg-neutral-light transition-all group hover:-translate-y-1">
                 <div class="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                     <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                 </div>
@@ -114,13 +114,13 @@
                 </div>
             </a>
             <a href="/dashboard/reseller/referrals?type=referral"
-               class="bg-white border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] p-5 flex items-center gap-4 hover:bg-neutral-light transition-all group hover:-translate-y-1">
-                <div class="w-12 h-12 bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 transition-colors">
-                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+               class="bg-white border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex items-center gap-4 hover:bg-neutral-light transition-all group hover:-translate-y-1">
+                <div class="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                 </div>
                 <div>
-                    <h4 class="font-headline font-black text-gray-900 uppercase text-sm italic">Kode Referral</h4>
-                    <p class="text-xs text-slate-500 mt-0.5 uppercase tracking-tight font-bold italic">Bagikan kode & lihat member</p>
+                    <h4 class="font-headline font-black text-primary uppercase text-sm italic">Kode Referral</h4>
+                    <p class="text-xs text-slate-500 mt-0.5 uppercase tracking-tight font-bold italic">Bagikan kode & lihat reseller</p>
                 </div>
             </a>
         </div>
@@ -136,8 +136,8 @@
                     <span class="font-headline font-black text-white text-lg uppercase tracking-tight italic">Profil Distributor Anda</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                    <span class="text-[10px] font-black text-white uppercase tracking-widest italic">TERVERIFIKASI</span>
+                    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                    <span class="text-[10px] font-black text-secondary uppercase tracking-widest italic">TERVERIFIKASI</span>
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
                             @endif
                         </div>
                         <h4 class="font-headline font-black text-gray-900 text-2xl uppercase italic leading-none tracking-tight mb-2">{{ $upline->name ?? 'CeeKlin Pusat' }}</h4>
-                        <p class="text-[11px] text-primary font-bold uppercase tracking-[0.2em] italic mb-6">ID DISTRIBUTOR: #{{ str_pad($upline->id ?? 0, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-[11px] text-secondary font-bold uppercase tracking-[0.2em] italic mb-6">ID DISTRIBUTOR: #{{ str_pad($upline->id ?? 0, 4, '0', STR_PAD_LEFT) }}</p>
                         
                         <div class="space-y-3 w-full">
                             <a href="https://wa.me/62{{ ltrim($upline->phone ?? '', '0') }}" target="_blank" 
@@ -168,7 +168,7 @@
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 border-t-2 lg:border-t-0 lg:border-l-2 border-dashed border-gray-200 pt-8 lg:pt-0 lg:pl-10">
                         <div class="space-y-6">
                             <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Wilayah Operasional</p>
+                                <p class="text-[9px] font-black text-secondary uppercase tracking-widest mb-2 italic">Wilayah Operasional</p>
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-neutral-light border-2 border-gray-900 flex items-center justify-center">
                                         <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>

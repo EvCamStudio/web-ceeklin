@@ -122,10 +122,14 @@ class ResellerDashboardController extends Controller
             ->map(function($order) {
                 $colors = [
                     'Menunggu Konfirmasi' => 'border-red-400 text-red-700 bg-red-50',
+                    'Menunggu Proses'     => 'border-red-400 text-red-700 bg-red-50',
+                    'Menunggu'            => 'border-red-400 text-red-700 bg-red-50',
                     'Diproses'            => 'border-yellow-500 text-yellow-800 bg-yellow-50',
+                    'Dikemas'             => 'border-yellow-500 text-yellow-800 bg-yellow-50',
                     'Dikirim'             => 'border-blue-500 text-blue-700 bg-blue-50',
                     'Selesai'             => 'border-green-600 text-green-700 bg-green-50',
-                    'Ditolak'             => 'border-gray-500 text-gray-700 bg-gray-50',
+                    'Ditolak'             => 'border-gray-400 text-gray-500 bg-gray-50',
+                    'Dibatalkan'          => 'border-gray-400 text-gray-500 bg-gray-50',
                 ];
                 $order->statusClass = $colors[$order->status] ?? 'border-gray-300 text-gray-500 bg-gray-50';
                 $order->formatted_date = $order->created_at->translatedFormat('d M Y');

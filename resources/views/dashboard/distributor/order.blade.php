@@ -170,7 +170,7 @@ Mohon segera divalidasi dan diproses pengirimannya. Terima kasih!`;
                                 <div class="flex-1 flex flex-col md:flex-row justify-between items-center w-full gap-6">
                                     <div class="text-center md:text-left">
                                         <h4 class="font-headline font-black text-primary uppercase text-2xl tracking-tight leading-none">CeeKlin 450ml</h4>
-                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Kategori: Sabun Pembersih Noda</p>
+                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Jagonya Pembasmih Noda</p>
                                         <p class="mt-4 font-headline font-black text-gray-900 text-lg" x-text="formatRupiah(price) + ' / pcs'"></p>
                                     </div>
                                     

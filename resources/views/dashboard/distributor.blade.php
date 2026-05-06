@@ -54,8 +54,15 @@
         </div>
     </div>
 
-    {{-- KPI Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    {{-- 2. KPI CARDS (PERFORMANCE) --}}
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-10 h-1 bg-primary"></span>
+            <h2 class="font-headline font-black text-xl text-primary uppercase tracking-tight italic">Ringkasan Performa</h2>
+            <span class="flex-1 h-[2px] bg-neutral-border"></span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {{-- Volume Bulanan (Terjual) --}}
         <div class="bg-white border-[3px] border-primary shadow-[6px_6px_0_var(--color-primary-darkest)] p-6">
             <p class="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1 italic">Volume Terjual (MTD)</p>
@@ -96,6 +103,7 @@
                 <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Level Stok: {{ $stockStatus }} ({{ round($stockLevel) }}%)</p>
             </div>
         </div>
+        </div>
     </div>
 
     {{-- Aksi Cepat + Pesanan Terakhir --}}
@@ -103,6 +111,20 @@
 
         {{-- Aksi Cepat --}}
         <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="w-8 h-1 bg-primary"></span>
+                <h2 class="font-headline font-black text-lg text-primary uppercase tracking-tight italic">Navigasi Cepat</h2>
+            </div>
+            <a href="/dashboard/distributor/order"
+               class="bg-primary border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] p-5 flex items-center gap-4 hover:bg-primary-hover transition-colors duration-150 group">
+                <div class="w-12 h-12 bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                    <h4 class="font-headline font-black text-white uppercase text-sm italic">Buat Pesanan Baru</h4>
+                    <p class="text-xs text-white/60 mt-0.5 uppercase tracking-tight font-bold italic">Pesan stok langsung ke pabrik</p>
+                </div>
+            </a>
             <a href="/dashboard/distributor/inventory"
                class="bg-white border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)] p-5 flex items-center gap-4 hover:bg-neutral-light transition-colors duration-150 group">
                 <div class="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -121,16 +143,6 @@
                 <div>
                     <h4 class="font-headline font-black text-primary uppercase text-sm italic">Kelola Reseller</h4>
                     <p class="text-xs text-slate-500 mt-0.5 uppercase tracking-tight font-bold italic">Lihat & kelola jaringan reseller</p>
-                </div>
-            </a>
-            <a href="/dashboard/distributor/order"
-               class="bg-primary border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] p-5 flex items-center gap-4 hover:bg-primary-hover transition-colors duration-150 group">
-                <div class="w-12 h-12 bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div>
-                    <h4 class="font-headline font-black text-white uppercase text-sm italic">Buat Pesanan Baru</h4>
-                    <p class="text-xs text-white/60 mt-0.5 uppercase tracking-tight font-bold italic">Pesan stok langsung ke pabrik</p>
                 </div>
             </a>
         </div>

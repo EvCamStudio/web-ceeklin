@@ -153,6 +153,7 @@
                                 <option value="Diproses">Dikemas</option>
                                 <option value="Dikirim">Dikirim</option>
                                 <option value="Selesai">Selesai</option>
+                                <option value="Dibatalkan">Dibatalkan</option>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
@@ -211,8 +212,8 @@
                                                 'border-yellow-500 text-yellow-700 bg-yellow-50': order.status === 'Diproses',
                                                 'border-blue-500 text-blue-600 bg-blue-50': order.status === 'Dikirim',
                                                 'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
-                                                'border-slate-400 text-slate-500 bg-slate-50': order.status === 'Dibatalkan'
-                                            }" x-text="order.status === 'Menunggu Proses' ? 'Menunggu' : (order.status === 'Diproses' ? 'Dikemas' : order.status)"></span>
+                                                'border-slate-400 text-slate-500 bg-slate-50': ['Dibatalkan', 'Ditolak'].includes(order.status)
+                                            }" x-text="order.status === 'Menunggu Proses' ? 'Menunggu' : (order.status === 'Diproses' ? 'Dikemas' : (['Dibatalkan', 'Ditolak'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
                                     </div>
                                     
                                     <button @click="openOrder(order)" 

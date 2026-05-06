@@ -81,8 +81,9 @@
         {{-- BALANCED AREA --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             {{-- Balance Card --}}
-            <div class="lg:col-span-4 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] p-8 flex flex-col justify-center text-center">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 italic">Saldo Bonus {{ $viewType === 'target' ? 'Target' : 'Referral' }}</p>
+            <div class="lg:col-span-4 bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-secondary)] p-8 flex flex-col justify-center text-center relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-secondary/5 rounded-full blur-2xl"></div>
+                <p class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3 italic">Saldo Bonus {{ $viewType === 'target' ? 'Target' : 'Referral' }}</p>
                 <h3 class="font-headline font-black text-5xl text-primary tracking-tighter italic mb-6 leading-none">Rp {{ number_format($currentBalance, 0, ',', '.') }}</h3>
                 
                 <button @click="showWithdrawModal = true" :disabled="requestSent || {{ $currentBalance }} <= 0"
@@ -94,17 +95,17 @@
             </div>
 
             {{-- Info Card --}}
-            <div class="lg:col-span-8 bg-neutral-light border-[4px] border-gray-900 p-8 shadow-[8px_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+            <div class="lg:col-span-8 bg-neutral-light border-[4px] border-primary p-8 shadow-[8px_8px_0_var(--color-primary-darkest)] relative overflow-hidden">
                 @if($viewType === 'target')
                     <div class="flex justify-between items-end mb-6 relative z-10">
                         <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Progres Target Bulan Ini</p>
                             <h3 class="font-headline font-black text-3xl text-gray-900 italic tracking-tight">{{ number_format($personalSales) }} / {{ number_format($targetQty) }} PCS</h3>
                         </div>
-                        <span class="text-3xl font-headline font-black text-primary italic">{{ round($progressPercent) }}%</span>
+                        <span class="text-3xl font-headline font-black text-secondary italic">{{ round($progressPercent) }}%</span>
                     </div>
-                    <div class="h-12 bg-white border-[4px] border-gray-900 relative overflow-hidden z-10">
-                        <div class="absolute top-0 left-0 h-full bg-primary transition-all duration-1000 border-r-[4px] border-gray-900" style="width: {{ $progressPercent }}%"></div>
+                    <div class="h-12 bg-white border-[4px] border-gray-900 relative overflow-hidden z-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                        <div class="absolute top-0 left-0 h-full bg-secondary transition-all duration-1000 border-r-[4px] border-gray-900" style="width: {{ $progressPercent }}%"></div>
                         <div class="absolute inset-0 flex items-center justify-center mix-blend-difference">
                             <span class="text-[11px] font-black text-white uppercase tracking-[0.5em] italic">GOAL {{ number_format($targetQty) }} PCS</span>
                         </div>
@@ -115,7 +116,7 @@
                 @else
                     <div class="flex flex-col h-full justify-between relative z-10">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Berikan Kode Referral Ini Kepada Calon Member</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Berikan Kode Referral Ini Kepada Calon Reseller</p>
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <div class="flex-1 font-mono font-black text-primary px-6 py-4 bg-white border-[3px] border-gray-900 text-xl tracking-[0.3em] flex items-center justify-center italic shadow-[4px_4px_0_var(--color-gray-900)]">
                                     {{ Auth::user()->username }}
@@ -129,13 +130,13 @@
                         </div>
                         <div class="mt-6 flex items-center gap-6">
                             <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Member Terajak</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Reseller Terajak</p>
                                 <p class="text-2xl font-headline font-black text-gray-900 italic">{{ count($referrals) }} Orang</p>
                             </div>
                             <div class="h-10 w-[2px] bg-gray-200"></div>
                             <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Bonus per Member</p>
-                                <p class="text-2xl font-headline font-black text-primary italic">Rp 50.000</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Bonus per Reseller</p>
+                                <p class="text-2xl font-headline font-black text-secondary italic">Rp 50.000</p>
                             </div>
                         </div>
                     </div>
@@ -167,8 +168,14 @@
                             </div>
                         </div>
                     @empty
-                        <div class="py-24 text-center">
-                            <p class="text-[10px] font-black text-slate-400 uppercase italic">Belum ada riwayat target tercapai.</p>
+                        <div class="px-8 py-20 text-center bg-neutral-light/50">
+                            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                <svg class="w-8 h-8 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            </div>
+                            <h3 class="font-headline font-black text-lg text-primary uppercase tracking-tight mb-1 italic">Belum Ada Target Tercapai</h3>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed italic">
+                                Terus tingkatkan penjualan Anda untuk mendapatkan bonus pencapaian bulanan!
+                            </p>
                         </div>
                     @endforelse
                 </div>
@@ -177,18 +184,18 @@
             {{-- REFERRAL VIEW WITH TABS --}}
             <div class="flex flex-col gap-0">
                 {{-- Internal Tabs (Logs First) --}}
-                <div class="flex gap-2 mb-6">
+                <div class="grid grid-cols-2 md:flex gap-3 mb-6">
                     <button @click="subTab = 'logs'"
                         :class="subTab === 'logs' ? 'bg-primary text-white shadow-[4px_4px_0_var(--color-gray-900)]' : 'bg-white text-gray-400 hover:bg-neutral-light border-b-4'"
-                        class="px-8 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[4px] border-gray-900 transition-all flex items-center gap-3">
+                        class="px-4 md:px-8 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[4px] border-gray-900 transition-all flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Riwayat Bonus
+                        <span class="text-center">Riwayat Bonus</span>
                     </button>
                     <button @click="subTab = 'members'"
                         :class="subTab === 'members' ? 'bg-primary text-white shadow-[4px_4px_0_var(--color-gray-900)]' : 'bg-white text-gray-400 hover:bg-neutral-light border-b-4'"
-                        class="px-8 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[4px] border-gray-900 transition-all flex items-center gap-3">
+                        class="px-4 md:px-8 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[4px] border-gray-900 transition-all flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Member Terajak
+                        <span class="text-center">Reseller Terajak</span>
                     </button>
                 </div>
 
@@ -218,8 +225,14 @@
                                 </div>
                             </div>
                             @empty
-                            <div class="py-24 text-center">
-                                <p class="text-[10px] font-black text-slate-400 uppercase italic">Belum ada riwayat bonus referral tercatat.</p>
+                            <div class="px-8 py-20 text-center bg-neutral-light/50">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                    <svg class="w-8 h-8 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <h3 class="font-headline font-black text-lg text-primary uppercase tracking-tight mb-1 italic">Belum Ada Bonus Referral</h3>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed italic">
+                                    Bonus akan muncul di sini setelah reseller yang Anda ajak melakukan transaksi pertama.
+                                </p>
                             </div>
                             @endforelse
                         </div>
@@ -228,7 +241,7 @@
                     {{-- TAB: MEMBERS (SECONDARY) --}}
                     <div x-show="subTab === 'members'" x-transition:enter="transition ease-out duration-200" style="display: none;">
                         <div class="bg-gray-900 px-6 py-4 border-b-[4px] border-gray-900">
-                            <span class="font-headline font-black text-white text-xs uppercase italic">Daftar Member Yang Bergabung</span>
+                            <span class="font-headline font-black text-white text-xs uppercase italic">Daftar Reseller Yang Bergabung</span>
                         </div>
                         <div class="divide-y-2 divide-neutral-border">
                             @forelse($referrals as $ref)
@@ -247,8 +260,14 @@
                                 </span>
                             </div>
                             @empty
-                            <div class="py-24 text-center">
-                                <p class="text-[10px] font-black text-slate-400 uppercase italic">Belum ada member yang diajak menggunakan kode Anda.</p>
+                            <div class="px-8 py-20 text-center bg-neutral-light/50">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                    <svg class="w-8 h-8 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </div>
+                                <h3 class="font-headline font-black text-lg text-primary uppercase tracking-tight mb-1 italic">Belum Ada Reseller</h3>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed italic">
+                                    Bagikan kode referral Anda dan ajak teman untuk bergabung menjadi reseller CeeKlin!
+                                </p>
                             </div>
                             @endforelse
                         </div>

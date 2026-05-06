@@ -132,7 +132,7 @@
                     <x-ui.input id="current_password" name="current_password" type="password" label="Sandi Lama" placeholder="••••••••" class="!border-gray-900" />
                     <x-ui.input id="new_password" name="new_password" type="password" label="Sandi Baru" placeholder="Min. 8 karakter" class="!border-gray-900" />
                     
-                    <x-ui.button variant="neutral" fullWidth="true" class="mt-2 shadow-[4px_4px_0_var(--color-primary-darkest)] italic" type="submit">
+                    <x-ui.button variant="primary" fullWidth="true" class="mt-2 shadow-[4px_4px_0_var(--color-gray-900)] italic" type="submit">
                         Perbarui Kata Sandi
                     </x-ui.button>
                 </form>

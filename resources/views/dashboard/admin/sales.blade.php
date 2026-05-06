@@ -10,7 +10,26 @@
     </x-slot:menuSlot>
 
     <div class="max-w-[1400px] mx-auto w-full" x-data="{
-        reportPeriod: 'Bulan Ini'
+        reportPeriod: 'Semua Periode',
+        filterByPeriod(dateStr) {
+            if (this.reportPeriod === 'Semua Periode') return true;
+            const now = new Date();
+            const date = new Date(dateStr);
+            if (this.reportPeriod === 'Hari Ini') {
+                return date.toDateString() === now.toDateString();
+            } else if (this.reportPeriod === 'Minggu Ini') {
+                const weekAgo = new Date(now);
+                weekAgo.setDate(now.getDate() - 7);
+                return date >= weekAgo;
+            } else if (this.reportPeriod === 'Bulan Ini') {
+                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+            } else if (this.reportPeriod === 'Kuartal Ini') {
+                const quarter = Math.floor(now.getMonth() / 3);
+                const dateQuarter = Math.floor(date.getMonth() / 3);
+                return dateQuarter === quarter && date.getFullYear() === now.getFullYear();
+            }
+            return true;
+        }
     }">
         {{-- KPI Cards Highlight --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 italic">
@@ -45,6 +64,7 @@
             <div class="flex flex-wrap gap-3 italic">
                 <div class="relative min-w-[200px] italic">
                     <select x-model="reportPeriod" class="appearance-none w-full bg-white border-[3px] border-gray-900 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none focus:border-secondary cursor-pointer pr-10 shadow-[4px_4px_0_rgba(0,0,0,0.05)] italic">
+                        <option>Semua Periode</option>
                         <option>Hari Ini</option>
                         <option>Minggu Ini</option>
                         <option>Bulan Ini</option>
@@ -66,64 +86,84 @@
 
         {{-- Main Table: Transaction Detail --}}
         <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)] overflow-hidden mb-12 italic">
-            <div class="bg-gray-900 px-8 py-4 flex justify-between items-center border-b-2 border-gray-900 italic">
-                <h4 class="font-headline font-black text-white text-sm uppercase tracking-widest italic">Rincian Transaksi Masuk</h4>
-                <div class="flex items-center gap-2 italic">
-                    <span class="w-2 h-2 bg-secondary rounded-full animate-pulse italic"></span>
-                    <span class="text-[9px] font-black text-secondary uppercase tracking-widest italic">Live Updates</span>
-                </div>
+            {{-- Table Header (consistent with other tables) --}}
+            <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-gray-900">
+                <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Invoice / Tgl</div>
+                <div class="col-span-3 text-[10px] font-headline font-bold text-white uppercase tracking-widest">Mitra / Wilayah</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Volume</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-right">Total Bayar</div>
+                <div class="col-span-2 text-[10px] font-headline font-bold text-white uppercase tracking-widest text-center">Status</div>
             </div>
-            
-            <div class="overflow-x-auto italic">
-                <table class="w-full text-left border-collapse min-w-[1000px] italic">
-                    <thead class="bg-neutral-light border-b-2 border-neutral-border italic">
-                        <tr>
-                            <th class="px-8 py-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest italic">Invoice / Tgl</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest italic">Mitra / Wilayah</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-center italic">Volume</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-right italic">Total Bayar</th>
-                            <th class="px-6 py-4 text-[10px] font-headline font-bold text-primary uppercase tracking-widest text-center italic">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y-2 divide-neutral-border italic">
-                        @forelse($recentTransactions ?? [] as $txn)
-                            <tr class="hover:bg-neutral-light transition-colors group italic">
-                                <td class="px-8 py-5 italic">
-                                    <p class="font-headline font-black text-sm text-gray-900 leading-none italic">{{ $txn->invoice_number }}</p>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 italic">{{ $txn->created_at->translatedFormat('d M Y') }}</p>
-                                </td>
-                                <td class="px-6 py-5 italic">
-                                    <div class="flex items-center gap-3 italic">
-                                        <div class="w-8 h-8 flex items-center justify-center border-2 border-gray-900 font-headline font-black text-[10px] bg-primary text-white italic">
-                                            <span>{{ substr($txn->user->role ?? 'U', 0, 1) }}</span>
-                                        </div>
-                                        <div class="italic">
-                                            <p class="text-[11px] font-black text-gray-900 uppercase leading-none italic">{{ $txn->user->name }}</p>
-                                            <p class="text-[9px] font-bold text-slate-500 uppercase mt-1 italic">{{ $txn->user->city_name }}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 text-center italic">
-                                    <p class="font-headline font-black text-base text-primary tracking-tighter italic">{{ number_format($txn->quantity) }} PCS</p>
-                                </td>
-                                <td class="px-6 py-5 text-right italic">
-                                    <p class="font-headline font-black text-lg text-gray-900 tracking-tighter italic">Rp {{ number_format($txn->total_price) }}</p>
-                                </td>
-                                <td class="px-6 py-5 text-center italic">
-                                    <span class="px-3 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic {{ $txn->status === 'Selesai' ? 'border-secondary text-secondary bg-secondary/5' : 'border-orange-400 text-orange-500 bg-orange-50' }}">
-                                        {{ $txn->status }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-10 text-center italic">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada transaksi</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+
+            {{-- Rows --}}
+            <div class="divide-y-2 divide-neutral-border italic">
+                @forelse($recentTransactions ?? [] as $txn)
+                    <div x-show="filterByPeriod('{{ $txn->created_at->toISOString() }}')" class="flex flex-col md:grid md:grid-cols-12 gap-3 md:gap-4 px-6 md:px-8 py-5 md:py-4 items-start md:items-center hover:bg-neutral-light transition-colors group italic">
+                        {{-- Invoice / Tgl --}}
+                        <div class="md:col-span-3 w-full">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">Invoice / Tgl</p>
+                            <p class="font-headline font-black text-sm text-gray-900 leading-none italic">{{ $txn->invoice_number }}</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 italic">{{ $txn->created_at->translatedFormat('d M Y') }}</p>
+                        </div>
+                        {{-- Mitra / Wilayah --}}
+                        <div class="md:col-span-3 w-full">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1 italic">Mitra / Wilayah</p>
+                            <div class="flex items-center gap-3 italic">
+                                <div class="w-8 h-8 flex items-center justify-center border-2 border-gray-900 font-headline font-black text-[10px] bg-primary text-white italic flex-shrink-0">
+                                    <span>{{ substr($txn->user->role ?? 'U', 0, 1) }}</span>
+                                </div>
+                                <div class="italic">
+                                    <p class="text-[11px] font-black text-gray-900 uppercase leading-none italic">{{ $txn->user->name }}</p>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase mt-1 italic">{{ $txn->user->city_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Volume & Total Bayar (side by side on mobile) --}}
+                        <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-center">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest italic">Volume</p>
+                            <p class="font-headline font-black text-base text-primary tracking-tighter italic">{{ number_format($txn->quantity) }} PCS</p>
+                        </div>
+                        <div class="md:col-span-2 w-full flex justify-between items-center md:block md:text-right">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest italic">Total Bayar</p>
+                            <p class="font-headline font-black text-lg text-gray-900 tracking-tighter italic">Rp {{ number_format($txn->total_price) }}</p>
+                        </div>
+                        {{-- Status --}}
+                        <div class="md:col-span-2 w-full flex justify-between items-center md:flex md:justify-center">
+                            <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest italic">Status</p>
+                            <span class="px-3 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic {{ $txn->status === 'Selesai' ? 'border-secondary text-secondary bg-secondary/5' : 'border-orange-400 text-orange-500 bg-orange-50' }}">
+                                {{ $txn->status }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="px-8 py-20 text-center bg-neutral-light/50 italic">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                            <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        </div>
+                        <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2 italic">Belum Ada Transaksi</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed italic">
+                            Belum ada transaksi yang tercatat pada periode ini. Data akan muncul saat pesanan masuk.
+                        </p>
+                    </div>
+                @endforelse
+
+                {{-- Empty State for Frontend Filter --}}
+                @if(count($recentTransactions ?? []) > 0)
+                    <div x-show="![
+                            @foreach($recentTransactions as $txn)
+                                filterByPeriod('{{ $txn->created_at->toISOString() }}'),
+                            @endforeach
+                        ].some(v => v)"
+                         x-cloak class="px-8 py-20 text-center bg-neutral-light/50 italic animate-in">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                            <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2 italic">Tidak Ada Hasil</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed italic">
+                            Tidak ditemukan transaksi untuk periode <span class="text-primary font-black" x-text="reportPeriod"></span>.
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
 
