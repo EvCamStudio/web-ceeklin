@@ -140,7 +140,7 @@
         </header>
 
         {{-- SCROLLABLE CONTENT AREA --}}
-        <main class="dash-main flex-1 overflow-y-auto p-4 md:p-8">
+        <main class="dash-main flex-1 overflow-y-auto p-4 md:px-8 md:pt-5 md:pb-8" style="scrollbar-gutter: stable;">
             <div class="dash-content-enter">
                 {{ $slot }}
             </div>

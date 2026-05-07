@@ -8,24 +8,24 @@
     <div class="max-w-[1400px] mx-auto w-full flex flex-col gap-6" x-data="{ activeTab: 'summary' }">
 
         {{-- NAVIGATION TABS --}}
-        <div class="flex flex-wrap gap-2 md:gap-4 border-b-[4px] border-gray-900 pb-2">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 border-b-[4px] border-gray-900 pb-2">
             <button @click="activeTab = 'summary'"
                 :class="activeTab === 'summary' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
-                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Ringkasan Stok
+                class="flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-[10px] md:text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span>Ringkasan Stok</span>
             </button>
             <button @click="activeTab = 'sync'"
                 :class="activeTab === 'sync' ? 'bg-secondary text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
-                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                Ajukan Sinkronisasi
+                class="flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-[10px] md:text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Sinkronisasi</span>
             </button>
             <button @click="activeTab = 'logs'"
                 :class="activeTab === 'logs' ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-neutral-light'"
-                class="flex items-center gap-2 px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-xs uppercase tracking-widest transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Riwayat Perubahan
+                class="flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-3 border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] font-headline font-black text-[10px] md:text-xs uppercase tracking-widest transition-all">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Riwayat Perubahan</span>
             </button>
         </div>
 
@@ -66,11 +66,11 @@
                                 </div>
                             </div>
 
-                            <div class="w-full bg-neutral-border-light border-[3px] border-gray-900 h-6 relative overflow-hidden">
-                                <div class="bg-secondary h-full transition-all duration-500" style="width: {{ $stockPercentage }}%"></div>
-                                <div class="absolute inset-0 flex items-center px-4">
-                                    <span class="text-[9px] font-black text-gray-900 uppercase italic">Kapasitas: {{ number_format($stockPercentage, 1) }}% {{ $stockPercentage < 30 ? '(Segera Restock)' : '' }}</span>
-                                </div>
+                            <div class="bg-neutral-light border-l-[4px] {{ $stockPercentage < 30 ? 'border-red-500' : 'border-secondary' }} px-4 py-3">
+                                <p class="text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2 italic">
+                                    <svg class="w-4 h-4 {{ $stockPercentage < 30 ? 'text-red-500' : 'text-secondary' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $stockPercentage < 30 ? 'Peringatan: Stok menipis, segera lakukan restock ke pabrik!' : 'Info: Kondisi stok saat ini berada pada batas aman.' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -206,8 +206,14 @@
                         @endif
                     </div>
                     @empty
-                    <div class="py-20 text-center">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Belum ada riwayat pergerakan stok</p>
+                    <div class="px-8 py-20 text-center bg-neutral-light/50">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                            <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Riwayat</h3>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                            Belum ada riwayat pergerakan stok di gudang Anda.
+                        </p>
                     </div>
                     @endforelse
                 </div>

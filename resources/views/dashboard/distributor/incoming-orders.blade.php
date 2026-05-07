@@ -155,8 +155,8 @@
                 <div class="flex flex-col md:flex-row gap-4 flex-1">
                     <div class="relative flex-1 max-w-md">
                         <input type="text" x-model="searchQuery" @input="currentPage = 1"
-                            placeholder="Cari Reseller, Wilayah, atau No. Order..."
-                            class="w-full bg-white border-[3px] border-gray-900 px-5 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary transition-all shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
+                            placeholder="Cari Reseller / No. Order..."
+                            class="w-full bg-white border-[3px] border-gray-900 px-5 pr-12 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary transition-all shadow-[4px_4px_0_rgba(0,0,0,0.05)]">
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -247,13 +247,13 @@
                                     <div class="text-center min-w-[130px]">
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                                             Status</p>
-                                        <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap"
+                                        <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap italic"
                                             :class="{
-                                                'border-red-500 text-red-600 bg-red-50': ['Menunggu Proses', 'Menunggu', 'Menunggu Konfirmasi'].includes(order.status),
+                                                'border-red-400 text-red-700 bg-red-50': ['Menunggu Proses', 'Menunggu', 'Menunggu Konfirmasi'].includes(order.status),
                                                 'border-yellow-500 text-yellow-800 bg-yellow-50': order.status === 'Diproses' || order.status === 'Dikemas',
                                                 'border-blue-500 text-blue-700 bg-blue-50': order.status === 'Dikirim',
                                                 'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
-                                                'border-gray-400 text-gray-500 bg-gray-50': order.status === 'Ditolak' || order.status === 'Dibatalkan'
+                                                'border-slate-400 text-slate-500 bg-slate-50': order.status === 'Ditolak' || order.status === 'Dibatalkan'
                                             }" x-text="['Menunggu Proses', 'Menunggu', 'Menunggu Konfirmasi'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Ditolak', 'Dibatalkan'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
                                     </div>
 
@@ -281,10 +281,9 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tidak ada pesanan yang
-                        sesuai dengan filter.</p>
-                    <button @click="filterStatus = 'Semua Status'; searchQuery = ''; currentPage = 1"
-                        class="mt-4 text-[10px] font-black text-primary uppercase underline tracking-widest">Reset
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4" x-text="orders.length === 0 ? 'Belum ada pesanan masuk dari jaringan reseller Anda' : 'Tidak ada pesanan yang sesuai dengan pencarian atau filter'"></p>
+                    <button x-show="orders.length > 0" @click="filterStatus = 'Semua Status'; searchQuery = ''; currentPage = 1"
+                        class="mt-4 text-[10px] font-black text-primary uppercase underline tracking-widest hover:text-secondary transition-colors">Reset
                         Filter</button>
                 </div>
             </div>
@@ -357,25 +356,10 @@
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-12 h-12 flex items-center justify-center border-[4px] transition-all duration-500"
                                         :class="['Menunggu Proses', 'Diproses', 'Dikirim', 'Selesai'].indexOf(selectedOrder?.status === 'Menunggu' ? 'Menunggu Proses' : (selectedOrder?.status === 'Dikemas' ? 'Diproses' : selectedOrder?.status)) >= {{ $i }} ? 'bg-primary border-gray-900 text-white shadow-[4px_4px_0_rgba(0,0,0,0.2)]' : 'bg-white border-neutral-light text-slate-300'">
-                                        @if($i == 0) <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                        @elseif($i == 1) <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                            </svg>
-                                        @elseif($i == 2) <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                            </svg>
-                                        @else <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
+                                        @if($i == 0) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        @elseif($i == 1) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                        @elseif($i == 2) <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+                                        @else <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                         @endif
                                     </div>
                                     <span class="text-[9px] font-black uppercase tracking-widest text-center"

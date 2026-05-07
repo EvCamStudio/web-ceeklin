@@ -130,8 +130,12 @@
                         {{-- Status --}}
                         <div class="md:col-span-2 w-full flex justify-between items-center md:flex md:justify-center">
                             <p class="md:hidden text-[8px] font-bold text-slate-400 uppercase tracking-widest italic">Status</p>
-                            <span class="px-3 py-1 border-2 text-[9px] font-black uppercase tracking-widest italic {{ $txn->status === 'Selesai' ? 'border-secondary text-secondary bg-secondary/5' : 'border-orange-400 text-orange-500 bg-orange-50' }}">
-                                {{ $txn->status }}
+                            <span class="min-w-[130px] text-center px-3 py-1.5 border-2 text-[9px] font-black uppercase tracking-widest italic shadow-[2px_2px_0_rgba(0,0,0,0.05)]
+                                {{ $txn->status === 'Selesai' ? 'border-green-600 text-green-700 bg-green-50' : 
+                                   ($txn->status === 'Dikirim' ? 'border-blue-500 text-blue-700 bg-blue-50' : 
+                                   ($txn->status === 'Dikemas' || $txn->status === 'Diproses' ? 'border-yellow-500 text-yellow-800 bg-yellow-50' : 
+                                   'border-red-400 text-red-700 bg-red-50')) }}">
+                                {{ in_array($txn->status, ['Menunggu Proses', 'Menunggu Konfirmasi', 'Menunggu']) ? 'MENUNGGU' : $txn->status }}
                             </span>
                         </div>
                     </div>

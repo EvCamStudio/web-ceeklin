@@ -14,7 +14,14 @@
         distPrice: {{ $distributorPrice->price ?? 13000 }},
         resPrice: {{ $resellerPrice->price ?? 15000 }},
         regionalPrices: [],
+        isConfirming: false,
+        adminPassword: '',
+
         saveChanges() {
+            if (!this.adminPassword) {
+                alert('Silakan masukkan kata sandi Anda untuk konfirmasi.');
+                return;
+            }
             this.$refs.priceForm.submit();
         }
     }">
@@ -22,7 +29,9 @@
             @csrf
             <input type="hidden" name="distributor_price" :value="distPrice">
             <input type="hidden" name="reseller_price" :value="resPrice">
+            <input type="hidden" name="current_password" :value="adminPassword">
         </form>
+
         {{-- Header & Info --}}
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
             <div>
@@ -44,8 +53,7 @@
                 </button>
             </div>
         </div>
-
-
+        
         {{-- VIEW 1: STANDARD NATIONAL PRICE --}}
         <div x-show="viewMode === 'standard'" x-transition>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
@@ -92,11 +100,43 @@
                 </div>
             </div>
 
-            <div class="flex justify-center mt-12">
-                <button @click="saveChanges()"
-                    class="w-full lg:max-w-md bg-primary text-white py-5 font-headline font-black text-sm uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-1 active:shadow-none">
-                    SIMPAN HARGA NASIONAL
-                </button>
+            {{-- Confirm Section Inline --}}
+            <div class="max-w-2xl mx-auto mt-12 overflow-hidden">
+                <div x-show="!isConfirming" class="flex justify-center">
+                    <button @click="isConfirming = true"
+                        class="w-full bg-primary text-white py-6 font-headline font-black text-base uppercase tracking-widest border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-1 active:shadow-none">
+                        SIMPAN HARGA NASIONAL
+                    </button>
+                </div>
+
+                <div x-show="isConfirming" style="display: none;" x-transition
+                    class="bg-white border-[4px] border-gray-900 p-8 shadow-[10px_10px_0_var(--color-primary-darkest)] relative">
+                    <button @click="isConfirming = false; adminPassword = ''" 
+                        class="absolute right-6 top-6 text-[10px] font-black text-slate-300 hover:text-red-600 uppercase tracking-widest italic">✕ Batal</button>
+                    
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-red-50 text-red-600 flex items-center justify-center border-2 border-red-600 mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                        <h4 class="font-headline font-black text-2xl text-gray-900 uppercase italic mb-2 tracking-tighter">Konfirmasi Keamanan</h4>
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-8">Masukkan Kata Sandi Admin Untuk Mengubah Harga Nasional</p>
+                        
+                        <div class="w-full max-w-sm space-y-6">
+                            <div class="relative">
+                                <input type="password" x-model="adminPassword" placeholder="••••••••"
+                                    @keydown.enter="saveChanges()"
+                                    class="w-full bg-neutral-light border-[4px] border-gray-900 px-6 py-4 text-center font-black text-xl tracking-[0.5em] focus:outline-none focus:border-primary transition-all">
+                                <x-ui.error name="current_password" />
+                            </div>
+                            
+                            <button @click="saveChanges()"
+                                class="w-full bg-gray-900 text-white py-6 font-headline font-black text-base uppercase tracking-widest shadow-[8px_8px_0_var(--color-primary)] hover:bg-primary transition-all active:translate-y-1 active:shadow-none flex items-center justify-center gap-4">
+                                <span>KONFIRMASI & SIMPAN</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

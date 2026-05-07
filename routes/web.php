@@ -89,7 +89,7 @@ Route::prefix('dashboard/distributor')->middleware(['auth'])->group(function () 
     Route::get('/order/store', function() { return redirect()->route('distributor.order'); }); // Fallback for refreshes
     Route::post('/order/store', [DistributorDashboardController::class, 'storeOrder'])->name('distributor.order.store');
     Route::get('/resellers', [DistributorDashboardController::class, 'resellers'])->name('distributor.resellers');
-    Route::get('/sales-map', [DistributorDashboardController::class, 'salesMap'])->name('distributor.sales-map');
+
     Route::get('/history', [DistributorDashboardController::class, 'history'])->name('distributor.history');
     Route::post('/history/confirm', [DistributorDashboardController::class, 'confirmReceived'])->name('distributor.history.confirm');
     Route::get('/settings', [DistributorDashboardController::class, 'settings'])->name('distributor.settings');

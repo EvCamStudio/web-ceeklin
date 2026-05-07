@@ -71,7 +71,7 @@
                                     <x-ui.input id="longitude" name="longitude" label="Longitude" placeholder="106.xxxxxx" value="{{ old('longitude', $user->longitude ?? '') }}" class="!py-3" />
                                 </div>
                                 <button type="button" onclick="alert('Mencari lokasi GPS...')" 
-                                    class="w-full mt-2 bg-gray-900 text-white px-6 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-primary)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2">
+                                    class="w-full mt-2 bg-primary text-white px-6 py-4 font-headline font-black text-[10px] uppercase tracking-widest border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2 italic">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                                     GUNAKAN LOKASI SAAT INI
                                 </button>
@@ -97,8 +97,8 @@
                     </div>
                     
                     <div class="mt-12">
-                        <x-ui.button class="w-full sm:w-auto px-12 py-5 italic text-sm" type="submit">
-                            Simpan Seluruh Perubahan Profil
+                        <x-ui.button class="w-full sm:w-auto px-12 py-5 italic text-xs" type="submit">
+                            Simpan Perubahan Profil
                         </x-ui.button>
                     </div>
                 </form>
@@ -113,12 +113,19 @@
                 
                 <form action="{{ route('reseller.settings.bank') }}" method="POST" class="flex flex-col gap-5 italic">
                     @csrf
-                    <x-ui.input id="bank_name" name="bank_name" label="Nama Bank" value="{{ old('bank_name', $user->bank_name) }}" class="!border-secondary" />
-                    <x-ui.input id="bank_account_number" name="bank_account_number" label="Nomor Rekening" value="{{ old('bank_account_number', $user->bank_account_number) }}" class="!border-secondary" />
-                    <x-ui.input id="bank_account_name" name="bank_account_name" label="Atas Nama" value="{{ old('bank_account_name', $user->bank_account_name) }}" class="!border-secondary" />
+                    <div class="space-y-4">
+                        <x-ui.input id="bank_name" name="bank_name" label="Nama Bank" value="{{ old('bank_name', $user->bank_name) }}" class="!border-secondary" />
+                        <x-ui.input id="bank_account_number" name="bank_account_number" label="Nomor Rekening" value="{{ old('bank_account_number', $user->bank_account_number) }}" class="!border-secondary" />
+                        <x-ui.input id="bank_account_name" name="bank_account_name" label="Atas Nama" value="{{ old('bank_account_name', $user->bank_account_name) }}" class="!border-secondary" />
+                        
+                        <div class="pt-4 border-t-2 border-dashed border-gray-100">
+                            <x-ui.input id="bank_password_confirm_reseller" name="current_password" type="password" label="Konfirmasi Sandi Akun" placeholder="Masukkan sandi saat ini" class="!border-secondary" />
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-relaxed">Dibutuhkan untuk memverifikasi perubahan rekening.</p>
+                        </div>
+                    </div>
                     
                     <x-ui.button variant="secondary" fullWidth="true" class="mt-2 shadow-[4px_4px_0_var(--color-gray-900)] italic" type="submit">
-                        Perbarui Rekening
+                        Perbarui Info Rekening
                     </x-ui.button>
                 </form>
             </x-ui.card>
@@ -127,10 +134,29 @@
             <x-ui.card shadow="gray" headerColor="gray">
                 <x-slot:titleSlot><span class="italic">Keamanan Akun</span></x-slot:titleSlot>
                 
-                <form action="{{ route('reseller.settings.password') }}" method="POST" class="flex flex-col gap-5 italic">
+                <form action="{{ route('reseller.settings.password') }}" method="POST" class="flex flex-col gap-5 italic"
+                    x-data="{ 
+                        errors: {},
+                        validate(e) {
+                            this.errors = {};
+                            if (!this.$el.current_password.value) this.errors.current_password = 'Sandi lama wajib diisi';
+                            if (!this.$el.new_password.value) this.errors.new_password = 'Sandi baru wajib diisi';
+                            else if (this.$el.new_password.value.length < 8) this.errors.new_password = 'Minimal 8 karakter';
+                            
+                            if (this.$el.new_password.value !== this.$el.new_password_confirmation.value) {
+                                this.errors.new_password_confirmation = 'Konfirmasi sandi tidak cocok';
+                            }
+                            
+                            if (Object.keys(this.errors).length > 0) {
+                                e.preventDefault();
+                                return false;
+                            }
+                        }
+                    }" @submit="validate" novalidate>
                     @csrf
-                    <x-ui.input id="current_password" name="current_password" type="password" label="Sandi Lama" placeholder="••••••••" class="!border-gray-900" />
-                    <x-ui.input id="new_password" name="new_password" type="password" label="Sandi Baru" placeholder="Min. 8 karakter" class="!border-gray-900" />
+                    <x-ui.input id="current_password" name="current_password" type="password" label="Sandi Lama" placeholder="••••••••" class="!border-gray-900" required />
+                    <x-ui.input id="new_password" name="new_password" type="password" label="Sandi Baru" placeholder="Min. 8 karakter" class="!border-gray-900" required />
+                    <x-ui.input id="new_password_confirmation" name="new_password_confirmation" type="password" label="Ulangi Sandi Baru" placeholder="Ketik ulang sandi baru" class="!border-gray-900" required />
                     
                     <x-ui.button variant="primary" fullWidth="true" class="mt-2 shadow-[4px_4px_0_var(--color-gray-900)] italic" type="submit">
                         Perbarui Kata Sandi

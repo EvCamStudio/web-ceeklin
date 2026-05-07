@@ -184,8 +184,14 @@
                     </div>
                 </div>
                 @empty
-                <div class="py-10 text-center">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada pesanan masuk</p>
+                <div class="px-8 py-16 text-center bg-neutral-light/50">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-primary/30">
+                        <svg class="w-8 h-8 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <h3 class="font-headline font-black text-lg text-primary uppercase tracking-tight mb-2">Belum Ada Pesanan</h3>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                        Saat ini belum ada pesanan masuk dari reseller Anda.
+                    </p>
                 </div>
                 @endforelse
             </div>

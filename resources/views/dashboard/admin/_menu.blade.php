@@ -108,7 +108,9 @@
             @php
                 // Cek apakah route saat ini cocok dengan route menu (menghapus domain)
                 $path = ltrim(parse_url($menu['route'], PHP_URL_PATH), '/');
-                $isActive = request()->is($path . '*') || ($menu['key'] === 'overview' && request()->is('dashboard/admin'));
+                $isActive = ($menu['key'] === 'overview') 
+                    ? request()->fullUrlIs(url($menu['route']))
+                    : request()->is($path . '*');
 
                 $activeClass = $isActive
                     ? 'bg-primary text-white border-l-[5px] border-secondary'

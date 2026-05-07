@@ -18,34 +18,31 @@
         
         {{-- VIEW: LIST RESELLER --}}
         <div x-show="viewMode === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-            {{-- Header & Title Section --}}
+            {{-- Header & Search Section --}}
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6">
-                <div>
-                    <h2 class="font-headline font-black text-3xl text-primary tracking-tighter uppercase leading-none italic">Jaringan Reseller</h2>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-3 italic">Pantau & Kelola Aktivitas Reseller Anda</p>
+                <div class="flex items-center gap-5">
+                    <div>
+                        <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase leading-none italic">Jaringan Reseller</h2>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-3 italic">Pantau & Kelola Aktivitas Reseller Anda</p>
+                    </div>
+                    <div class="bg-white border-[3px] border-gray-900 px-4 py-2.5 shadow-[4px_4px_0_var(--color-primary-darkest)] flex items-center gap-2.5">
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest italic">Total</span>
+                        <span class="font-headline font-black text-xl text-primary leading-none italic">{{ $resellerCount }}</span>
+                    </div>
                 </div>
-                
-                {{-- Total Counter Widget --}}
-                <div class="bg-white border-[3px] border-gray-900 px-6 py-4 shadow-[4px_4px_0_var(--color-primary-darkest)] flex flex-col items-center justify-center min-w-[120px]">
-                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Total Reseller</span>
-                    <span class="font-headline font-black text-2xl text-primary leading-none italic">{{ $resellerCount }}</span>
-                </div>
-            </div>
 
-            {{-- Filter & Search Section --}}
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <div class="flex gap-4 flex-wrap w-full md:w-auto">
-                    <div class="relative w-full md:w-80">
+                <div class="flex items-center gap-4 w-full lg:w-auto">
+                    <p class="hidden xl:block text-[9px] font-bold text-slate-400 uppercase tracking-widest italic shrink-0">
+                        ℹ️ Klik baris untuk detail
+                    </p>
+                    <div class="relative w-full lg:w-72">
                         <input type="text" placeholder="Cari Reseller / Wilayah..." 
-                            class="w-full bg-white border-[3px] border-gray-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary shadow-[3px_3px_0_rgba(0,0,0,0.05)] placeholder:text-slate-300 italic">
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-900">
+                            class="w-full bg-white border-[3px] border-gray-900 px-4 pr-10 py-3 text-xs font-bold uppercase tracking-widest text-primary focus:outline-none focus:border-secondary shadow-[3px_3px_0_rgba(0,0,0,0.05)] placeholder:text-primary/40 italic">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                     </div>
                 </div>
-                <p class="hidden sm:block text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">
-                    ℹ️ Klik baris untuk melihat detail performa
-                </p>
             </div>
 
             <div class="bg-white border-[4px] border-gray-900 shadow-[8px_8px_0_var(--color-primary-darkest)] overflow-hidden">
@@ -93,8 +90,14 @@
                         </div>
                     </template>
                     <template x-if="resellers.length === 0">
-                        <div class="py-20 text-center">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Belum ada reseller di jaringan Anda</p>
+                        <div class="px-8 py-20 text-center bg-neutral-light/50">
+                            <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                                <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </div>
+                            <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Belum Ada Reseller</h3>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                                Jaringan Anda masih kosong. Ajak reseller untuk bergabung!
+                            </p>
                         </div>
                     </template>
                 </div>
@@ -228,14 +231,20 @@
             <div class="flex flex-col md:flex-row items-start md:items-center mb-8 gap-6">
                 <x-ui.back-button @click="viewMode = 'detail'" />
                 <div>
-                    <h2 class="font-headline font-black text-3xl text-primary tracking-tighter uppercase leading-none">Histori Lengkap Transaksi</h2>
+                    <h2 class="font-headline font-black text-2xl text-primary tracking-tighter uppercase leading-none">Histori Lengkap Transaksi</h2>
                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2" x-text="'Seluruh Rekam Jejak Pesanan ' + selectedReseller?.name"></p>
                 </div>
             </div>
 
             <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_var(--color-primary-darkest)]">
-                <div class="py-20 text-center">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Fitur Riwayat Lengkap Segera Hadir</p>
+                <div class="px-8 py-20 text-center bg-neutral-light/50">
+                    <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-primary/30">
+                        <svg class="w-10 h-10 text-primary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="font-headline font-black text-xl text-primary uppercase tracking-tight mb-2">Segera Hadir</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                        Fitur histori transaksi lengkap sedang dalam pengembangan.
+                    </p>
                 </div>
             </div>
         </div>

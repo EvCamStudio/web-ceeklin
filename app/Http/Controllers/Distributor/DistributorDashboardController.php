@@ -229,22 +229,7 @@ class DistributorDashboardController extends Controller
         return view('dashboard.distributor.order', compact('orders', 'productPrice'));
     }
 
-    public function salesMap()
-    {
-        $user = Auth::user();
-        
-        // Get reseller counts by city for resellers under this distributor
-        $cityStats = User::where('upline_id', $user->id)
-            ->where('role', 'reseller')
-            ->join('indonesia_cities', 'users.city_id', '=', 'indonesia_cities.code')
-            ->select('indonesia_cities.name as city_name')
-            ->selectRaw('count(users.id) as count')
-            ->selectRaw('(SELECT SUM(quantity) FROM reseller_orders WHERE distributor_id = ? AND status = "Selesai" AND reseller_id IN (SELECT id FROM users u2 WHERE u2.city_id = indonesia_cities.code)) as total_volume', [$user->id])
-            ->groupBy('indonesia_cities.name', 'indonesia_cities.code')
-            ->get();
 
-        return view('dashboard.distributor.sales-map', compact('cityStats'));
-    }
 
     public function history()
     {
@@ -256,12 +241,15 @@ class DistributorDashboardController extends Controller
             ->get()
             ->map(function($order) {
                 $statusColors = [
-                    'Menunggu Proses' => 'border-red-500 text-red-600 bg-red-50',
-                    'Diproses' => 'border-yellow-500 text-yellow-800 bg-yellow-50',
-                    'Dikirim' => 'border-blue-500 text-blue-700 bg-blue-50',
-                    'Selesai' => 'border-green-600 text-green-700 bg-green-50',
-                    'Dibatalkan' => 'border-gray-400 text-gray-500 bg-gray-50',
-                    'Ditolak' => 'border-gray-400 text-gray-500 bg-gray-50',
+                    'Menunggu Konfirmasi' => 'border-red-400 text-red-700 bg-red-50',
+                    'Menunggu Proses'     => 'border-red-400 text-red-700 bg-red-50',
+                    'Menunggu'            => 'border-red-400 text-red-700 bg-red-50',
+                    'Diproses'            => 'border-yellow-500 text-yellow-800 bg-yellow-50',
+                    'Dikemas'             => 'border-yellow-500 text-yellow-800 bg-yellow-50',
+                    'Dikirim'             => 'border-blue-500 text-blue-700 bg-blue-50',
+                    'Selesai'             => 'border-green-600 text-green-700 bg-green-50',
+                    'Dibatalkan'          => 'border-gray-400 text-gray-500 bg-gray-50',
+                    'Ditolak'             => 'border-gray-400 text-gray-500 bg-gray-50',
                 ];
 
                 $statusLabels = [

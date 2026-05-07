@@ -125,8 +125,12 @@
                                     <td class="px-6 py-5 text-center font-headline font-black text-lg">{{ $trx['qty'] }} <span class="text-[9px] text-slate-400">PCS</span></td>
                                     <td class="px-6 py-5 text-right font-headline font-black text-lg text-primary">{{ $trx['total'] }}</td>
                                     <td class="px-6 py-5 text-center">
-                                        <span class="inline-block whitespace-nowrap px-3 py-1 text-[8px] font-black uppercase tracking-widest {{ $trx['status'] === 'SELESAI' ? 'bg-green-100 text-green-700 border-green-700/20' : 'bg-orange-100 text-orange-700 border-orange-700/20' }} border-2">
-                                            {{ $trx['status'] }}
+                                        <span class="min-w-[110px] inline-block whitespace-nowrap px-3 py-1.5 text-[8px] font-black uppercase tracking-widest border-2 italic shadow-[2px_2px_0_rgba(0,0,0,0.05)]
+                                            {{ $trx['status'] === 'SELESAI' ? 'border-green-600 text-green-700 bg-green-50' : 
+                                               ($trx['status'] === 'DIKIRIM' ? 'border-blue-500 text-blue-700 bg-blue-50' : 
+                                               ($trx['status'] === 'DIKEMAS' ? 'border-yellow-500 text-yellow-800 bg-yellow-50' : 
+                                               'border-red-400 text-red-700 bg-red-50')) }}">
+                                            {{ in_array($trx['status'], ['MENUNGGU PROSES', 'MENUNGGU KONFIRMASI', 'MENUNGGU']) ? 'MENUNGGU' : $trx['status'] }}
                                         </span>
                                     </td>
                                 </tr>
@@ -149,8 +153,12 @@
                                     <h5 class="font-headline font-black text-sm text-gray-900 uppercase leading-none">{{ $trx['name'] }}</h5>
                                     <span class="text-[8px] font-black uppercase tracking-widest text-primary">{{ $trx['type'] }}</span>
                                 </div>
-                                <span class="inline-block whitespace-nowrap px-2 py-1 text-[7px] font-black uppercase tracking-widest {{ $trx['status'] === 'SELESAI' ? 'bg-green-100 text-green-700 border-green-700/20' : 'bg-orange-100 text-orange-700 border-orange-700/20' }} border-2">
-                                    {{ $trx['status'] }}
+                                <span class="min-w-[90px] text-center inline-block whitespace-nowrap px-2 py-1 text-[7px] font-black uppercase tracking-widest border-2 italic shadow-[2px_2px_0_rgba(0,0,0,0.05)]
+                                    {{ $trx['status'] === 'SELESAI' ? 'border-green-600 text-green-700 bg-green-50' : 
+                                       ($trx['status'] === 'DIKIRIM' ? 'border-blue-500 text-blue-700 bg-blue-50' : 
+                                       ($trx['status'] === 'DIKEMAS' ? 'border-yellow-500 text-yellow-800 bg-yellow-50' : 
+                                       'border-red-400 text-red-700 bg-red-50')) }}">
+                                    {{ in_array($trx['status'], ['MENUNGGU PROSES', 'MENUNGGU KONFIRMASI', 'MENUNGGU']) ? 'MENUNGGU' : $trx['status'] }}
                                 </span>
                             </div>
 

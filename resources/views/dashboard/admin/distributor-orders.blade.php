@@ -211,16 +211,23 @@
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
                                         <p class="font-headline font-black text-xl text-primary tracking-tighter italic" x-text="order.total"></p>
                                     </div>
-                                    <div class="text-center min-w-[130px]">
+                                    <div class="text-center">
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                                        <span class="px-2 py-1 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap"
-                                            :class="{
-                                                'border-orange-500 text-orange-600 bg-orange-50': ['Menunggu Proses', 'Menunggu'].includes(order.status),
-                                                'border-secondary text-secondary bg-secondary/5': ['Diproses', 'Dikemas'].includes(order.status),
-                                                'border-primary text-primary bg-primary/5': order.status === 'Dikirim',
-                                                'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
-                                                'border-slate-400 text-slate-500 bg-slate-50': ['Dibatalkan', 'Ditolak'].includes(order.status)
-                                            }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Dibatalkan', 'Ditolak'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
+                                        <div class="flex flex-col items-center gap-1.5">
+                                            <span class="min-w-[130px] px-3 py-1.5 border-2 text-[9px] font-black uppercase tracking-widest block whitespace-nowrap italic shadow-[2px_2px_0_rgba(0,0,0,0.05)]"
+                                                :class="{
+                                                    'border-red-400 text-red-700 bg-red-50': ['Menunggu Proses', 'Menunggu'].includes(order.status),
+                                                    'border-yellow-500 text-yellow-800 bg-yellow-50': ['Diproses', 'Dikemas'].includes(order.status),
+                                                    'border-blue-500 text-blue-700 bg-blue-50': order.status === 'Dikirim',
+                                                    'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
+                                                    'border-slate-400 text-slate-500 bg-slate-50': ['Dibatalkan', 'Ditolak'].includes(order.status)
+                                                }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Dibatalkan', 'Ditolak'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
+                                            
+                                            {{-- Problem Indicator (Mockup) --}}
+                                            <template x-if="order.status === 'Dikirim' && order.id.includes('C819C2')">
+                                                <span class="text-[7px] font-black text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 uppercase tracking-tighter animate-pulse">⚠️ Laporan Kendala</span>
+                                            </template>
+                                        </div>
                                     </div>
                                     
                                     <button @click="openOrder(order)" 
@@ -336,6 +343,107 @@
                                      ) >= {{ $i }} ? 'text-gray-900' : 'text-slate-300'">{{ $step }}</span>
                             </div>
                             @endforeach
+                        </div>
+                    </div>
+
+                    {{-- 1.5 Receipt Verification Report (Enhanced Visibility) --}}
+                    <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_rgba(0,0,0,0.05)] overflow-hidden">
+                        <div class="bg-gray-900 px-6 py-3 flex items-center justify-between">
+                            <span class="text-[10px] font-black text-white uppercase tracking-widest italic">Laporan Penerimaan Distributor</span>
+                            <template x-if="selectedOrder?.id.includes('C819C2') && selectedOrder?.status === 'Dikirim'">
+                                <span class="bg-red-600 text-white text-[8px] font-black px-2 py-1 uppercase italic border border-white/20">Ada Kendala Dilaporkan</span>
+                            </template>
+                            <template x-if="selectedOrder?.status === 'Selesai'">
+                                <span class="bg-green-600 text-white text-[8px] font-black px-2 py-1 uppercase italic border border-white/20">Diterima Dengan Baik</span>
+                            </template>
+                        </div>
+                        
+                        <div class="p-8">
+                            <template x-if="selectedOrder?.status !== 'Selesai' && !selectedOrder?.id.includes('C819C2')">
+                                <div class="text-center py-6 border-2 border-dashed border-gray-200">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada laporan penerimaan dari distributor.</p>
+                                </div>
+                            </template>
+
+                            {{-- Mockup Report: Problem Case --}}
+                            <template x-if="selectedOrder?.id.includes('C819C2') && selectedOrder?.status === 'Dikirim'">
+                                <div class="space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div class="space-y-5">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-red-600 text-white flex items-center justify-center font-black italic border-2 border-gray-900 text-[10px]">!</div>
+                                                <p class="text-[10px] font-black text-red-600 uppercase italic">Detail Kendala Dilaporkan:</p>
+                                            </div>
+                                            <div class="bg-red-50 border-l-[6px] border-red-600 p-5 shadow-[4px_4px_0_rgba(220,38,38,0.1)]">
+                                                <p class="text-xs font-bold text-red-700 italic leading-relaxed">"Barang pecah 2 botol saat unboxing, dus penyok di bagian samping. Mohon tindak lanjutnya."</p>
+                                            </div>
+                                            <div class="flex flex-wrap gap-3">
+                                                <a :href="'https://wa.me/6281234567890?text=Halo%20Distributor%20' + selectedOrder?.name + ',%20kami%20menerima%20laporan%20kendala%20pada%20order%20' + selectedOrder?.id" target="_blank"
+                                                    class="bg-[#25D366] text-white px-5 py-3 text-[10px] font-black uppercase shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-[#1DA851] transition-all italic flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                                    Diskusi via WA
+                                                </a>
+                                                <button class="bg-gray-900 text-white px-5 py-3 text-[10px] font-black uppercase shadow-[4px_4px_0_var(--color-red-600)] hover:bg-red-600 transition-all italic">Proses Retur</button>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <p class="text-[9px] font-black text-slate-400 uppercase italic tracking-widest">Foto Bukti Kerusakan (Unboxing)</p>
+                                                <span class="text-[8px] font-bold text-red-600 uppercase">2 Foto Terlampir</span>
+                                            </div>
+                                            <div class="flex flex-wrap gap-5">
+                                                <div class="group relative w-36 h-36 bg-gray-900 border-4 border-gray-900 shadow-[6px_6px_0_var(--color-red-600)] cursor-zoom-in overflow-hidden">
+                                                    <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500 opacity-80 group-hover:opacity-100">
+                                                    <div class="absolute inset-0 bg-red-600/10 group-hover:bg-transparent transition-colors"></div>
+                                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                                        <p class="text-[8px] font-black text-white text-center uppercase tracking-widest">Lihat Foto 1</p>
+                                                    </div>
+                                                </div>
+                                                <div class="group relative w-36 h-36 bg-gray-900 border-4 border-gray-900 shadow-[6px_6px_0_var(--color-slate-200)] cursor-zoom-in overflow-hidden">
+                                                    <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover grayscale opacity-30 group-hover:opacity-100 transition-all duration-500">
+                                                    <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
+                                                        <p class="text-[9px] font-black text-white/40 group-hover:hidden uppercase leading-tight italic">Tampak<br>Samping Dus</p>
+                                                    </div>
+                                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                                        <p class="text-[8px] font-black text-white text-center uppercase tracking-widest">Lihat Foto 2</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            {{-- Mockup Report: Success Case --}}
+                            <template x-if="selectedOrder?.status === 'Selesai'">
+                                <div class="space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div class="space-y-5">
+                                            <p class="text-[9px] font-black text-green-600 uppercase italic tracking-widest">Hasil Verifikasi Fisik:</p>
+                                            <div class="grid grid-cols-1 gap-3">
+                                                <template x-for="check in ['VOLUME PCS SESUAI', 'KEMASAN UTUH & SEGEL', 'BARANG ORIGINAL PABRIK']">
+                                                    <div class="flex items-center gap-3 bg-green-50 border-l-[4px] border-green-600 p-3 shadow-[2px_2px_0_rgba(0,0,0,0.05)]">
+                                                        <div class="w-5 h-5 bg-green-600 text-white flex items-center justify-center border border-gray-900 text-[10px] italic">✓</div>
+                                                        <span class="text-[10px] font-black text-gray-900 uppercase italic" x-text="check"></span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <p class="text-[9px] font-black text-slate-400 uppercase italic tracking-widest">Foto Bukti Penerimaan:</p>
+                                            <div class="group relative w-40 h-40 bg-gray-900 border-4 border-gray-900 shadow-[8px_8px_0_var(--color-green-600)] cursor-zoom-in overflow-hidden">
+                                                <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                                                <div class="absolute bottom-0 left-0 right-0 bg-gray-900/90 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                                    <p class="text-[9px] font-black text-white text-center uppercase tracking-widest italic">Dokumentasi Distributor</p>
+                                                </div>
+                                                <div class="absolute top-3 right-3">
+                                                    <span class="bg-green-600 text-white text-[7px] font-black px-2 py-1 uppercase shadow-[2px_2px_0_rgba(0,0,0,0.3)]">Verified</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
