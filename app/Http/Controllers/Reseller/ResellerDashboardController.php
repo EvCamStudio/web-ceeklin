@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ResellerOrder;
 use App\Models\User;
 use App\Models\Pricing;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,6 +15,7 @@ class ResellerDashboardController extends Controller
 {
     public function overview()
     {
+        /** @var User $user */
         $user = Auth::user();
         $totalOrders = ResellerOrder::where('reseller_id', $user->id)->count();
         $completedOrders = ResellerOrder::where('reseller_id', $user->id)->where('status', 'Selesai')->count();
@@ -25,8 +27,8 @@ class ResellerDashboardController extends Controller
             ->get();
 
         // Target Data
-        $targetQty = \App\Models\Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
-        $targetReward = \App\Models\Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
+        $targetQty = Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
+        $targetReward = Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
         
         $currentMonthOrders = ResellerOrder::where('reseller_id', $user->id)
             ->where('status', 'Selesai')
@@ -49,6 +51,7 @@ class ResellerDashboardController extends Controller
 
     public function order()
     {
+        /** @var User $user */
         $user = Auth::user();
 
         // Security: Ensure only resellers can see this page
@@ -65,13 +68,14 @@ class ResellerDashboardController extends Controller
         
         // Define price per PCS (CeeKlin 450ml)
         // Check if there is a global price settings, or use default 20.000
-        $price = \App\Models\Pricing::where('tier', 'reseller')->first()->price ?? 15000; 
+        $price = Pricing::where('tier', 'reseller')->first()->price ?? 15000; 
 
         return view('dashboard.reseller.order', compact('user', 'upline', 'price'));
     }
 
     public function storeOrder(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         // Security: Ensure only resellers can order through this method
@@ -90,9 +94,22 @@ class ResellerDashboardController extends Controller
 
         $upline = $user->upline;
 
-        // Security: Check if distributor has enough stock
-        if ($upline->stock < $request->quantity) {
-            return back()->with('error', "Stok distributor Anda saat ini tidak mencukupi (Tersedia: {$upline->stock} PCS). Silakan hubungi distributor Anda.");
+        // Security: Check if distributor has enough "Ready Stock"
+        // Ready Stock = Physical Stock - (All active orders that haven't been completed/cancelled)
+        $activeOrdersQuantity = ResellerOrder::where('distributor_id', $upline->id)
+            ->whereNotIn('status', ['Selesai', 'Ditolak', 'Dibatalkan'])
+            ->sum('quantity');
+        
+        $readyStock = $upline->stock - $activeOrdersQuantity;
+
+        if ($readyStock < $request->quantity) {
+            $errorMessage = "Stok distributor Anda saat ini tidak mencukupi untuk pesanan baru.";
+            if ($activeOrdersQuantity > 0) {
+                $errorMessage .= " (Tersedia: {$readyStock} PCS, sedang tertahan di pesanan lain: {$activeOrdersQuantity} PCS).";
+            } else {
+                $errorMessage .= " (Tersedia: {$readyStock} PCS).";
+            }
+            return back()->with('error', $errorMessage);
         }
 
         $resellerPrice = Pricing::where('tier', 'reseller')->first()->price ?? 15000;
@@ -115,6 +132,7 @@ class ResellerDashboardController extends Controller
 
     public function history()
     {
+        /** @var User $user */
         $user = Auth::user();
         $orders = ResellerOrder::with('distributor')
             ->where('reseller_id', $user->id)
@@ -196,6 +214,7 @@ class ResellerDashboardController extends Controller
 
     public function referrals()
     {
+        /** @var User $user */
         $user = Auth::user();
         $referrals = User::where('upline_id', $user->id)->where('role', 'reseller')->get();
         
@@ -258,6 +277,7 @@ class ResellerDashboardController extends Controller
 
     public function updateProfile(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $request->validate([
             'name' => 'required|string|max:255',
@@ -290,6 +310,7 @@ class ResellerDashboardController extends Controller
 
     public function updateBank(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $request->validate([
             'bank_name' => 'required|string',

@@ -16,6 +16,9 @@
                     history: @json($history),
                     statusFilter: 'all',
                     searchQuery: '',
+                    problemNote: '',
+                    problemImage: null,
+                    problemImageUrl: null,
                     get filteredHistory() {
                         let filtered = this.history || [];
                         if (this.statusFilter !== 'all') {
@@ -33,11 +36,51 @@
                         this.viewMode = 'detail';
                         this.confirmMode = false;
                         this.checklist = { qty: false, quality: false, original: false };
+                        this.problemNote = '';
+                        this.problemImage = null;
+                        this.problemImageUrl = null;
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     },
-                    confirmReceived() {
+                    handleFileSelect(event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            this.problemImage = file;
+                            this.problemImageUrl = URL.createObjectURL(file);
+                        }
+                    },
+                    confirmReceived(customNote = null) {
+                        if (customNote) {
+                            window.dispatchEvent(new CustomEvent('ask-confirm', {
+                                detail: {
+                                    title: 'Kirim Laporan Masalah',
+                                    message: 'Apakah Anda yakin ingin mengirim laporan masalah ini ke Admin? Pesanan akan ditandai memiliki kendala.',
+                                    confirmText: 'YA, KIRIM LAPORAN',
+                                    onConfirm: () => {
+                                        this.$refs.confirmType.value = 'problem';
+                                        this.$refs.confirmNote.value = this.problemNote;
+                                        this.$refs.confirmForm.submit();
+                                    }
+                                }
+                            }));
+                            return;
+                        }
+
                         if(this.canConfirm()) {
-                            this.$refs.confirmForm.submit();
+                            window.dispatchEvent(new CustomEvent('ask-confirm', {
+                                detail: {
+                                    title: 'Konfirmasi Selesai',
+                                    message: 'Pastikan barang sudah dicek sesuai checklist. Setelah konfirmasi, stok Anda akan bertambah secara permanen.',
+                                    confirmText: 'YA, BARANG DITERIMA',
+                                    onConfirm: () => {
+                                        this.$refs.confirmType.value = 'success';
+                                        this.$refs.confirmForm.submit();
+                                    }
+                                }
+                            }));
+                        } else {
+                            window.dispatchEvent(new CustomEvent('toast', {
+                                detail: { message: 'Mohon lengkapi semua checklist verifikasi!', type: 'warning' }
+                            }));
                         }
                     },
                     canConfirm() {
@@ -49,9 +92,14 @@
                 }));
             });
         </script>
-        <form x-ref="confirmForm" action="{{ route('distributor.history.confirm') }}" method="POST" style="display: none;">
+        <form x-ref="confirmForm" action="{{ route('distributor.history.confirm') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="order_id" :value="selectedOrder?.id">
+            <input type="hidden" name="type" x-ref="confirmType" value="success">
+            <input type="hidden" name="note" x-ref="confirmNote" value="">
+            
+            {{-- Hidden file input that will be triggered by the UI --}}
+            <input type="file" name="evidence_photo" x-ref="problemFileInput" @change="handleFileSelect" class="hidden" accept="image/*">
         </form>
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4" x-show="viewMode === 'list'">
@@ -323,13 +371,27 @@
                                 </template>
                             </div>
 
-                            {{-- Photo Upload Mockup --}}
+                            {{-- Photo Upload --}}
                             <div class="space-y-4">
                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Unggah Bukti Penerimaan (Opsional):</p>
-                                <div class="bg-white border-[3px] border-dashed border-gray-300 p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-neutral-light transition-colors group relative overflow-hidden">
-                                    <svg class="w-10 h-10 text-slate-300 mb-3 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Klik untuk ambil foto / upload bukti</p>
-                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                <div @click="$refs.problemFileInput.click()" 
+                                    class="bg-white border-[3px] border-dashed border-gray-300 p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-neutral-light transition-colors group relative overflow-hidden h-48">
+                                    
+                                    <template x-if="!problemImageUrl">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-10 h-10 text-slate-300 mb-3 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Klik untuk ambil foto / upload bukti</p>
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="problemImageUrl">
+                                        <div class="absolute inset-0 p-2">
+                                            <img :src="problemImageUrl" class="w-full h-full object-cover border-2 border-primary shadow-sm">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <span class="text-white text-[10px] font-black uppercase tracking-widest">Ganti Foto</span>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                                 <p class="text-[8px] font-bold text-slate-400 uppercase leading-relaxed">Maksimal 2MB. Format: JPG, PNG.</p>
                             </div>
@@ -360,7 +422,7 @@
                             <div class="space-y-6">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-[10px] font-black text-red-600 uppercase tracking-widest italic">Detail Masalah:</label>
-                                    <textarea rows="4" placeholder="Jelaskan masalah (Barang pecah, kurang qty, salah kirim, dll)..." 
+                                    <textarea rows="4" x-model="problemNote" placeholder="Jelaskan masalah (Barang pecah, kurang qty, salah kirim, dll)..." 
                                         class="w-full bg-white border-[3px] border-red-600 p-4 font-body text-xs text-red-600 focus:outline-none focus:border-gray-900 transition-colors resize-none italic"></textarea>
                                 </div>
                                 <div class="bg-red-100 border-l-[6px] border-red-600 p-4">
@@ -372,10 +434,24 @@
 
                             <div class="space-y-4">
                                 <p class="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4 italic">Wajib Unggah Bukti Foto (Unboxing):</p>
-                                <div class="bg-white border-[3px] border-dashed border-red-300 p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-red-50 transition-colors group relative overflow-hidden">
-                                    <svg class="w-10 h-10 text-red-200 mb-3 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    <p class="text-[10px] font-bold text-red-300 uppercase tracking-widest">Klik untuk unggah bukti masalah</p>
-                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                <div @click="$refs.problemFileInput.click()" 
+                                    class="bg-white border-[3px] border-dashed border-red-300 p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-red-50 transition-colors group relative overflow-hidden h-48">
+                                    
+                                    <template x-if="!problemImageUrl">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-10 h-10 text-red-200 mb-3 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            <p class="text-[10px] font-bold text-red-300 uppercase tracking-widest">Klik untuk unggah bukti masalah</p>
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="problemImageUrl">
+                                        <div class="absolute inset-0 p-2">
+                                            <img :src="problemImageUrl" class="w-full h-full object-cover border-2 border-red-600 shadow-sm">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <span class="text-white text-[10px] font-black uppercase tracking-widest">Ganti Foto</span>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -386,7 +462,7 @@
                                 <span>Kirim Laporan Masalah</span>
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
-                            <a :href="'https://wa.me/6281234567890?text=Halo%20Admin%20CeeKlin,%20saya%20ingin%20melaporkan%20masalah%20pada%20order%20' + selectedOrder?.id" target="_blank"
+                            <a :href="'https://wa.me/6282215433606?text=Halo%20Admin%20CeeKlin,%20saya%20ingin%20melaporkan%20masalah%20pada%20order%20' + selectedOrder?.id" target="_blank"
                                 class="flex-1 bg-[#25D366] text-white py-6 font-headline font-black text-base uppercase tracking-widest shadow-[8px_8px_0_var(--color-gray-900)] hover:bg-[#1DA851] transition-all flex items-center justify-center gap-3">
                                 <span>Hubungi Admin via WA</span>
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>

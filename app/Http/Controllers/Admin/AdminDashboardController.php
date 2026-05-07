@@ -17,6 +17,8 @@ class AdminDashboardController extends Controller
         $pendingDistributorOrdersCount = \App\Models\DistributorOrder::where('status', 'Menunggu Proses')->count();
         $pendingBonusRequestsCount = \App\Models\BonusAllocation::where('status', 'pending')->count();
         
+        $distributorPrice = \App\Models\Pricing::where('tier', 'distributor')->value('price') ?? 13000;
+        
         // Provinces with active distributors
         $provincesCount = User::where('role', 'distributor')
             ->whereNotNull('province_id')
@@ -35,13 +37,13 @@ class AdminDashboardController extends Controller
             });
 
         // Fetch recent transactions from distributor orders
-        $recentTransactions = \App\Models\DistributorOrder::with('user')->latest()->take(7)->get()->map(function($order) {
+        $recentTransactions = \App\Models\DistributorOrder::with('user')->latest()->take(7)->get()->map(function($order) use ($distributorPrice) {
             return [
                 'time' => $order->created_at->diffForHumans(),
                 'name' => $order->user->name,
                 'type' => 'Distributor',
                 'qty' => $order->quantity,
-                'total' => 'Rp ' . number_format($order->quantity * 13000, 0, ',', '.'),
+                'total' => 'Rp ' . number_format($order->quantity * $distributorPrice, 0, ',', '.'),
                 'status' => strtoupper($order->status),
                 'created_at' => $order->created_at
             ];
@@ -57,6 +59,10 @@ class AdminDashboardController extends Controller
             ->get();
 
         $totalCentralStock = User::where('role', 'distributor')->sum('stock');
+        
+        // Dynamic stock percentage based on a target capacity (e.g., 50,000 bottles)
+        $nationalCapacity = \App\Models\Setting::where('key', 'national_capacity')->value('value') ?? 50000;
+        $stockPercentage = min(100, round(($totalCentralStock / $nationalCapacity) * 100));
 
         return view('dashboard.admin', compact(
             'distributorsCount',
@@ -68,7 +74,8 @@ class AdminDashboardController extends Controller
             'recentActivity',
             'recentTransactions',
             'topPerformers',
-            'totalCentralStock'
+            'totalCentralStock',
+            'stockPercentage'
         ));
     }
 
@@ -182,7 +189,9 @@ class AdminDashboardController extends Controller
 
     public function distributorOrders()
     {
-        $orders = \App\Models\DistributorOrder::with('user')->latest()->get()->map(function($order) {
+        $distributorPrice = \App\Models\Pricing::where('tier', 'distributor')->value('price') ?? 13000;
+
+        $orders = \App\Models\DistributorOrder::with('user')->latest()->get()->map(function($order) use ($distributorPrice) {
             return [
                 'id' => $order->order_number ?? ('ORD-' . $order->id),
                 'db_id' => $order->id,
@@ -193,9 +202,10 @@ class AdminDashboardController extends Controller
                 'status' => $order->status,
                 'date' => $order->created_at->translatedFormat('d M Y, H:i'),
                 'items' => 'CeeKlin 450ml (x' . number_format($order->quantity) . ')',
-                'total' => 'Rp ' . number_format($order->quantity * 13000, 0, ',', '.'),
+                'total' => 'Rp ' . number_format($order->quantity * $distributorPrice, 0, ',', '.'),
                 'method' => $order->payment_method ?? 'Manual Transfer',
                 'note' => $order->notes ?? '',
+                'evidence_photo' => $order->evidence_photo,
                 'courier_name' => $order->courier_name ?? '',
                 'tracking_number' => $order->tracking_number ?? ''
             ];
@@ -205,6 +215,7 @@ class AdminDashboardController extends Controller
             'Menunggu' => $orders->where('status', 'Menunggu Proses')->count(),
             'Dikemas' => $orders->where('status', 'Diproses')->count(),
             'Dikirim' => $orders->where('status', 'Dikirim')->count(),
+            'Masalah' => $orders->where('status', 'Masalah')->count(),
         ];
 
         return view('dashboard.admin.distributor-orders', compact('orders', 'stats'));
@@ -212,6 +223,8 @@ class AdminDashboardController extends Controller
 
     public function sales()
     {
+        $distributorPrice = \App\Models\Pricing::where('tier', 'distributor')->value('price') ?? 13000;
+
         // 1. National Trend: Sum volume by month from completed orders
         $monthlyTrend = \App\Models\DistributorOrder::where('status', 'Selesai')
             ->select(
@@ -240,16 +253,16 @@ class AdminDashboardController extends Controller
 
         // Summary Stats
         $totalVolume = \App\Models\DistributorOrder::where('status', 'Selesai')->sum('quantity');
-        $totalOmzet = $totalVolume * 13000; // Fallback price
+        $totalOmzet = $totalVolume * $distributorPrice;
         $totalTransactions = \App\Models\DistributorOrder::count();
         
         $recentTransactions = \App\Models\DistributorOrder::with('user')
             ->latest()
             ->take(10)
             ->get()
-            ->map(function($order) {
+            ->map(function($order) use ($distributorPrice) {
                 $order->invoice_number = $order->order_number;
-                $order->total_price = $order->quantity * 13000;
+                $order->total_price = $order->quantity * $distributorPrice;
                 return $order;
             });
 
@@ -287,8 +300,14 @@ class AdminDashboardController extends Controller
 
         $order = \App\Models\DistributorOrder::findOrFail($request->order_id);
         
+        // Logical Guard: Prevent modification of Finished or Cancelled orders
+        if (in_array($order->status, ['Selesai', 'Dibatalkan', 'Ditolak'])) {
+            return back()->with('error', 'Pesanan yang sudah selesai atau dibatalkan tidak dapat diubah lagi statusnya.');
+        }
+
         // If status changed to Selesai, add stock to distributor
-        if ($request->status === 'Selesai' && $order->status !== 'Selesai') {
+        if ($request->status === 'Selesai') {
+            /** @var User $distributor */
             $distributor = $order->user;
             $distributor->increment('stock', $order->quantity);
         }

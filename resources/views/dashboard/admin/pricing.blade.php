@@ -47,9 +47,10 @@
                     Standar Nasional
                 </button>
                 <button @click="viewMode = 'regional'"
-                    class="px-5 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] transition-all"
+                    class="relative px-5 py-2.5 text-[10px] font-headline font-black uppercase tracking-widest border-[3px] transition-all"
                     :class="viewMode === 'regional' ? 'bg-primary text-white border-gray-900 shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'">
                     Harga Per Wilayah
+                    <span class="absolute -top-3 -right-2 bg-secondary text-gray-900 text-[7px] px-1 py-0.5 border border-gray-900 shadow-[2px_2px_0_var(--color-primary)]">SOON</span>
                 </button>
             </div>
         </div>

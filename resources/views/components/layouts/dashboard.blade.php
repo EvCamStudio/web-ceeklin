@@ -122,18 +122,42 @@
             </div>
 
             <div class="flex items-center gap-3 md:gap-6">
-                {{-- Search (Hidden on small mobile) --}}
+                {{-- Search (Linked to page search if available) --}}
                 <div class="relative hidden sm:block border-[3px] border-primary shadow-[4px_4px_0_var(--color-primary-darkest)]">
-                    <input type="text" placeholder="Cari..." class="w-32 md:w-56 bg-white border-none px-4 py-2 font-body text-xs md:text-sm font-bold text-primary focus:ring-0 focus:outline-none">
+                    <input type="text" placeholder="Cari..." 
+                        @keydown.enter="$dispatch('global-search', $el.value)"
+                        class="w-32 md:w-56 bg-white border-none px-4 py-2 font-body text-xs md:text-sm font-bold text-primary focus:ring-0 focus:outline-none">
                 </div>
 
                 {{-- Notif + Avatar --}}
                 <div class="flex items-center gap-3 md:gap-5 text-primary">
-                    <button class="hover:text-secondary transition-colors" aria-label="Notifikasi">
+                    <button class="hover:text-secondary transition-colors" aria-label="Notifikasi" @click="$dispatch('notify', { message: 'Belum ada notifikasi baru', type: 'info' })">
                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     </button>
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-primary border-[2px] md:border-[3px] border-gray-900 text-white flex items-center justify-center font-headline font-black text-xs md:text-base shadow-[3px_3px_0_var(--color-gray-900)]">
-                        A
+                    
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="w-8 h-8 md:w-10 md:h-10 bg-primary border-[2px] md:border-[3px] border-gray-900 text-white flex items-center justify-center font-headline font-black text-xs md:text-base shadow-[3px_3px_0_var(--color-gray-900)] hover:bg-primary-hover transition-all active:translate-y-0.5 active:shadow-none">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </button>
+                        
+                        {{-- Profile Dropdown --}}
+                        <div x-show="open" @click.away="open = false" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="absolute right-0 mt-3 w-48 bg-white border-[3px] border-gray-900 shadow-[6px_6px_0_var(--color-primary)] z-[150] overflow-hidden">
+                            <div class="px-4 py-3 border-b-2 border-neutral-light bg-neutral-light">
+                                <p class="text-[10px] font-black uppercase text-slate-400">Login Sebagai</p>
+                                <p class="text-xs font-bold text-primary truncate">{{ Auth::user()->name }}</p>
+                            </div>
+                            <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-[10px] font-black uppercase hover:bg-neutral-light border-b-2 border-neutral-light transition-colors tracking-widest">Pengaturan Akun</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left block px-4 py-3 text-[10px] font-black uppercase text-red-600 hover:bg-red-50 transition-colors tracking-widest italic">
+                                    Keluar Sesi
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,33 +171,93 @@
         </main>
     </div>
 
-    {{-- Global Toast Notifications --}}
-    <div class="fixed top-6 right-6 z-[200] flex flex-col gap-4 pointer-events-none">
-        @if(session('success'))
-            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
-                <x-ui.toast type="success" :message="session('success')" />
+    {{-- Global Toast Notifications & Confirmation --}}
+    <div class="fixed top-6 right-6 z-[250] flex flex-col gap-4 pointer-events-none" 
+         x-data="{ 
+            toasts: [],
+            addToast(message, type = 'success') {
+                const id = Date.now();
+                this.toasts.push({ id, message, type });
+                setTimeout(() => {
+                    this.toasts = this.toasts.filter(t => t.id !== id);
+                }, 5000);
+            }
+         }"
+         @notify.window="addToast($event.detail.message, $event.detail.type || 'success')"
+         @toast.window="addToast($event.detail.message, $event.detail.type || 'success')">
+        
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-data="{ show: true }" x-show="show" x-init="$nextTick(() => { })" x-transition>
+                <x-ui.toast x-bind:type="toast.type" x-bind:message="toast.message" />
             </div>
+        </template>
+
+        @if(session('success'))
+            <x-ui.toast type="success" :message="session('success')" />
         @endif
 
         @if(session('error'))
-            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
-                <x-ui.toast type="error" :message="session('error')" />
-            </div>
+            <x-ui.toast type="error" :message="session('error')" />
         @endif
 
         @if(session('warning'))
-            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
-                <x-ui.toast type="warning" :message="session('warning')" />
-            </div>
+            <x-ui.toast type="warning" :message="session('warning')" />
         @endif
 
         @if($errors->any())
-            <div class="pointer-events-auto" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)" x-transition>
-                <x-ui.toast type="error" message="Ada kesalahan pada input Anda. Silakan periksa kembali." />
-            </div>
+            <x-ui.toast type="error" message="Ada kesalahan pada input Anda. Silakan periksa kembali." />
         @endif
     </div>
 </div>
+    {{-- Global Confirmation Modal --}}
+    <div x-data="{ 
+            show: false, 
+            title: '', 
+            message: '', 
+            onConfirm: null,
+            confirmText: 'YA, LANJUTKAN',
+            cancelText: 'BATAL'
+         }"
+         @ask-confirm.window="
+            show = true; 
+            title = $event.detail.title || 'Konfirmasi Tindakan';
+            message = $event.detail.message || 'Apakah Anda yakin ingin melakukan tindakan ini?';
+            onConfirm = $event.detail.onConfirm;
+            confirmText = $event.detail.confirmText || 'YA, LANJUTKAN';
+            cancelText = $event.detail.cancelText || 'BATAL';
+         "
+         x-show="show"
+         style="display: none;"
+         class="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm">
+        
+        <div x-show="show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-90 translate-y-10"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             class="bg-white border-[4px] border-gray-900 shadow-[16px_16px_0_rgba(0,0,0,0.2)] max-w-md w-full overflow-hidden">
+            
+            <div class="bg-primary p-6 border-b-[4px] border-gray-900 flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/20 border-2 border-white/30 flex items-center justify-center text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <h3 class="font-headline font-black text-xl text-white uppercase tracking-tighter italic" x-text="title"></h3>
+            </div>
+            
+            <div class="p-8">
+                <p class="text-sm font-bold text-gray-600 leading-relaxed uppercase tracking-wider" x-text="message"></p>
+                
+                <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    <button @click="show = false; if(onConfirm) onConfirm()" 
+                            class="flex-1 bg-primary text-white py-4 font-headline font-black text-xs uppercase tracking-[0.2em] border-[3px] border-gray-900 shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all"
+                            x-text="confirmText"></button>
+                    
+                    <button @click="show = false" 
+                            class="flex-1 bg-white text-gray-900 py-4 font-headline font-black text-xs uppercase tracking-[0.2em] border-[3px] border-gray-900 shadow-[4px_4px_0_rgba(0,0,0,0.1)] hover:bg-neutral-light active:translate-y-1 active:shadow-none transition-all"
+                            x-text="cancelText"></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

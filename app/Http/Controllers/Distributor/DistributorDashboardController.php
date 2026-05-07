@@ -8,12 +8,14 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ResellerOrder;
 use App\Models\DistributorOrder;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 
 class DistributorDashboardController extends Controller
 {
     public function overview()
     {
+        /** @var User $user */
         $user = Auth::user();
         $resellersCount = User::where('upline_id', $user->id)->count();
         $pendingOrdersCount = ResellerOrder::where('distributor_id', $user->id)
@@ -55,16 +57,15 @@ class DistributorDashboardController extends Controller
 
     public function inventory()
     {
+        /** @var User $user */
         $user = Auth::user();
         
         // Stock physical = total in system
         $physicalStock = $user->stock;
         
-        // Stock hold = orders paid/processed but not yet finished (if we subtract on finish)
-        // Or if we subtract on paid, hold is orders processed but not finished.
-        // Actually, let's define hold as orders with status 'Menunggu' and 'Diproses'
+        // Stock hold = orders that are active but not yet finished/cancelled
         $holdStock = ResellerOrder::where('distributor_id', $user->id)
-            ->whereIn('status', ['Menunggu Konfirmasi', 'Menunggu Proses', 'Diproses', 'Dikemas', 'Dikirim', 'Menunggu'])
+            ->whereNotIn('status', ['Selesai', 'Ditolak', 'Dibatalkan'])
             ->sum('quantity');
         
         $readyStock = $physicalStock - $holdStock;
@@ -121,6 +122,7 @@ class DistributorDashboardController extends Controller
                 $q->where('status', 'Selesai')->latest()->limit(1);
             }])
             ->get()
+            /** @param User $reseller */
             ->map(function($reseller) {
                 $lastOrder = $reseller->resellerOrders->first();
                 
@@ -233,6 +235,7 @@ class DistributorDashboardController extends Controller
 
     public function history()
     {
+        /** @var User $user */
         $user = Auth::user();
         
         // Purchase History (from Factory/Admin)
@@ -250,6 +253,7 @@ class DistributorDashboardController extends Controller
                     'Selesai'             => 'border-green-600 text-green-700 bg-green-50',
                     'Dibatalkan'          => 'border-gray-400 text-gray-500 bg-gray-50',
                     'Ditolak'             => 'border-gray-400 text-gray-500 bg-gray-50',
+                    'Masalah'             => 'border-red-600 text-red-600 bg-red-50',
                 ];
 
                 $statusLabels = [
@@ -260,6 +264,7 @@ class DistributorDashboardController extends Controller
                     'Selesai' => 'Selesai',
                     'Dibatalkan' => 'Dibatalkan',
                     'Ditolak' => 'Dibatalkan',
+                    'Masalah' => 'Masalah',
                 ];
 
                 $leftBorders = [
@@ -317,7 +322,10 @@ class DistributorDashboardController extends Controller
     public function confirmReceived(Request $request)
     {
         $request->validate([
-            'order_id' => 'required'
+            'order_id' => 'required',
+            'type' => 'required|in:success,problem',
+            'note' => 'nullable|string',
+            'evidence_photo' => 'nullable|image|max:2048'
         ]);
 
         $order = DistributorOrder::where('order_number', $request->order_id)
@@ -328,7 +336,23 @@ class DistributorDashboardController extends Controller
             return back()->with('error', 'Pesanan ini sudah selesai.');
         }
 
-        // Update status and increment stock
+        if ($request->type === 'problem') {
+            $updateData = [
+                'status' => 'Masalah',
+                'notes' => $request->note ?? $order->notes
+            ];
+
+            if ($request->hasFile('evidence_photo')) {
+                $path = $request->file('evidence_photo')->store('evidence', 'public');
+                $updateData['evidence_photo'] = $path;
+            }
+
+            $order->update($updateData);
+
+            return back()->with('success', 'Laporan masalah telah dikirim ke Admin. Mohon tunggu tindak lanjut.');
+        }
+
+        // Default: Success path
         $order->update(['status' => 'Selesai']);
         
         $user = Auth::user();
@@ -339,6 +363,7 @@ class DistributorDashboardController extends Controller
 
     public function settings()
     {
+        /** @var User $user */
         $user = Auth::user();
         return view('dashboard.distributor.settings', compact('user'));
     }
@@ -356,6 +381,7 @@ class DistributorDashboardController extends Controller
             ->where('distributor_id', Auth::id())
             ->firstOrFail();
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Prevent update if already Selesai or Ditolak (to avoid double stock deduction etc)
@@ -373,11 +399,11 @@ class DistributorDashboardController extends Controller
 
             // Bonus Target Calculation Logic
             $reseller = $order->reseller;
-            $targetQty = \App\Models\Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
-            $targetReward = \App\Models\Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
+            $targetQty = Setting::where('key', 'monthly_target_qty')->value('value') ?? 1000;
+            $targetReward = Setting::where('key', 'monthly_target_reward')->value('value') ?? 2500000;
 
             // Get total volume for this month (including this order)
-            $monthlyVolume = \App\Models\ResellerOrder::where('reseller_id', $reseller->id)
+            $monthlyVolume = ResellerOrder::where('reseller_id', $reseller->id)
                 ->where('status', 'Selesai')
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
@@ -461,6 +487,7 @@ class DistributorDashboardController extends Controller
 
     public function updateProfile(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $request->validate([
             'name' => 'required|string|max:255',
@@ -490,6 +517,7 @@ class DistributorDashboardController extends Controller
 
     public function updateBank(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $request->validate([
             'bank_name' => 'required|string|max:255',

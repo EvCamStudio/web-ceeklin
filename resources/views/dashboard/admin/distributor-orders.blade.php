@@ -107,7 +107,9 @@
             
             return 'https://wa.me/' + (phone.startsWith('0') ? '62' + phone.substring(1) : phone) + '?text=' + encodeURIComponent(msg);
         }
-    }">
+    }" 
+    @global-search.window="searchQuery = $event.detail; currentPage = 1"
+    @notify.window="$dispatch('toast', { message: $event.detail.message, type: $event.detail.type || 'info' })">
         {{-- ========================= --}}
         {{-- VIEW: LIST PESANAN MASUK --}}
         {{-- ========================= --}}
@@ -126,7 +128,7 @@
                     </p>
                 </div>
                 
-                <div class="lg:col-span-5 grid grid-cols-3 gap-4">
+                <div class="lg:col-span-5 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_var(--color-primary-darkest)]">
                         <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Menunggu</p>
                         <p class="font-headline font-black text-2xl text-primary leading-none">{{ sprintf('%02d', $stats['Menunggu']) }}</p>
@@ -138,6 +140,10 @@
                     <div class="bg-primary border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_var(--color-gray-900)]">
                         <p class="text-[8px] font-black text-white/50 uppercase tracking-widest mb-1 italic">Dikirim</p>
                         <p class="font-headline font-black text-2xl text-white leading-none">{{ sprintf('%02d', $stats['Dikirim']) }}</p>
+                    </div>
+                    <div class="bg-red-600 border-[3px] border-gray-900 p-4 shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
+                        <p class="text-[8px] font-black text-white/50 uppercase tracking-widest mb-1 italic">Kendala</p>
+                        <p class="font-headline font-black text-2xl text-white leading-none">{{ sprintf('%02d', $stats['Masalah']) }}</p>
                     </div>
                 </div>
             </div>
@@ -160,6 +166,7 @@
                                 <option value="Diproses">Dikemas</option>
                                 <option value="Dikirim">Dikirim</option>
                                 <option value="Selesai">Selesai</option>
+                                <option value="Masalah">Kendala</option>
                                 <option value="Dibatalkan">Dibatalkan</option>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
@@ -170,7 +177,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Update Terakhir: {{ now()->format('H:i') }}</span>
-                    <button class="bg-primary text-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all">Export Laporan</button>
+                    <button @click="window.print()" class="bg-primary text-white border-[3px] border-gray-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_var(--color-primary-darkest)] hover:bg-primary-hover active:translate-y-1 active:shadow-none transition-all">Export Laporan</button>
                 </div>
             </div>
 
@@ -220,11 +227,12 @@
                                                     'border-yellow-500 text-yellow-800 bg-yellow-50': ['Diproses', 'Dikemas'].includes(order.status),
                                                     'border-blue-500 text-blue-700 bg-blue-50': order.status === 'Dikirim',
                                                     'border-green-600 text-green-700 bg-green-50': order.status === 'Selesai',
+                                                    'border-red-600 text-red-700 bg-red-50 font-black animate-pulse': order.status === 'Masalah',
                                                     'border-slate-400 text-slate-500 bg-slate-50': ['Dibatalkan', 'Ditolak'].includes(order.status)
-                                                }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Dibatalkan', 'Ditolak'].includes(order.status) ? 'Dibatalkan' : order.status))"></span>
+                                                }" x-text="['Menunggu Proses', 'Menunggu'].includes(order.status) ? 'Menunggu' : (['Diproses', 'Dikemas'].includes(order.status) ? 'Dikemas' : (['Dibatalkan', 'Ditolak'].includes(order.status) ? 'Dibatalkan' : (order.status === 'Masalah' ? 'KENDALA' : order.status)))"></span>
                                             
-                                            {{-- Problem Indicator (Mockup) --}}
-                                            <template x-if="order.status === 'Dikirim' && order.id.includes('C819C2')">
+                                            {{-- Problem Indicator --}}
+                                            <template x-if="order.status === 'Masalah'">
                                                 <span class="text-[7px] font-black text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 uppercase tracking-tighter animate-pulse">⚠️ Laporan Kendala</span>
                                             </template>
                                         </div>
@@ -289,7 +297,7 @@
                 </div>
 
                 <div class="flex gap-4 w-full lg:w-auto">
-                    <button class="flex-1 lg:flex-none bg-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-light transition-all shadow-[4px_4px_0_var(--color-gray-900)]">Cetak Surat Jalan</button>
+                    <button @click="window.print()" class="flex-1 lg:flex-none bg-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-light transition-all shadow-[4px_4px_0_var(--color-gray-900)]">Cetak Surat Jalan</button>
                     <a :href="getWaLink()" target="_blank" class="flex-1 lg:flex-none bg-[#25D366] text-white border-[3px] border-gray-900 px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#1DA851] shadow-[4px_4px_0_var(--color-gray-900)] transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                         <span>WhatsApp Distributor</span>
@@ -350,7 +358,7 @@
                     <div class="bg-white border-[4px] border-gray-900 shadow-[10px_10px_0_rgba(0,0,0,0.05)] overflow-hidden">
                         <div class="bg-gray-900 px-6 py-3 flex items-center justify-between">
                             <span class="text-[10px] font-black text-white uppercase tracking-widest italic">Laporan Penerimaan Distributor</span>
-                            <template x-if="selectedOrder?.id.includes('C819C2') && selectedOrder?.status === 'Dikirim'">
+                            <template x-if="selectedOrder?.status === 'Masalah'">
                                 <span class="bg-red-600 text-white text-[8px] font-black px-2 py-1 uppercase italic border border-white/20">Ada Kendala Dilaporkan</span>
                             </template>
                             <template x-if="selectedOrder?.status === 'Selesai'">
@@ -359,14 +367,14 @@
                         </div>
                         
                         <div class="p-8">
-                            <template x-if="selectedOrder?.status !== 'Selesai' && !selectedOrder?.id.includes('C819C2')">
+                            <template x-if="selectedOrder?.status !== 'Selesai' && selectedOrder?.status !== 'Masalah'">
                                 <div class="text-center py-6 border-2 border-dashed border-gray-200">
                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Belum ada laporan penerimaan dari distributor.</p>
                                 </div>
                             </template>
 
-                            {{-- Mockup Report: Problem Case --}}
-                            <template x-if="selectedOrder?.id.includes('C819C2') && selectedOrder?.status === 'Dikirim'">
+                            {{-- Real Report: Problem Case --}}
+                            <template x-if="selectedOrder?.status === 'Masalah'">
                                 <div class="space-y-6">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                         <div class="space-y-5">
@@ -375,15 +383,23 @@
                                                 <p class="text-[10px] font-black text-red-600 uppercase italic">Detail Kendala Dilaporkan:</p>
                                             </div>
                                             <div class="bg-red-50 border-l-[6px] border-red-600 p-5 shadow-[4px_4px_0_rgba(220,38,38,0.1)]">
-                                                <p class="text-xs font-bold text-red-700 italic leading-relaxed">"Barang pecah 2 botol saat unboxing, dus penyok di bagian samping. Mohon tindak lanjutnya."</p>
+                                                <p class="text-xs font-bold text-red-700 italic leading-relaxed" x-text="'“' + (selectedOrder?.note || 'Tidak ada deskripsi') + '”'"></p>
                                             </div>
                                             <div class="flex flex-wrap gap-3">
-                                                <a :href="'https://wa.me/6281234567890?text=Halo%20Distributor%20' + selectedOrder?.name + ',%20kami%20menerima%20laporan%20kendala%20pada%20order%20' + selectedOrder?.id" target="_blank"
+                                                <a :href="'https://wa.me/' + (selectedOrder?.phone || '').replace(/\D/g, '').replace(/^0/, '62') + '?text=' + encodeURIComponent('Halo Distributor ' + selectedOrder?.name + ', kami menerima laporan kendala pada order ' + selectedOrder?.id + '. Mohon informasinya lebih lanjut.')" target="_blank"
                                                     class="bg-[#25D366] text-white px-5 py-3 text-[10px] font-black uppercase shadow-[4px_4px_0_var(--color-gray-900)] hover:bg-[#1DA851] transition-all italic flex items-center gap-2">
                                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                                                     Diskusi via WA
                                                 </a>
-                                                <button class="bg-gray-900 text-white px-5 py-3 text-[10px] font-black uppercase shadow-[4px_4px_0_var(--color-red-600)] hover:bg-red-600 transition-all italic">Proses Retur</button>
+                                                <button @click="$dispatch('ask-confirm', { 
+                                                    title: 'Konfirmasi Retur',
+                                                    message: 'Apakah Anda yakin ingin memproses retur untuk pesanan ini? Status akan dikembalikan ke tahap pengemasan.',
+                                                    confirmText: 'YA, PROSES RETUR',
+                                                    onConfirm: () => { 
+                                                        newStatus = 'Dikemas'; 
+                                                        $nextTick(() => document.getElementById('adminStatusUpdateForm').submit()); 
+                                                    }
+                                                })" class="bg-gray-900 text-white px-5 py-3 text-[10px] font-black uppercase shadow-[4px_4px_0_var(--color-red-600)] hover:bg-red-600 transition-all italic">Proses Retur</button>
                                             </div>
                                         </div>
                                         <div class="space-y-4">
@@ -392,22 +408,20 @@
                                                 <span class="text-[8px] font-bold text-red-600 uppercase">2 Foto Terlampir</span>
                                             </div>
                                             <div class="flex flex-wrap gap-5">
-                                                <div class="group relative w-36 h-36 bg-gray-900 border-4 border-gray-900 shadow-[6px_6px_0_var(--color-red-600)] cursor-zoom-in overflow-hidden">
-                                                    <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500 opacity-80 group-hover:opacity-100">
-                                                    <div class="absolute inset-0 bg-red-600/10 group-hover:bg-transparent transition-colors"></div>
-                                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                                        <p class="text-[8px] font-black text-white text-center uppercase tracking-widest">Lihat Foto 1</p>
+                                                <template x-if="selectedOrder?.evidence_photo">
+                                                    <div class="group relative w-36 h-36 bg-gray-900 border-4 border-gray-900 shadow-[6px_6px_0_var(--color-red-600)] cursor-zoom-in overflow-hidden">
+                                                        <img :src="'/storage/' + selectedOrder.evidence_photo" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500 opacity-80 group-hover:opacity-100">
+                                                        <div class="absolute inset-0 bg-red-600/10 group-hover:bg-transparent transition-colors"></div>
+                                                        <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                                            <p class="text-[8px] font-black text-white text-center uppercase tracking-widest">Lihat Bukti Foto</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="group relative w-36 h-36 bg-gray-900 border-4 border-gray-900 shadow-[6px_6px_0_var(--color-slate-200)] cursor-zoom-in overflow-hidden">
-                                                    <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover grayscale opacity-30 group-hover:opacity-100 transition-all duration-500">
-                                                    <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
-                                                        <p class="text-[9px] font-black text-white/40 group-hover:hidden uppercase leading-tight italic">Tampak<br>Samping Dus</p>
+                                                </template>
+                                                <template x-if="!selectedOrder?.evidence_photo">
+                                                    <div class="w-36 h-36 bg-gray-100 border-4 border-dashed border-gray-300 flex items-center justify-center text-center p-4">
+                                                        <p class="text-[8px] font-bold text-slate-400 uppercase">Tidak ada foto bukti</p>
                                                     </div>
-                                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                                        <p class="text-[8px] font-black text-white text-center uppercase tracking-widest">Lihat Foto 2</p>
-                                                    </div>
-                                                </div>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
@@ -430,16 +444,22 @@
                                             </div>
                                         </div>
                                         <div class="space-y-4">
-                                            <p class="text-[9px] font-black text-slate-400 uppercase italic tracking-widest">Foto Bukti Penerimaan:</p>
-                                            <div class="group relative w-40 h-40 bg-gray-900 border-4 border-gray-900 shadow-[8px_8px_0_var(--color-green-600)] cursor-zoom-in overflow-hidden">
-                                                <img src="/images/hero-bottle.jpeg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                                                <div class="absolute bottom-0 left-0 right-0 bg-gray-900/90 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                                    <p class="text-[9px] font-black text-white text-center uppercase tracking-widest italic">Dokumentasi Distributor</p>
+                                            <template x-if="selectedOrder?.evidence_photo">
+                                                <div class="group relative w-40 h-40 bg-gray-900 border-4 border-gray-900 shadow-[8px_8px_0_var(--color-green-600)] cursor-zoom-in overflow-hidden">
+                                                    <img :src="'/storage/' + selectedOrder.evidence_photo" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                                                    <div class="absolute bottom-0 left-0 right-0 bg-gray-900/90 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                                        <p class="text-[9px] font-black text-white text-center uppercase tracking-widest italic">Dokumentasi Distributor</p>
+                                                    </div>
+                                                    <div class="absolute top-3 right-3">
+                                                        <span class="bg-green-600 text-white text-[7px] font-black px-2 py-1 uppercase shadow-[2px_2px_0_rgba(0,0,0,0.3)]">Verified</span>
+                                                    </div>
                                                 </div>
-                                                <div class="absolute top-3 right-3">
-                                                    <span class="bg-green-600 text-white text-[7px] font-black px-2 py-1 uppercase shadow-[2px_2px_0_rgba(0,0,0,0.3)]">Verified</span>
+                                            </template>
+                                            <template x-if="!selectedOrder?.evidence_photo">
+                                                <div class="w-40 h-40 bg-gray-100 border-4 border-dashed border-gray-300 flex items-center justify-center text-center p-4">
+                                                    <p class="text-[8px] font-bold text-slate-400 uppercase">Tidak ada foto bukti</p>
                                                 </div>
-                                            </div>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -561,8 +581,8 @@
                         
                         <div class="p-8">
                             {{-- Action State: Normal --}}
-                            <div x-show="!forceCompleteMode" class="space-y-8">
-                                <form action="{{ route('admin.distributor-orders.update-status') }}" method="POST" class="space-y-8" novalidate @submit.prevent="if(validate('update')) $el.submit()">
+                            <div x-show="!forceCompleteMode && !cancelMode" class="space-y-8">
+                                <form id="adminStatusUpdateForm" action="{{ route('admin.distributor-orders.update-status') }}" method="POST" class="space-y-8" novalidate @submit.prevent="if(validate('update')) $el.submit()">
                                     @csrf
                                     <input type="hidden" name="order_id" :value="selectedOrder?.db_id">
                                     <input type="hidden" name="status" :value="newStatus === 'Menunggu' ? 'Menunggu Proses' : (newStatus === 'Dikemas' ? 'Diproses' : newStatus)">
@@ -572,12 +592,12 @@
                                         
                                         {{-- Custom Radio Group for Status --}}
                                         <div class="flex flex-col gap-3">
-                                            <template x-for="status in ['Menunggu', 'Dikemas', 'Dikirim']">
+                                            <template x-for="status in (selectedOrder?.status === 'Masalah' ? ['Masalah', 'Selesai'] : ['Menunggu', 'Dikemas', 'Dikirim'])">
                                                 <button type="button" @click="newStatus = status; errors = {}"
-                                                        :disabled="selectedOrder?.status === 'Selesai'"
+                                                        :disabled="selectedOrder?.status === 'Selesai' || (selectedOrder?.status === 'Masalah' && status === 'Masalah')"
                                                         :class="newStatus === status ? 'bg-primary text-white border-gray-900 shadow-[4px_4px_0_var(--color-gray-900)]' : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
                                                         class="w-full px-5 py-4 border-[3px] font-headline font-black text-[11px] uppercase tracking-widest text-left transition-all flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed">
-                                                    <span x-text="status"></span>
+                                                    <span x-text="status === 'Masalah' ? 'DALAM KENDALA (LOCK)' : status"></span>
                                                     <div :class="newStatus === status ? 'bg-white border-gray-900 text-primary' : 'bg-gray-50 border-gray-300 text-transparent'" class="w-6 h-6 border-[2px] flex items-center justify-center transition-all duration-300">
                                                         <svg class="w-4 h-4 transition-all duration-300" :class="newStatus === status ? 'scale-100 opacity-100' : 'scale-50 opacity-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
                                                     </div>
@@ -593,13 +613,19 @@
                                         <div class="space-y-3">
                                             <div class="space-y-1 relative">
                                                 <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest">No. Resi / Surat Jalan</label>
-                                                <input type="text" name="tracking_number" :value="selectedOrder?.tracking_number" @input="delete errors.tracking_number" placeholder="Masukkan Nomor Resi Valid"
+                                                <input type="text" name="tracking_number" x-model="selectedOrder.tracking_number" @input="delete errors.tracking_number" placeholder="Masukkan Nomor Resi Valid"
                                                     class="w-full bg-white border-2 border-gray-900 px-3 py-2 text-[11px] font-bold uppercase tracking-widest font-mono focus:border-primary focus:outline-none transition-all placeholder:text-slate-300">
                                                 <template x-if="errors.tracking_number">
                                                     <p class="text-[9px] font-black text-red-500 uppercase tracking-widest mt-1" x-text="errors.tracking_number"></p>
                                                 </template>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {{-- Admin Resolution Note --}}
+                                    <div class="space-y-2">
+                                        <label class="text-[9px] font-black text-slate-400 uppercase italic">Catatan Admin / Resolusi:</label>
+                                        <textarea name="note" rows="2" class="w-full bg-neutral-light border-[3px] border-gray-300 p-4 font-bold text-gray-900 text-[10px] focus:outline-none focus:border-primary transition-all resize-none uppercase" placeholder="Masukkan catatan atau alasan update status..."></textarea>
                                     </div>
 
                                     <div class="pt-8 mt-8 border-t-[4px] border-gray-100 space-y-6">

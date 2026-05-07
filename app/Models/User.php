@@ -10,6 +10,33 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $username
+ * @property string $email
+ * @property string $password
+ * @property string $role
+ * @property string $status
+ * @property string $phone
+ * @property string $nik
+ * @property string $ktp_photo
+ * @property string $address
+ * @property string|null $province_id
+ * @property string|null $city_id
+ * @property string|null $district_id
+ * @property string|null $bank_name
+ * @property string|null $bank_account_name
+ * @property string|null $bank_account_number
+ * @property string|null $referral_code
+ * @property int|null $upline_id
+ * @property string|null $reject_reason
+ * @property int $stock
+ * @property-read \Illuminate\Support\Carbon|null $created_at
+ * @property-read \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $upline
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ResellerOrder[] $resellerOrders
+ */
 #[Fillable([
     'name',
     'username',

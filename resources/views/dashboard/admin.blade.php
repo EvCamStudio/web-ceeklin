@@ -221,7 +221,7 @@
                         <span class="text-[10px] font-bold text-slate-400 uppercase italic pb-1">Botol Beredar</span>
                     </div>
                     <div class="w-full h-3 bg-neutral-light border-2 border-gray-900 overflow-hidden">
-                        <div class="h-full bg-primary w-[75%] border-r-2 border-gray-900"></div>
+                        <div class="h-full bg-primary border-r-2 border-gray-900 transition-all duration-1000" style="width: {{ $stockPercentage }}%"></div>
                     </div>
                     <p class="text-[9px] font-bold text-slate-500 mt-3 uppercase italic">*Akumulasi stok di seluruh distributor resmi</p>
                 </div>
